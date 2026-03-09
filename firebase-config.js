@@ -24,3 +24,5 @@ try {
 const db = firebase.firestore();
 const storage = firebase.storage();
 const productsCollection = db.collection('products');
+const ordersCollection = db.collection('orders');
+const customersCollection = db.collection('customers');

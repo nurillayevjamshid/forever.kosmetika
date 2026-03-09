@@ -720,77 +720,147 @@ async function submitOrder(event, isPage = false) {
     const BOT_TOKEN = window.TELEGRAM_CONFIG?.BOT_TOKEN;
     const CHAT_ID = window.TELEGRAM_CONFIG?.CHAT_ID;
 
-    if (!BOT_TOKEN || !CHAT_ID) {
-        alert('❌ Telegram bot sozlanmagan! telegram-config.js faylini tekshiring.');
-        return;
-    }
-
-    // Create order message
-    let message = `🔔 *YANGI BUYURTMA*\n\n`;
-    message += `👤 *Mijoz:* ${name}\n`;
-    message += `📞 *Telefon:* ${phone}\n`;
-    message += `📍 *Manzil:* ${viloyat}, ${tuman}\n`;
-    message += `\n📦 *Mahsulotlar:*\n`;
-    message += `━━━━━━━━━━━━━━━━\n`;
-
-    cart.forEach((item, index) => {
-        message += `${index + 1}. *${item.name}*\n`;
-        message += `   Soni: ${item.quantity} ta\n`;
-        message += `   Narxi: ${formatPrice(item.price * item.quantity)} so'm\n\n`;
-    });
-
-    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    message += `━━━━━━━━━━━━━━━━\n`;
-    message += `💰 *JAMI: ${formatPrice(total)} so'm*\n\n`;
-    message += `📅 Sana: ${new Date().toLocaleString('uz-UZ')}`;
-
     // Show loading state
     const submitBtn = event.target.querySelector('button[type="submit"]');
     const originalBtnText = submitBtn.textContent;
     submitBtn.disabled = true;
     submitBtn.textContent = 'Yuborilmoqda...';
 
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
     try {
-        const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                chat_id: CHAT_ID,
-                text: message,
-                parse_mode: 'Markdown'
-            })
-        });
+        // ============================
+        // 1. FIREBASE: Buyurtmani saqlash (orders)
+        // ============================
+        let orderResult = null;
+        if (typeof firebaseSaveOrder === 'function') {
+            orderResult = await firebaseSaveOrder({
+                customerName: name,
+                customerPhone: phone,
+                customerAddress: `${viloyat}, ${tuman}`,
+                viloyat: viloyat,
+                tuman: tuman,
+                items: cart,
+                totalAmount: total
+            });
+            console.log('📋 Buyurtma Firebase ga saqlandi:', orderResult);
+        }
 
-        const data = await response.json();
+        // ============================
+        // 2. FIREBASE: Mijozni saqlash (customers)
+        // ============================
+        if (typeof firebaseSaveCustomer === 'function') {
+            const customerResult = await firebaseSaveCustomer({
+                name: name,
+                phone: phone,
+                address: `${viloyat}, ${tuman}`,
+                viloyat: viloyat,
+                tuman: tuman,
+                orderAmount: total,
+                orderNumber: orderResult?.orderNumber || '',
+                orderItems: cart.map(item => ({
+                    name: item.name,
+                    quantity: item.quantity,
+                    price: item.price,
+                    total: item.price * item.quantity
+                }))
+            });
+            console.log('👤 Mijoz Firebase ga saqlandi:', customerResult);
+        }
 
-        if (data.ok) {
-            // Success
+        // ============================
+        // 3. TELEGRAM: Guruhga xabar yuborish
+        // ============================
+        let telegramSuccess = false;
+        if (BOT_TOKEN && CHAT_ID) {
+            let message = `🔔 *YANGI BUYURTMA*\n\n`;
+            if (orderResult?.orderNumber) {
+                message += `🔢 *Buyurtma №:* ${orderResult.orderNumber}\n`;
+            }
+            message += `👤 *Mijoz:* ${name}\n`;
+            message += `📞 *Telefon:* ${phone}\n`;
+            message += `📍 *Manzil:* ${viloyat}, ${tuman}\n`;
+            message += `\n📦 *Mahsulotlar:*\n`;
+            message += `━━━━━━━━━━━━━━━━\n`;
+
+            cart.forEach((item, index) => {
+                message += `${index + 1}. *${item.name}*\n`;
+                message += `   Soni: ${item.quantity} ta\n`;
+                message += `   Narxi: ${formatPrice(item.price * item.quantity)} so'm\n\n`;
+            });
+
+            message += `━━━━━━━━━━━━━━━━\n`;
+            message += `💰 *JAMI: ${formatPrice(total)} so'm*\n\n`;
+            message += `📅 Sana: ${new Date().toLocaleString('uz-UZ')}`;
+
+            try {
+                const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chat_id: CHAT_ID,
+                        text: message,
+                        parse_mode: 'Markdown'
+                    })
+                });
+
+                const data = await response.json();
+                telegramSuccess = data.ok;
+                if (!data.ok) {
+                    console.error('Telegram xatolik:', data);
+                }
+            } catch (telegramError) {
+                console.error('Telegram yuborishda xatolik:', telegramError);
+            }
+        }
+
+        // ============================
+        // 4. NATIJA: Muvaffaqiyat
+        // ============================
+        if (orderResult || telegramSuccess) {
+            // Savatni tozalash
             cart = [];
             localStorage.setItem('cart', JSON.stringify(cart));
             updateCartCount();
 
             if (isPage) {
+                // Success sahifasida buyurtma raqamini ko'rsatish
+                const successContent = document.querySelector('.success-page-content');
+                if (successContent && orderResult?.orderNumber) {
+                    const orderNumEl = successContent.querySelector('.order-number-display');
+                    if (orderNumEl) {
+                        orderNumEl.textContent = orderResult.orderNumber;
+                    } else {
+                        const h2 = successContent.querySelector('h2');
+                        if (h2) {
+                            const numSpan = document.createElement('p');
+                            numSpan.className = 'order-number-display';
+                            numSpan.style.cssText = 'font-size: 1.1rem; color: var(--primary-color); font-weight: 600; margin-top: 0.5rem;';
+                            numSpan.textContent = `Buyurtma raqami: ${orderResult.orderNumber}`;
+                            h2.after(numSpan);
+                        }
+                    }
+                }
                 if (typeof showStep === 'function') showStep('successStep');
             } else {
                 closeOrderModal();
                 showSuccessModal();
             }
 
-            // Update all product cards
+            // Barcha mahsulot kartalarini yangilash
             if (typeof products !== 'undefined') {
                 products.forEach(p => updateProductUI(p.id));
             }
         } else {
-            console.error('Telegram error:', data);
-            alert(`Xatolik: ${data.description}`);
+            alert('❌ Buyurtma yuborilmadi. Iltimos, qayta urinib ko\'ring.');
             submitBtn.disabled = false;
             submitBtn.textContent = originalBtnText;
         }
     } catch (error) {
-        console.error('Network error:', error);
-        showNotification('❌ Internet bilan aloqa yo\'q', 'error');
+        console.error('Buyurtma yuborishda umumiy xatolik:', error);
+        showNotification('❌ Xatolik yuz berdi. Iltimos, qayta urinib ko\'ring.');
         submitBtn.disabled = false;
         submitBtn.textContent = originalBtnText;
     }

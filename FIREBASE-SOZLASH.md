@@ -101,6 +101,16 @@ service cloud.firestore {
       allow read: if true;           // Hamma o'qiy oladi
       allow write: if false;         // Hech kim yoza olmaydi (admin paneldan tashqari)
     }
+    match /orders/{orderId} {
+      allow read: if true;           // CRM dan o'qish
+      allow create: if true;         // Websitedan buyurtma yaratish
+      allow update, delete: if false; // Faqat admin/CRM dan boshqarish
+    }
+    match /customers/{customerId} {
+      allow read: if true;           // CRM dan o'qish
+      allow create, update: if true; // Websitedan mijoz yaratish/yangilash
+      allow delete: if false;        // Faqat admin/CRM dan o'chirish
+    }
   }
 }
 ```
