@@ -245,30 +245,31 @@ function createProductCard(product) {
     card.id = `product-card-${product.id}`; // Add unique ID for scrolling
     // card.setAttribute('data-category', product.category); // Optional, but good for filtering compatibility if needed
 
-    // Check if new (less than 7 days)
-    const isNew = (new Date() - new Date(product.createdAt?.toDate ? product.createdAt.toDate() : product.createdAt)) / (1000 * 60 * 60 * 24) < 7;
-
     card.innerHTML = `
-        <div class="product-image">
-            <img src="${product.image}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/300x300?text=${product.name}'">
-            <button class="favorite-btn">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                </svg>
-            </button>
-            ${product.badge ? `<span class="product-badge">${product.badge}</span>` : (isNew ? '<span class="product-badge new">Yangi</span>' : '')}
+        <div class="product-click-area" onclick="openProductDetailModal('${product.id}')">
+            <div class="product-image">
+                <img src="${product.image}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/300x300?text=${product.name}'">
+                <button class="favorite-btn" onclick="event.stopPropagation()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                </button>
+                ${product.badge ? `<span class="product-badge">${product.badge}</span>` : (isNew ? '<span class="product-badge new">Yangi</span>' : '')}
+            </div>
+            <div class="product-info">
+                <div class="product-price-row">
+                    <span class="product-price">${formatPrice(product.price)} so'm</span>
+                </div>
+                <h3 class="product-name">${product.name}</h3>
+                <div class="product-rating">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="#FFB547" stroke="#FFB547">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                    <span class="rating-score">4.9</span>
+                </div>
+            </div>
         </div>
-        <div class="product-info">
-            <div class="product-price-row">
-                <span class="product-price">${formatPrice(product.price)} so'm</span>
-            </div>
-            <h3 class="product-name">${product.name}</h3>
-            <div class="product-rating">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="#FFB547" stroke="#FFB547">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                </svg>
-                <span class="rating-score">4.9</span>
-            </div>
+        <div class="product-footer-container">
             <div class="product-footer" id="footer-${product.id}">
                 ${getProductFooterHTML(product)}
             </div>
@@ -293,7 +294,7 @@ function getProductFooterHTML(product) {
     } else {
         // Savatda yo'q (Add button only)
         return `
-            <button class="btn-add-uzum" onclick="addToCart('${product.id}')">
+            <button class="btn-add-uzum" onclick="event.stopPropagation(); addToCart('${product.id}')">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;">
                     <path d="M16 11V7a4 4 0 0 0-8 0v4M5 9h14l1 12H4L5 9z"></path>
                 </svg>
@@ -309,6 +310,15 @@ function updateProductUI(productId) {
         const product = products.find(p => p.id.toString() === productId.toString());
         if (product) {
             footer.innerHTML = getProductFooterHTML(product);
+
+            // Agar detail modal ochiq bo'lsa, uni ham yangilash
+            const detailModal = document.getElementById('productDetailModal');
+            if (detailModal && detailModal.classList.contains('active')) {
+                const detailFooter = document.getElementById('detailFooter');
+                if (detailFooter) {
+                    detailFooter.innerHTML = getProductFooterHTML(product);
+                }
+            }
         }
     }
 }
@@ -788,16 +798,44 @@ async function submitOrder(event) {
 window.submitOrder = submitOrder;
 
 
+// Product Detail Modal
+function openProductDetailModal(productId) {
+    const product = products.find(p => p.id.toString() === productId.toString());
+    if (!product) return;
+
+    document.getElementById('detailImage').src = product.image;
+    document.getElementById('detailName').textContent = product.name;
+    document.getElementById('detailPrice').textContent = formatPrice(product.price) + " so'm";
+    document.getElementById('detailDescription').textContent = product.description || "Mahsulot haqida batafsil ma'lumot tez orada joylanadi.";
+
+    const detailFooter = document.getElementById('detailFooter');
+    detailFooter.innerHTML = getProductFooterHTML(product);
+
+    const modal = document.getElementById('productDetailModal');
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden'; // Stop scrolling
+}
+
+function closeProductDetailModal() {
+    const modal = document.getElementById('productDetailModal');
+    modal.classList.remove('active');
+    document.body.style.overflow = ''; // Restore scrolling
+}
+
 // Close modals when clicking outside
 window.addEventListener('click', function (event) {
     const cartModal = document.getElementById('cartModal');
     const orderModal = document.getElementById('orderModal');
+    const productDetailModal = document.getElementById('productDetailModal');
 
     if (event.target === cartModal) {
         closeCartModal();
     }
     if (event.target === orderModal) {
         closeOrderModal();
+    }
+    if (event.target === productDetailModal) {
+        closeProductDetailModal();
     }
 });
 
@@ -809,4 +847,5 @@ window.openOrderModal = openOrderModal;
 window.closeOrderModal = closeOrderModal;
 window.showNotification = showNotification;
 window.changeQuantity = changeQuantity;
-// window.submitOrder allaqachon yuqorida aniqlangan
+window.openProductDetailModal = openProductDetailModal;
+window.closeProductDetailModal = closeProductDetailModal;

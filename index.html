@@ -411,6 +411,39 @@
         </div>
     </div>
 
+    <!-- Product Detail Modal -->
+    <div id="productDetailModal" class="modal">
+        <div class="modal-content product-detail-content">
+            <button class="modal-close detail-close" onclick="closeProductDetailModal()">&times;</button>
+            <div class="product-detail-layout">
+                <div class="product-detail-image">
+                    <img id="detailImage" src="" alt="">
+                </div>
+                <div class="product-detail-info">
+                    <h2 id="detailName"></h2>
+                    <div class="detail-price-row">
+                        <span id="detailPrice" class="detail-price"></span>
+                    </div>
+                    <div class="detail-rating">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="#FFB547" stroke="#FFB547">
+                            <polygon
+                                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+                            </polygon>
+                        </svg>
+                        <span id="detailRating">4.9</span>
+                    </div>
+                    <div class="detail-description">
+                        <h3>Mahsulot haqida</h3>
+                        <p id="detailDescription"></p>
+                    </div>
+                    <div class="detail-footer" id="detailFooter">
+                        <!-- Add to cart button será insertado aquí -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
