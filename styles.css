@@ -1147,7 +1147,6 @@ body {
     }
 
     .btn-add-main svg {
-        margin: 0 !important;
         width: 18px;
         height: 18px;
     }
@@ -1161,25 +1160,34 @@ body {
     .qty-counter {
         width: auto;
         height: 36px;
-        background: #00dd00;
-        border-radius: 8px;
-        color: white;
+        background: transparent;
+        color: #1a1a2e;
+        border: none;
+        gap: 8px;
     }
 
     .qty-display {
-        color: white;
-        padding: 0 10px;
-        font-size: 0.95rem;
+        color: #1a1a2e;
+        padding: 0;
+        font-size: 1rem;
     }
 
     .qty-btn {
-        color: white;
-        width: 30px;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #f0f0f5;
+        color: #1a1a2e;
+        font-size: 1.2rem;
+        padding-bottom: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .qty-btn:hover {
-        background: rgba(0, 0, 0, 0.1);
-        color: white;
+        background: #e0e0e5;
+        color: #1a1a2e;
     }
 
     .product-info {
@@ -1585,19 +1593,20 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #f0f0f5;
-    border-radius: 8px;
+    background: transparent;
     padding: 0;
-    width: 100px;
-    /* Fix width */
+    width: auto;
     height: 40px;
+    gap: 12px;
 }
 
 .qty-btn {
     width: 32px;
-    height: 100%;
+    height: 32px;
+    border-radius: 8px;
+    /* Square with rounded corners like Uzum */
     border: none;
-    background: transparent;
+    background: #f0f0f5;
     font-size: 1.2rem;
     color: #1a1a2e;
     cursor: pointer;
@@ -1605,11 +1614,11 @@ body {
     align-items: center;
     justify-content: center;
     padding-bottom: 2px;
+    transition: all 0.2s;
 }
 
 .qty-btn:hover {
-    color: #7000ff;
-    background: rgba(0, 0, 0, 0.05);
+    background: #e0e0e5;
 }
 
 .qty-display {
