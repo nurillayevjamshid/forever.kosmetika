@@ -255,7 +255,7 @@ function getProductFooterHTML(product) {
                     <path d="M3 6h18"></path>
                     <path d="M16 10a4 4 0 0 1-8 0"></path>
                 </svg>
-                <span>Ertaga</span>
+                <span>Tanlash</span>
             </button>
         `;
     }
