@@ -348,66 +348,179 @@
 
     <!-- Cart Modal -->
     <div id="cartModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content cart-full-modal">
             <div class="modal-header">
-                <h2>Savatcha</h2>
-                <button class="modal-close" onclick="closeCartModal()">&times;</button>
-            </div>
-            <div class="modal-body" id="cartItems">
-                <!-- Cart items will be loaded here -->
-            </div>
-            <div class="modal-footer">
-                <div class="cart-total">
-                    <span>Jami:</span>
-                    <span id="cartTotalPrice">0 so'm</span>
+                <div class="modal-header-left">
+                    <h2>Savatingiz</h2>
+                    <span class="cart-items-count-badge" id="cartBadgeCount">0 ta mahsulot</span>
                 </div>
-                <button class="btn btn-primary btn-full" onclick="openOrderModal()">
-                    Buyurtma berish
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M5 12h14M12 5l7 7-7 7"></path>
-                    </svg>
-                </button>
+                <div class="modal-header-right">
+                    <button class="clear-cart-btn" onclick="clearCart()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path
+                                d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                            </path>
+                        </svg>
+                        Savatni tozalash
+                    </button>
+                    <button class="modal-close" onclick="closeCartModal()">&times;</button>
+                </div>
+            </div>
+            <div class="modal-body-layout">
+                <div class="modal-main-content">
+                    <div id="cartItemsList" class="cart-items-list">
+                        <!-- Cart items will be loaded here -->
+                    </div>
+                </div>
+                <div class="modal-sidebar">
+                    <div class="order-summary-card">
+                        <h3>Buyurtma xulosasi</h3>
+                        <div id="cartSummaryItems" class="summary-items-list">
+                            <!-- Summary items will be loaded here -->
+                        </div>
+                        <div class="summary-total">
+                            <span>Jami:</span>
+                            <span id="cartTotalPrice">0 so'm</span>
+                        </div>
+                        <button class="btn btn-primary btn-full checkout-btn" onclick="openOrderModal()">
+                            Buyurtma berish
+                        </button>
+                        <button class="continue-shopping" onclick="closeCartModal()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M19 12H5M12 19l-7-7 7-7"></path>
+                            </svg>
+                            Xarid davom ettirish
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Order Modal -->
     <div id="orderModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content order-full-modal">
             <div class="modal-header">
-                <h2>Buyurtma qoldirish</h2>
+                <button class="back-to-cart" onclick="backToCart()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"></path>
+                    </svg>
+                    Savatga qaytish
+                </button>
+                <h2>Buyurtma berish</h2>
                 <button class="modal-close" onclick="closeOrderModal()">&times;</button>
             </div>
             <form id="orderForm" onsubmit="submitOrder(event)">
-                <div class="modal-body">
-                    <div class="form-group">
-                        <input type="text" id="orderName" required placeholder=" ">
-                        <label for="orderName">Ismingiz *</label>
+                <div class="modal-body-layout">
+                    <div class="modal-main-content">
+                        <!-- Personal Info Card -->
+                        <div class="order-section-card">
+                            <div class="section-title-row">
+                                <div class="section-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                </div>
+                                <h3>Shaxsiy ma'lumotlar</h3>
+                            </div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="orderName">Ism *</label>
+                                    <input type="text" id="orderName" required placeholder="Masalan: Jamshid">
+                                </div>
+                                <div class="form-group">
+                                    <label for="orderPhone">Telefon raqam *</label>
+                                    <div class="phone-input-wrapper">
+                                        <span class="country-code">+998</span>
+                                        <input type="tel" id="orderPhone" required placeholder="90 123 45 67"
+                                            maxlength="9">
+                                    </div>
+                                    <span class="input-hint">Masalan: +998 90 123 45 67</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Address Card -->
+                        <div class="order-section-card">
+                            <div class="section-title-row">
+                                <div class="section-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                        <circle cx="12" cy="10" r="3"></circle>
+                                    </svg>
+                                </div>
+                                <h3>Manzil</h3>
+                            </div>
+                            <div class="form-grid two-cols">
+                                <div class="form-group">
+                                    <label for="orderViloyat">Viloyat *</label>
+                                    <select id="orderViloyat" required onchange="handleViloyatChange()">
+                                        <option value="" disabled selected>Viloyatni tanlang</option>
+                                        <option value="Toshkent shahri">Toshkent shahri</option>
+                                        <option value="Toshkent viloyati">Toshkent viloyati</option>
+                                        <option value="Andijon">Andijon</option>
+                                        <option value="Buxoro">Buxoro</option>
+                                        <option value="Farg'ona">Farg'ona</option>
+                                        <option value="Jizzax">Jizzax</option>
+                                        <option value="Xorazm">Xorazm</option>
+                                        <option value="Namangan">Namangan</option>
+                                        <option value="Navoiy">Navoiy</option>
+                                        <option value="Qashqadaryo">Qashqadaryo</option>
+                                        <option value="Qoraqalpog'iston">Qoraqalpog'iston</option>
+                                        <option value="Samarqand">Samarqand</option>
+                                        <option value="Sirdaryo">Sirdaryo</option>
+                                        <option value="Surxondaryo">Surxondaryo</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="orderTuman">Tuman *</label>
+                                    <select id="orderTuman" required disabled>
+                                        <option value="" disabled selected>Tumanni tanlang</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <input type="tel" id="orderPhone" required placeholder=" " pattern="[+]?[0-9]{9,13}">
-                        <label for="orderPhone">Telefon raqamingiz *</label>
+
+                    <div class="modal-sidebar">
+                        <div class="order-summary-card">
+                            <h3>Buyurtma tafsilotlari</h3>
+                            <div id="checkoutSummaryItems" class="summary-items-list">
+                                <!-- Items will be populated -->
+                            </div>
+                            <div class="summary-total">
+                                <span>Jami:</span>
+                                <span id="orderTotalPrice">0 so'm</span>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-full checkout-btn">
+                                Buyurtmani yuborish
+                            </button>
+                            <p class="summary-note">Buyurtmangiz qabul qilinganidan so'ng, siz bilan bog'lanamiz.</p>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <textarea id="orderComment" rows="4" placeholder=" "></textarea>
-                        <label for="orderComment">Izoh (ixtiyoriy)</label>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <div class="cart-total">
-                        <span>Jami:</span>
-                        <span id="orderTotalPrice">0 so'm</span>
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-full">
-                        Buyurtma qoldirish
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <line x1="22" y1="2" x2="11" y2="13"></line>
-                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                        </svg>
-                    </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content success-modal">
+            <div class="success-icon-wrapper">
+                <div class="success-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </div>
+            </div>
+            <h2>Buyurtmangiz qabul qilindi!</h2>
+            <p>Tez orada operatorimiz siz bilan aloqaga chiqadi.</p>
+            <button class="btn btn-primary" onclick="closeSuccessModal()">Davom etish</button>
         </div>
     </div>
 

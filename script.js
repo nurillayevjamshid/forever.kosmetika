@@ -14,6 +14,24 @@ const defaultProducts = [];
 // Cart state
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
+// Viloyatlar va Tumanlar ma'lumotlari
+const tumanlarData = {
+    "Toshkent shahri": ["Olmazor tumani", "Bektemir tumani", "Mirobod tumani", "Mirzo Ulug'bek tumani", "Sergeli tumani", "Uchtepa tumani", "Chilonzor tumani", "Shayxontohur tumani", "Yunusobod tumani", "Yakkasaroy tumani", "Yashnobod tumani", "Yangihayot tumani"],
+    "Toshkent viloyati": ["Angren shahri", "Olmaliq shahri", "Nurafshon shahri", "Ohangaron tumani", "Bekobod tumani", "Bo'stonliq tumani", "Bo'ka tumani", "Chinoz tumani", "Qibray tumani", "Parkent tumani", "Piskent tumani", "Quyi Chirchiq tumani", "O'rta Chirchiq tumani", "Yuqori Chirchiq tumani", "Zangiota tumani", "Yangiyo'l tumani", "Toshkent tumani"],
+    "Andijon": ["Andijon shahri", "Andijon tumani", "Asaka tumani", "Baliqchi tumani", "Bo'ston tumani", "Buloqboshi tumani", "Izboskan tumani", "Jalaquduq tumani", "Marhamat tumani", "Oltinko'l tumani", "Paxtaobod tumani", "Qo'rg'ontepa tumani", "Shahrixon tumani", "Ulug'nor tumani", "Xo'jaobod tumani"],
+    "Buxoro": ["Buxoro shahri", "Buxoro tumani", "G'ijduvon tumani", "Jondor tumani", "Kogon tumani", "Olot tumani", "Peshku tumani", "Qorako'l tumani", "Qorovulbozor tumani", "Romitan tumani", "Shofirkon tumani", "Vobkent tumani"],
+    "Farg'ona": ["Farg'ona shahri", "Marg'ilon shahri", "Qo'qon shahri", "Quva tumani", "Beshariq tumani", "Bag'dod tumani", "Buvayda tumani", "Dang'ara tumani", "Furqat tumani", "Oltiariq tumani", "Rishton tumani", "So'x tumani", "Toshloq tumani", "Uchko'prik tumani", "O'zbekiston tumani", "Yozyovon tumani"],
+    "Jizzax": ["Jizzax shahri", "Arnasoy tumani", "Baxmal tumani", "Do'stlik tumani", "Forish tumani", "G'allaorol tumani", "Sharof Rashidov tumani", "Mirzachul tumani", "Paxtakor tumani", "Yangiobod tumani", "Zafarobod tumani", "Zamin tumani", "Zarbdor tumani"],
+    "Xorazm": ["Urganch shahri", "Urganch tumani", "Bog'ot tumani", "Gurlan tumani", "Xonqa tumani", "Xazoraap tumani", "Xiva tumani", "Qo'shko'pir tumani", "Shovot tumani", "Yangiariq tumani", "Yangibozor tumani", "Tuproqqal'a tumani"],
+    "Namangan": ["Namangan shahri", "Namangan tumani", "Chortoq tumani", "Chust tumani", "Kosonsoy tumani", "Mingbuloq tumani", "Norin tumani", "Pop tumani", "To'raqo'rg'on tumani", "Uychi tumani", "Uychi tumani", "Yangiqo'rg'on tumani"],
+    "Navoiy": ["Navoiy shahri", "Zarafshon shahri", "Konimex tumani", "Karmana tumani", "Qiziltepa tumani", "Navbahor tumani", "Nurota tumani", "Tomdi tumani", "Uchkuduk tumani", "Xatirchi tumani"],
+    "Qashqadaryo": ["Qarshi shahri", "Qarshi tumani", "Dehqonobod tumani", "G'uzor tumani", "Kasbi tumani", "Kitob tumani", "Koson tumani", "Mirishkor tumani", "Muborak tumani", "Nishon tumani", "Shahrisabz shahri", "Shahrisabz tumani", "Chiroqchi tumani", "Yakkabog' tumani", "Qamashi tumani"],
+    "Qoraqalpog'iston": ["Nukus shahri", "Amudaryo tumani", "Beruniy tumani", "Chimboy tumani", "Ellikqala tumani", "Kegeyli tumani", "Mo'ynoq tumani", "Nukus tumani", "Qonliko'l tumani", "Qo'ng'irot tumani", "Qorao'zak tumani", "Shumanay tumani", "Taxtako'pir tumani", "To'rtko'l tumani", "Xo'jayli tumani", "Taxiatosh shahri"],
+    "Samarqand": ["Samarqand shahri", "Samarqand tumani", "Bulung'ur tumani", "Ishtixon tumani", "Jomboy tumani", "Kattaqo'rg'on shahri", "Kattaqo'rg'on tumani", "Narpay tumani", "Nurobod tumani", "Oqdaryo tumani", "Paxtachi tumani", "Payariq tumani", "Pastdarg'om tumani", "Toyloq tumani", "Urgut tumani", "Qo'shrabot tumani"],
+    "Sirdaryo": ["Guliston shahri", "Guliston tumani", "Boyovut tumani", "Oqoltin tumani", "Sardoba tumani", "Sayxunobod tumani", "Sirdaryo tumani", "Xovos tumani", "Mirzaobod tumani", "Shirin shahri", "Yangiyer shahri"],
+    "Surxondaryo": ["Termiz shahri", "Termiz tumani", "Angor tumani", "Boysun tumani", "Denov tumani", "Jarqo'rg'on tumani", "Muzrabot tumani", "Oltinsoy tumani", "Qiziriq tumani", "Qumqo'rg'on tumani", "Sariosiyo tumani", "Sherobod tumani", "Sho'rchi tumani", "Uzun tumani"]
+};
+
 // ================================
 // INITIALIZATION
 // ================================
@@ -513,30 +531,65 @@ function openCartModal() {
     }
 
     const modal = document.getElementById('cartModal');
-    const cartItems = document.getElementById('cartItems');
+    const itemsList = document.getElementById('cartItemsList');
+    const summaryList = document.getElementById('cartSummaryItems');
+    const batchCount = document.getElementById('cartBadgeCount');
 
-    // Render cart items
-    cartItems.innerHTML = cart.map(item => `
+    // Update batch count
+    const totalQty = cart.reduce((sum, item) => sum + item.quantity, 0);
+    batchCount.textContent = `${totalQty} ta mahsulot`;
+
+    // Render main items list
+    itemsList.innerHTML = cart.map(item => `
         <div class="cart-item">
-            <img src="${item.imageUrl || item.image}" alt="${item.name}" class="cart-item-image" onerror="this.src='https://via.placeholder.com/80'">
+            <img src="${item.imageUrl || item.image}" alt="${item.name}" class="cart-item-image" onerror="this.src='https://via.placeholder.com/100'">
             <div class="cart-item-info">
                 <h4>${item.name}</h4>
-                <div class="cart-item-controls" style="display: flex; gap: 10px; align-items: center; margin: 5px 0;">
-                    <button onclick="changeQuantity('${item.id}', -1)" style="padding: 2px 8px; border: 1px solid #ddd; border-radius: 4px; background: #fff; cursor: pointer;">-</button>
-                    <span style="font-weight: 600;">${item.quantity}</span>
-                    <button onclick="changeQuantity('${item.id}', 1)" style="padding: 2px 8px; border: 1px solid #ddd; border-radius: 4px; background: #fff; cursor: pointer;">+</button>
+                <div class="cart-item-price">${formatPrice(item.price)} so'm</div>
+                <div class="cart-item-controls">
+                    <div class="qty-counter">
+                        <button class="qty-btn" onclick="changeQuantity('${item.id}', -1)">−</button>
+                        <span class="qty-display">${item.quantity}</span>
+                        <button class="qty-btn" onclick="changeQuantity('${item.id}', 1)">+</button>
+                    </div>
                 </div>
-                <div class="cart-item-price">${formatPrice(item.price * item.quantity)} so'm</div>
             </div>
-            <button class="cart-item-remove" onclick="removeFromCart('${item.id}')">O'chirish</button>
+            <button class="cart-item-remove-icon" onclick="removeFromCart('${item.id}')" title="O'chirish">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+            </button>
+        </div>
+    `).join('');
+
+    // Render summary list
+    summaryList.innerHTML = cart.map(item => `
+        <div class="summary-item-row">
+            <span>${item.name} (${item.quantity} ta)</span>
+            <span>${formatPrice(item.price * item.quantity)} so'm</span>
         </div>
     `).join('');
 
     // Update total
-    updateCartTotal();
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    document.getElementById('cartTotalPrice').textContent = formatPrice(total) + ' so\'m';
 
     // Show modal
     modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function clearCart() {
+    if (confirm('Savatchani tozalamoqchimisiz?')) {
+        cart = [];
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartCount();
+        closeCartModal();
+        showNotification('Savatcha tozalandi');
+
+        // Update all product cards to show "Add" button
+        products.forEach(p => updateProductUI(p.id));
+    }
 }
 
 function closeCartModal() {
@@ -640,19 +693,55 @@ function openOrderModal() {
     closeCartModal();
 
     const modal = document.getElementById('orderModal');
-    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const summaryItems = document.getElementById('checkoutSummaryItems');
+    const totalPriceEl = document.getElementById('orderTotalPrice');
 
-    // Update total in order modal
-    document.getElementById('orderTotalPrice').textContent = formatPrice(total) + ' so\'m';
+    // Render details
+    summaryItems.innerHTML = cart.map(item => `
+        <div class="summary-item-row">
+            <span>${item.name} x${item.quantity}</span>
+            <span>${formatPrice(item.price * item.quantity)} so'm</span>
+        </div>
+    `).join('');
+
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    totalPriceEl.textContent = formatPrice(total) + ' so\'m';
 
     // Show modal
     modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function handleViloyatChange() {
+    const viloyat = document.getElementById('orderViloyat').value;
+    const tumanSelect = document.getElementById('orderTuman');
+
+    // Clear current tumanlar
+    tumanSelect.innerHTML = '<option value="" disabled selected>Tumanni tanlang</option>';
+
+    if (viloyat && tumanlarData[viloyat]) {
+        tumanSelect.disabled = false;
+        tumanlarData[viloyat].forEach(tuman => {
+            const option = document.createElement('option');
+            option.value = tuman;
+            option.textContent = tuman;
+            tumanSelect.appendChild(option);
+        });
+    } else {
+        tumanSelect.disabled = true;
+    }
+}
+
+function backToCart() {
+    closeOrderModal();
+    openCartModal();
 }
 
 function closeOrderModal() {
     const modal = document.getElementById('orderModal');
     modal.classList.remove('active');
     document.getElementById('orderForm').reset();
+    document.body.style.overflow = '';
 }
 
 // ================================
@@ -663,8 +752,10 @@ async function submitOrder(event) {
     event.preventDefault();
 
     const name = document.getElementById('orderName').value;
-    const phone = document.getElementById('orderPhone').value;
-    const comment = document.getElementById('orderComment').value;
+    const phoneInput = document.getElementById('orderPhone').value;
+    const phone = "+998 " + phoneInput;
+    const viloyat = document.getElementById('orderViloyat').value;
+    const tuman = document.getElementById('orderTuman').value;
 
     // Get Telegram config
     const BOT_TOKEN = window.TELEGRAM_CONFIG?.BOT_TOKEN;
@@ -677,11 +768,9 @@ async function submitOrder(event) {
 
     // Create order message
     let message = `🔔 *YANGI BUYURTMA*\n\n`;
-    message += `👤 *Ism:* ${name}\n`;
+    message += `👤 *Mijoz:* ${name}\n`;
     message += `📞 *Telefon:* ${phone}\n`;
-    if (comment) {
-        message += `💬 *Izoh:* ${comment}\n`;
-    }
+    message += `📍 *Manzil:* ${viloyat}, ${tuman}\n`;
     message += `\n📦 *Mahsulotlar:*\n`;
     message += `━━━━━━━━━━━━━━━━\n`;
 
@@ -696,8 +785,11 @@ async function submitOrder(event) {
     message += `💰 *JAMI: ${formatPrice(total)} so'm*\n\n`;
     message += `📅 Sana: ${new Date().toLocaleString('uz-UZ')}`;
 
-    // Show loading notification
-    showNotification('Buyurtma yuborilmoqda...');
+    // Show loading state
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Yuborilmoqda...';
 
     try {
         const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
@@ -720,15 +812,34 @@ async function submitOrder(event) {
             localStorage.setItem('cart', JSON.stringify(cart));
             updateCartCount();
             closeOrderModal();
-            showNotification('✅ Buyurtma qabul qilindi! Tez orada aloqaga chiqamiz.');
+            showSuccessModal();
+
+            // Update all product cards
+            products.forEach(p => updateProductUI(p.id));
         } else {
             console.error('Telegram error:', data);
             alert(`Xatolik: ${data.description}`);
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalBtnText;
         }
     } catch (error) {
         console.error('Network error:', error);
         showNotification('❌ Internet bilan aloqa yo\'q', 'error');
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalBtnText;
     }
+}
+
+function showSuccessModal() {
+    const modal = document.getElementById('successModal');
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeSuccessModal() {
+    const modal = document.getElementById('successModal');
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
 }
 
 // Make globally available
@@ -774,15 +885,22 @@ window.addEventListener('click', function (event) {
     if (event.target === productDetailModal) {
         closeProductDetailModal();
     }
+    if (event.target === document.getElementById('successModal')) {
+        closeSuccessModal();
+    }
 });
 
 // Global functions for onclick handlers
 window.openCartModal = openCartModal;
 window.closeCartModal = closeCartModal;
+window.clearCart = clearCart;
 window.removeFromCart = removeFromCart;
 window.openOrderModal = openOrderModal;
 window.closeOrderModal = closeOrderModal;
+window.backToCart = backToCart;
+window.handleViloyatChange = handleViloyatChange;
 window.showNotification = showNotification;
 window.changeQuantity = changeQuantity;
 window.openProductDetailModal = openProductDetailModal;
 window.closeProductDetailModal = closeProductDetailModal;
+window.closeSuccessModal = closeSuccessModal;
