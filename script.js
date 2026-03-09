@@ -199,10 +199,6 @@ function createProductCard(product) {
     card.className = 'product-card';
     card.id = `product-card-${product.id}`;
 
-    // Old price and installments calculation (visual only if not in data)
-    const oldPrice = product.oldPrice || Math.floor(product.price * 1.15);
-    const monthlyPrice = Math.floor(product.price / 12);
-    const reviewsCount = product.reviewsCount || Math.floor(Math.random() * 500) + 10;
     const rating = product.rating || "4.9";
 
     card.innerHTML = `
@@ -214,24 +210,17 @@ function createProductCard(product) {
                         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                     </svg>
                 </button>
-                <div class="uzum-badge-bottom">
-                    <span>ORIGINAL</span>
-                </div>
             </div>
             <div class="product-info">
                 <h3 class="product-name">${product.name}</h3>
+                <div class="product-price-container">
+                    <span class="current-price">${formatPrice(product.price)} so'm</span>
+                </div>
                 <div class="product-rating">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="#FFB547" stroke="#FFB547">
                         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                     </svg>
-                    <span class="rating-score">${rating} (${reviewsCount} sharhlar)</span>
-                </div>
-                <div class="installment-badge">
-                    ${formatPrice(monthlyPrice)} so'm/oyiga
-                </div>
-                <div class="product-price-container">
-                    <span class="old-price">${formatPrice(oldPrice)} so'm</span>
-                    <span class="current-price">${formatPrice(product.price)} so'm</span>
+                    <span class="rating-score">${rating}</span>
                 </div>
             </div>
         </div>
