@@ -204,7 +204,14 @@ function displayProducts(filter = 'all') {
     // Filter products
     const filteredProducts = filter === 'all'
         ? products
-        : products.filter(p => p.category === filter);
+        : products.filter(p => {
+            const cat = (p.category || '').toLowerCase();
+            const f = filter.toLowerCase();
+            // Mappings if necessary
+            if (f === 'parvarish' && (cat.includes('parvarish') || cat.includes('krem'))) return true;
+            if (f === 'atir' && (cat === 'atir' || cat === 'parfyumeriya')) return true;
+            return cat === f;
+        });
 
     // Clear grid
     productsGrid.innerHTML = '';
@@ -248,7 +255,7 @@ function createProductCard(product) {
     card.innerHTML = `
         <div class="product-click-area" onclick="openProductDetailModal('${product.id}')">
             <div class="product-image">
-                <img src="${product.image}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/300x300?text=${product.name}'">
+                <img src="${product.imageUrl || product.image}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/300x300?text=${product.name}'">
                 <button class="favorite-btn" onclick="event.stopPropagation()">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
@@ -581,7 +588,7 @@ function openCartModal() {
     // Render cart items
     cartItems.innerHTML = cart.map(item => `
         <div class="cart-item">
-            <img src="${item.image}" alt="${item.name}" class="cart-item-image" onerror="this.src='https://via.placeholder.com/80'">
+            <img src="${item.imageUrl || item.image}" alt="${item.name}" class="cart-item-image" onerror="this.src='https://via.placeholder.com/80'">
             <div class="cart-item-info">
                 <h4>${item.name}</h4>
                 <div class="cart-item-controls" style="display: flex; gap: 10px; align-items: center; margin: 5px 0;">
@@ -803,7 +810,7 @@ function openProductDetailModal(productId) {
     const product = products.find(p => p.id.toString() === productId.toString());
     if (!product) return;
 
-    document.getElementById('detailImage').src = product.image;
+    document.getElementById('detailImage').src = product.imageUrl || product.image;
     document.getElementById('detailName').textContent = product.name;
     document.getElementById('detailPrice').textContent = formatPrice(product.price) + " so'm";
     document.getElementById('detailDescription').textContent = product.description || "Mahsulot haqida batafsil ma'lumot tez orada joylanadi.";

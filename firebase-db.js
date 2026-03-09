@@ -8,7 +8,11 @@ async function firebaseGetProducts() {
         const snapshot = await productsCollection.orderBy('createdAt', 'desc').get();
         const products = [];
         snapshot.forEach(doc => {
-            products.push({ id: doc.id, ...doc.data() });
+            const data = doc.data();
+            // Faqat 'active' yoki statusi bo'lmagan mahsulotlarni ko'rsatish
+            if ((data.status || 'active') !== 'inactive') {
+                products.push({ id: doc.id, ...data });
+            }
         });
         return products;
     } catch (error) {
@@ -34,8 +38,8 @@ async function firebaseGetProduct(productId) {
 // Yangi mahsulot qo'shish
 async function firebaseAddProduct(productData) {
     try {
-        productData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-        productData.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+        productData.createdAt = new Date().toISOString();
+        productData.updatedAt = new Date().toISOString();
         const docRef = await productsCollection.add(productData);
         console.log('✅ Mahsulot qo\'shildi, ID:', docRef.id);
         return docRef.id;
@@ -48,7 +52,7 @@ async function firebaseAddProduct(productData) {
 // Mahsulotni yangilash
 async function firebaseUpdateProduct(productId, productData) {
     try {
-        productData.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+        productData.updatedAt = new Date().toISOString();
         await productsCollection.doc(productId).update(productData);
         console.log('✅ Mahsulot yangilandi:', productId);
         return true;
@@ -174,7 +178,10 @@ function firebaseListenProducts(callback) {
         (snapshot) => {
             const products = [];
             snapshot.forEach(doc => {
-                products.push({ id: doc.id, ...doc.data() });
+                const data = doc.data();
+                if ((data.status || 'active') !== 'inactive') {
+                    products.push({ id: doc.id, ...data });
+                }
             });
             callback(products);
         },
@@ -197,7 +204,10 @@ async function firebaseGetProductsByCategory(category) {
 
         const products = [];
         snapshot.forEach(doc => {
-            products.push({ id: doc.id, ...doc.data() });
+            const data = doc.data();
+            if ((data.status || 'active') !== 'inactive') {
+                products.push({ id: doc.id, ...data });
+            }
         });
         return products;
     } catch (error) {
