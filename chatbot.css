@@ -222,7 +222,8 @@ body.show-chatbot .chatbot {
 @media (max-width: 490px) {
     .chatbot-toggler {
         right: 20px;
-        bottom: 20px;
+        bottom: 80px;
+        /* Adjusted to be above bottom nav */
     }
 
     .chatbot {

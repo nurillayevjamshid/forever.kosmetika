@@ -171,12 +171,25 @@ function initNavigation() {
         });
     }
 
-    // Active link highlighting
+    // Active link highlighting for desktop
     const navLinks = document.querySelectorAll('.nav-link');
     navLinks.forEach(link => {
         link.addEventListener('click', function () {
             navLinks.forEach(l => l.classList.remove('active'));
             this.classList.add('active');
+        });
+    });
+
+    // Active link highlighting for mobile bottom nav
+    const mobileNavItems = document.querySelectorAll('.mobile-bottom-nav .nav-item');
+    mobileNavItems.forEach(item => {
+        item.addEventListener('click', function () {
+            // Remove active from all
+            mobileNavItems.forEach(nav => nav.classList.remove('active'));
+            // Add active to clicked (unless it's cart, cart has its own visual state or doesn't change active tab)
+            if (!this.classList.contains('cart-btn-mobile')) {
+                this.classList.add('active');
+            }
         });
     });
 }
@@ -280,7 +293,7 @@ function getProductFooterHTML(product) {
                         <path d="M20 20a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"></path>
                         <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
                     </svg>
-                    Savatga
+                    <span class="btn-text">Savatga</span>
                 </button>
             </div>
         `;
@@ -393,10 +406,10 @@ function addToCart(productId) {
 }
 
 function updateCartCount() {
-    const cartCount = document.querySelector('.cart-count');
+    const cartCounts = document.querySelectorAll('.cart-count');
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
-    if (cartCount) {
+    cartCounts.forEach(cartCount => {
         cartCount.textContent = totalItems;
 
         // Add animation
@@ -404,7 +417,7 @@ function updateCartCount() {
         setTimeout(() => {
             cartCount.style.transform = 'scale(1)';
         }, 200);
-    }
+    });
 }
 
 // ================================
