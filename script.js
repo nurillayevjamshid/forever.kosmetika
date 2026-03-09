@@ -262,16 +262,12 @@ function createProductCard(product) {
             <div class="product-price-row">
                 <span class="product-price">${formatPrice(product.price)} so'm</span>
             </div>
-            <div class="product-credit">
-                <span class="credit-badge">${formatPrice(Math.floor(product.price / 12))} so'm/oyiga</span>
-            </div>
             <h3 class="product-name">${product.name}</h3>
             <div class="product-rating">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="#FFB547" stroke="#FFB547">
                     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                 </svg>
                 <span class="rating-score">4.9</span>
-                <span class="rating-count">(99 ta sharh)</span>
             </div>
             <div class="product-footer" id="footer-${product.id}">
                 ${getProductFooterHTML(product)}
@@ -301,7 +297,7 @@ function getProductFooterHTML(product) {
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;">
                     <path d="M16 11V7a4 4 0 0 0-8 0v4M5 9h14l1 12H4L5 9z"></path>
                 </svg>
-                <span>Ertaga</span>
+                <span>Tanlash</span>
             </button>
         `;
     }
