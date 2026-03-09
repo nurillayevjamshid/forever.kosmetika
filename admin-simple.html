@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - For.Ever Cosmetics</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            background: #f8f9fe;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .admin-header {
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-title {
+            font-size: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .firebase-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .firebase-status.connected {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .firebase-status.disconnected {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .firebase-status .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .firebase-status.connected .dot {
+            background: #4caf50;
+        }
+
+        .firebase-status.disconnected .dot {
+            background: #ff9800;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .tab {
+            padding: 1rem 2rem;
+            background: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .tab:hover:not(.active) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-box {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.08);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-group label {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-weight: 600;
+            color: #8b8b9f;
+            font-size: 1rem;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            background: white;
+            padding: 0 0.25rem;
+            z-index: 2;
+        }
+
+        .form-group:has(textarea) label {
+            top: 2rem;
+            transform: translateY(0);
+        }
+
+        .form-group input:focus~label,
+        .form-group input:not(:placeholder-shown)~label,
+        .form-group select:focus~label,
+        .form-group select.has-value~label,
+        .form-group textarea:focus~label,
+        .form-group textarea:not(:placeholder-shown)~label,
+        .form-group label.active {
+            top: 0;
+            transform: translateY(-50%);
+            font-size: 0.85rem;
+            color: #667eea;
+            font-weight: 700;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 1rem;
+            padding-top: 1.5rem;
+            border: 2px solid #e8e8f0;
+            border-radius: 8px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background: white;
+            color: #1a1a2e;
+            position: relative;
+            z-index: 1;
+        }
+
+        .form-group select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23667eea' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            padding-right: 2.5rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .upload-progress-container {
+            display: none;
+            margin-top: 0.5rem;
+            background: #f0f0f5;
+            border-radius: 8px;
+            overflow: hidden;
+            height: 28px;
+        }
+
+        .upload-progress-container.active {
+            display: block;
+        }
+
+        .upload-progress-bar {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 600;
+            min-width: 40px;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #f8f9fe;
+            color: #667eea;
+        }
+
+        .btn-migrate {
+            background: linear-gradient(135deg, #ff9800 0%, #f44336 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            font-size: 0.9rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .products-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .product-item {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            display: grid;
+            grid-template-columns: 80px 1fr auto;
+            gap: 1rem;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
+        }
+
+        .product-item:hover {
+            transform: translateX(4px);
+        }
+
+        .product-img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .product-info h3 {
+            margin: 0 0 0.5rem 0;
+            color: #1a1a2e;
+        }
+
+        .product-info p {
+            margin: 0;
+            color: #8b8b9f;
+            font-size: 0.9rem;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-edit,
+        .btn-delete {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-edit {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #f5576c;
+            color: white;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            animation: slideIn 0.3s;
+            font-weight: 600;
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #f5576c 0%, #ff6b6b 100%);
+        }
+
+        .notification.warning {
+            background: linear-gradient(135deg, #ff9800 0%, #ffb74d 100%);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            display: none;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid #e8e8f0;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #8b8b9f;
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .migrate-box {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .migrate-box p {
+            margin: 0;
+            color: #e65100;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .product-item {
+                grid-template-columns: 60px 1fr;
+            }
+
+            .product-actions {
+                grid-column: 1 / -1;
+                justify-content: flex-end;
+            }
+
+            .admin-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .header-actions {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+
+        /* Login Styles */
+        #loginOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 11000;
+        }
+
+        .login-box {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .login-box h2 {
+            margin-bottom: 2rem;
+            color: #1a1a2e;
+            font-family: 'Playfair Display', serif;
+        }
+
+        #adminContent {
+            display: none;
+        }
+
+        #adminContent.visible {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Login Overlay -->
+    <div id="loginOverlay">
+        <div class="login-box">
+            <h2>🔥 Admin Kirish</h2>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <input type="text" id="loginUser" required placeholder=" ">
+                    <label>Login</label>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="loginPass" required placeholder=" ">
+                    <label>Parol</label>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full" style="width: 100%; margin-top: 1rem;">
+                    KIRISH
+                </button>
+            </form>
+            <p style="margin-top: 2rem;"><a href="index.html"
+                    style="color: #667eea; text-decoration: none; font-weight: 600;">← Saytga qaytish</a></p>
+        </div>
+    </div>
+
+    <!-- Main Admin Content -->
+    <div id="adminContent">
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="loading-overlay">
+            <div class="loading-spinner"></div>
+        </div>
+
+        <div class="admin-container">
+            <div class="admin-header">
+                <h1 class="admin-title">🔥 For.Ever Admin Panel</h1>
+                <div class="header-actions">
+                    <div id="firebaseStatus" class="firebase-status disconnected">
+                        <div class="dot"></div>
+                        <span>Tekshirmoqda...</span>
+                    </div>
+                    <a href="index.html" class="btn btn-secondary">Bosh sahifa</a>
+                    <button onclick="handleLogout()" class="btn btn-secondary"
+                        style="background: #f5576c; color: white;">🚪 Chiqish</button>
+                </div>
+            </div>
+
+            <!-- Migration Notice -->
+            <div id="migrateBox" class="migrate-box" style="display: none;">
+                <div>
+                    <p><strong>📦 LocalStorage'da mahsulotlar topildi!</strong></p>
+                    <p style="font-size: 0.9rem;">Ularni Firebase bazasiga ko'chirmoqchimisiz?</p>
+                </div>
+                <button class="btn-migrate" onclick="handleMigration()">Ko'chirish</button>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('add', this)">➕ Yangi mahsulot</button>
+                <button class="tab" onclick="showTab('list', this)">📋 Mahsulotlar ro'yxati</button>
+            </div>
+
+            <!-- Add Product Tab -->
+            <div id="tab-add" class="tab-content active">
+                <div class="form-box">
+                    <h2 id="formTitle">Yangi mahsulot qo'shish</h2>
+                    <form id="productForm" onsubmit="handleSubmit(event)">
+                        <input type="hidden" id="editId" value="">
+
+                        <div class="form-group">
+                            <input type="text" id="name" required placeholder=" ">
+                            <label>Mahsulot nomi *</label>
+                        </div>
+
+                        <div class="form-group">
+                            <select id="category" required>
+                                <option value="">Tanlang</option>
+                                <option value="kosmetika">Kosmetika</option>
+                                <option value="atir">Atirlar</option>
+                                <option value="parvarish">Teri parvarishi</option>
+                                <option value="soch">Soch vositalari</option>
+                            </select>
+                            <label>Kategoriya *</label>
+                        </div>
+
+                        <div class="form-group">
+                            <input type="number" id="price" required min="0" step="1000" placeholder=" ">
+                            <label>Narxi (so'm) *</label>
+                        </div>
+
+                        <div class="form-group">
+                            <textarea id="description" rows="3" required placeholder=" "></textarea>
+                            <label>Ta'rif *</label>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="active">Rasm *</label>
+                            <div
+                                style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem; margin-top: 1rem;">
+                                <button type="button" class="btn btn-secondary"
+                                    onclick="document.getElementById('imageFile').click()">
+                                    📁 Kompyuterdan yuklash
+                                </button>
+                                <span style="color: #8b8b9f;">yoki</span>
+                                <button type="button" class="btn btn-secondary" onclick="toggleUrlInput()">
+                                    🔗 URL kiriting
+                                </button>
+                            </div>
+
+                            <input type="file" id="imageFile" accept="image/*" style="display: none;"
+                                onchange="handleImageUpload(event)">
+
+                            <div id="uploadProgressContainer" class="upload-progress-container">
+                                <div id="uploadProgress" class="upload-progress-bar" style="width: 0%">0%</div>
+                            </div>
+
+                            <div id="urlInputContainer" style="display: none;">
+                                <input type="url" id="imageUrl" placeholder="https://example.com/image.jpg">
+                                <button type="button" class="btn btn-secondary" style="margin-top: 0.5rem;"
+                                    onclick="loadFromUrl()">URL dan yuklash</button>
+                            </div>
+
+                            <input type="hidden" id="image" required>
+                            <input type="hidden" id="imageStoragePath" value="">
+
+                            <div id="imagePreview"
+                                style="margin-top: 1rem; min-height: 200px; border: 2px dashed #e8e8f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: #f8f9fe;">
+                                <p style="color: #8b8b9f;">Rasm preview</p>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <select id="badge">
+                                <option value="">Yo'q</option>
+                                <option value="Yangi">Yangi</option>
+                                <option value="Top">Top</option>
+                                <option value="Ommabop">Ommabop</option>
+                                <option value="Premium">Premium</option>
+                                <option value="Lux">Lux</option>
+                                <option value="Set">Set</option>
+                                <option value="Chegirma">Chegirma</option>
+                            </select>
+                            <label>Badge</label>
+                        </div>
+
+                        <div style="display: flex; gap: 1rem;">
+                            <button type="submit" class="btn btn-primary" id="submitBtn">💾 Saqlash</button>
+                            <button type="button" class="btn btn-secondary" onclick="resetForm()">🔄 Tozalash</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Products List Tab -->
+            <div id="tab-list" class="tab-content">
+                <div class="form-box">
+                    <h2>Barcha mahsulotlar <span id="productCount" style="color: #8b8b9f; font-size: 1rem;"></span></h2>
+                    <div id="productsList" class="products-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="imgbb-config.js"></script>
+    <script src="firebase-db.js"></script>
+
+    <script>
+        // ================================
+        // FIREBASE STATUS CHECK
+        // ================================
+
+        let isFirebaseConnected = false;
+
+        function checkFirebaseStatus() {
+            const statusEl = document.getElementById('firebaseStatus');
+            try {
+                if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length > 0) {
+                    isFirebaseConnected = true;
+                    statusEl.className = 'firebase-status connected';
+                    statusEl.innerHTML = '<div class="dot"></div><span>🔥 Firebase ulangan</span>';
+                    checkMigration();
+                } else {
+                    isFirebaseConnected = false;
+                    statusEl.className = 'firebase-status disconnected';
+                    statusEl.innerHTML = '<div class="dot"></div><span>⚠️ Firebase ulanmagan</span>';
+                }
+            } catch (e) {
+                isFirebaseConnected = false;
+                statusEl.className = 'firebase-status disconnected';
+                statusEl.innerHTML = '<div class="dot"></div><span>❌ Xatolik</span>';
+            }
+        }
+
+        // ================================
+        // MIGRATION
+        // ================================
+
+        function checkMigration() {
+            const localProducts = JSON.parse(localStorage.getItem('products'));
+            if (localProducts && localProducts.length > 0 && isFirebaseConnected) {
+                document.getElementById('migrateBox').style.display = 'flex';
+            }
+        }
+
+        async function handleMigration() {
+            if (!confirm("LocalStorage'dagi barcha mahsulotlarni Firebase'ga ko'chirmoqchimisiz?")) return;
+
+            showLoading(true);
+            try {
+                const count = await migrateLocalStorageToFirebase();
+                showNotification("🎉 " + count + " ta mahsulot Firebase'ga ko'chirildi!");
+                document.getElementById('migrateBox').style.display = 'none';
+
+                if (confirm("LocalStorage'dagi mahsulotlarni o'chirmoqchimisiz? (Ular Firebase'da saqlandi)")) {
+                    localStorage.removeItem('products');
+                }
+
+                loadProducts();
+            } catch (error) {
+                showNotification('Xatolik: ' + error.message, 'error');
+            }
+            showLoading(false);
+        }
+
+        // ================================
+        // TAB NAVIGATION
+        // ================================
+
+        function showTab(tabName, btn) {
+            document.querySelectorAll('.tab-content').forEach(function (t) { t.classList.remove('active'); });
+            document.querySelectorAll('.tab').forEach(function (t) { t.classList.remove('active'); });
+
+            document.getElementById('tab-' + tabName).classList.add('active');
+            if (btn) btn.classList.add('active');
+
+            if (tabName === 'list') {
+                loadProducts();
+            }
+        }
+
+        // ================================
+        // FORM SUBMIT
+        // ================================
+
+        async function handleSubmit(event) {
+            event.preventDefault();
+
+            var submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Saqlanmoqda...';
+
+            var editId = document.getElementById('editId').value;
+            var product = {
+                name: document.getElementById('name').value,
+                category: document.getElementById('category').value,
+                price: parseInt(document.getElementById('price').value),
+                description: document.getElementById('description').value,
+                image: document.getElementById('image').value,
+                badge: document.getElementById('badge').value || null
+            };
+
+            var storagePath = document.getElementById('imageStoragePath').value;
+            if (storagePath) {
+                product.imageStoragePath = storagePath;
+            }
+
+            try {
+                if (isFirebaseConnected) {
+                    if (editId) {
+                        await firebaseUpdateProduct(editId, product);
+                        showNotification('✅ Mahsulot yangilandi!');
+                    } else {
+                        await firebaseAddProduct(product);
+                        showNotification("✅ Mahsulot Firebase'ga qo'shildi!");
+                    }
+                } else {
+                    var products = getProductsLocal();
+                    if (editId) {
+                        var index = products.findIndex(function (p) { return p.id == editId; });
+                        if (index !== -1) {
+                            product.id = parseInt(editId);
+                            products[index] = product;
+                        }
+                    } else {
+                        product.id = products.length > 0 ? Math.max.apply(null, products.map(function (p) { return p.id; })) + 1 : 1;
+                        products.push(product);
+                    }
+                    saveProductsLocal(products);
+                    showNotification('✅ Mahsulot saqlandi (localStorage)');
+                }
+
+                resetForm();
+            } catch (error) {
+                showNotification('❌ Xatolik: ' + error.message, 'error');
+            }
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = '💾 Saqlash';
+        }
+
+        // ================================
+        // LOAD & DISPLAY PRODUCTS
+        // ================================
+
+        async function loadProducts() {
+            var container = document.getElementById('productsList');
+            var countEl = document.getElementById('productCount');
+
+            container.innerHTML = '<div style="text-align:center;padding:2rem;"><div class="loading-spinner" style="margin:0 auto;width:32px;height:32px;border-width:3px;"></div></div>';
+
+            var products = [];
+
+            try {
+                if (isFirebaseConnected) {
+                    products = await firebaseGetProducts();
+                } else {
+                    products = getProductsLocal();
+                }
+            } catch (error) {
+                products = getProductsLocal();
+            }
+
+            countEl.textContent = '(' + products.length + ' ta)';
+
+            if (products.length === 0) {
+                container.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg><p>Hozircha mahsulotlar yo\'q</p><p style="font-size: 0.85rem;">Yangi mahsulot qo\'shish uchun "Yangi mahsulot" tabini bosing</p></div>';
+                return;
+            }
+
+            var html = '';
+            for (var i = 0; i < products.length; i++) {
+                var p = products[i];
+                var badgeHtml = p.badge ? ' <span style="background:#667eea;color:white;padding:2px 8px;border-radius:4px;font-size:0.75rem;">' + p.badge + '</span>' : '';
+                html += '<div class="product-item">';
+                html += '<img src="' + p.image + '" alt="' + p.name + '" class="product-img" onerror="this.src=\'https://via.placeholder.com/80/667eea/ffffff?text=📦\'">';
+                html += '<div class="product-info">';
+                html += '<h3>' + p.name + badgeHtml + '</h3>';
+                html += '<p>' + p.description + '</p>';
+                html += '<p><strong>' + formatPrice(p.price) + " so'm</strong> • " + getCategoryName(p.category) + '</p>';
+                html += '</div>';
+                html += '<div class="product-actions">';
+                html += '<button class="btn-edit" onclick="editProduct(\'' + p.id + '\')">✏️ Tahrirlash</button>';
+                html += '<button class="btn-delete" onclick="deleteProduct(\'' + p.id + '\')">🗑️ O\'chirish</button>';
+                html += '</div>';
+                html += '</div>';
+            }
+            container.innerHTML = html;
+        }
+
+        // ================================
+        // EDIT PRODUCT
+        // ================================
+
+        async function editProduct(id) {
+            var product;
+
+            if (isFirebaseConnected) {
+                product = await firebaseGetProduct(id);
+            } else {
+                var products = getProductsLocal();
+                product = products.find(function (p) { return p.id == id; });
+            }
+
+            if (!product) {
+                showNotification('Mahsulot topilmadi!', 'error');
+                return;
+            }
+
+            document.getElementById('editId').value = product.id;
+            document.getElementById('name').value = product.name;
+            document.getElementById('category').value = product.category;
+            document.getElementById('price').value = product.price;
+            document.getElementById('description').value = product.description;
+            document.getElementById('image').value = product.image;
+            document.getElementById('imageStoragePath').value = product.imageStoragePath || '';
+            document.getElementById('badge').value = product.badge || '';
+
+            document.getElementById('formTitle').textContent = '✏️ Mahsulotni tahrirlash';
+            document.getElementById('submitBtn').textContent = '💾 Yangilash';
+
+            showImagePreview(product.image);
+
+            // Switch to add tab
+            showTab('add', document.querySelectorAll('.tab')[0]);
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ================================
+        // DELETE PRODUCT
+        // ================================
+
+        async function deleteProduct(id) {
+            if (!confirm("Bu mahsulotni o'chirmoqchimisiz?")) return;
+
+            showLoading(true);
+            try {
+                if (isFirebaseConnected) {
+                    await firebaseDeleteProduct(id);
+                    showNotification("🗑️ Mahsulot Firebase'dan o'chirildi!");
+                } else {
+                    var products = getProductsLocal();
+                    products = products.filter(function (p) { return p.id != id; });
+                    saveProductsLocal(products);
+                    showNotification("🗑️ Mahsulot o'chirildi!");
+                }
+                loadProducts();
+            } catch (error) {
+                showNotification('❌ Xatolik: ' + error.message, 'error');
+            }
+            showLoading(false);
+        }
+
+        // ================================
+        // IMAGE HANDLING
+        // ================================
+
+        async function handleImageUpload(event) {
+            var file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 5 * 1024 * 1024) {
+                showNotification("Rasm hajmi 5MB dan kichik bo'lishi kerak!", 'error');
+                return;
+            }
+
+            if (!file.type.startsWith('image/')) {
+                showNotification('Faqat rasm fayllarini yuklash mumkin!', 'error');
+                return;
+            }
+
+            if (isFirebaseConnected) {
+                var progressContainer = document.getElementById('uploadProgressContainer');
+                progressContainer.classList.add('active');
+
+                try {
+                    var result = await firebaseUploadImage(file);
+                    if (result) {
+                        document.getElementById('image').value = result.url;
+                        document.getElementById('imageStoragePath').value = result.storagePath;
+                        showImagePreview(result.url);
+                        showNotification("✅ Rasm Firebase'ga yuklandi!");
+                    }
+                } catch (error) {
+                    showNotification('❌ Rasm yuklashda xatolik: ' + error.message, 'error');
+                }
+
+                setTimeout(function () {
+                    progressContainer.classList.remove('active');
+                }, 1000);
+            } else {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('image').value = e.target.result;
+                    showImagePreview(e.target.result);
+                    showNotification('📸 Rasm yuklandi (mahalliy)');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function toggleUrlInput() {
+            var container = document.getElementById('urlInputContainer');
+            container.style.display = container.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function loadFromUrl() {
+            var url = document.getElementById('imageUrl').value;
+            if (!url) {
+                showNotification('URL kiriting!', 'warning');
+                return;
+            }
+
+            document.getElementById('image').value = url;
+            document.getElementById('imageStoragePath').value = '';
+            showImagePreview(url);
+            showNotification('🔗 URL saqlandi!');
+        }
+
+        function showImagePreview(imageSrc) {
+            var preview = document.getElementById('imagePreview');
+            preview.innerHTML = '<img src="' + imageSrc + '" style="max-width: 100%; max-height: 400px; border-radius: 8px;" onerror="this.parentElement.innerHTML=\'<p style=color:red>Rasmni yuklab bolmadi</p>\'">';
+            preview.style.border = '2px solid #667eea';
+        }
+
+        // ================================
+        // RESET FORM
+        // ================================
+
+        function resetForm() {
+            document.getElementById('productForm').reset();
+            document.getElementById('editId').value = '';
+            document.getElementById('image').value = '';
+            document.getElementById('imageStoragePath').value = '';
+            document.getElementById('formTitle').textContent = "Yangi mahsulot qo'shish";
+            document.getElementById('submitBtn').textContent = '💾 Saqlash';
+
+            var preview = document.getElementById('imagePreview');
+            preview.innerHTML = '<p style="color: #8b8b9f;">Rasm preview</p>';
+            preview.style.border = '2px dashed #e8e8f0';
+
+            document.getElementById('urlInputContainer').style.display = 'none';
+            document.getElementById('uploadProgressContainer').classList.remove('active');
+
+            document.querySelectorAll('.form-group select').forEach(function (select) {
+                select.classList.remove('has-value');
+            });
+        }
+
+        // ================================
+        // HELPER FUNCTIONS
+        // ================================
+
+        function getProductsLocal() {
+            return JSON.parse(localStorage.getItem('products')) || [];
+        }
+
+        function saveProductsLocal(products) {
+            localStorage.setItem('products', JSON.stringify(products));
+        }
+
+        function formatPrice(price) {
+            return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+        }
+
+        function getCategoryName(category) {
+            var names = {
+                'kosmetika': 'Kosmetika',
+                'atir': 'Atirlar',
+                'parvarish': 'Teri parvarishi',
+                'soch': 'Soch vositalari'
+            };
+            return names[category] || category;
+        }
+
+        function showLoading(show) {
+            var overlay = document.getElementById('loadingOverlay');
+            if (show) overlay.classList.add('active');
+            else overlay.classList.remove('active');
+        }
+
+        function showNotification(message, type) {
+            type = type || 'success';
+            var notif = document.createElement('div');
+            notif.className = 'notification ' + type;
+            notif.textContent = message;
+            document.body.appendChild(notif);
+
+            setTimeout(function () {
+                notif.style.animation = 'slideIn 0.3s ease reverse';
+                setTimeout(function () { notif.remove(); }, 300);
+            }, 3000);
+        }
+
+        // ================================
+        // LOGIN HANDLING
+        // ================================
+
+        function handleLogin(event) {
+            event.preventDefault();
+            var user = document.getElementById('loginUser').value;
+            var pass = document.getElementById('loginPass').value;
+
+            // Foydalanuvchi so'ragan login va parol
+            if (user === 'njuhoz' && pass === 'jamshid877orasta') {
+                sessionStorage.setItem('adminLoggedIn', 'true');
+                showAdminPanel();
+                showNotification('Xush kelibsiz, Admin!');
+            } else {
+                showNotification('Login yoki parol noto\'g\'ri!', 'error');
+            }
+        }
+
+        function showAdminPanel() {
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('adminContent').classList.add('visible');
+            setTimeout(checkFirebaseStatus, 500);
+            setTimeout(loadProducts, 600);
+        }
+
+        function handleLogout() {
+            if (confirm("Rostdan ham tizimdan chiqmoqchimisiz?")) {
+                sessionStorage.removeItem('adminLoggedIn');
+                location.reload();
+            }
+        }
+
+        function checkLogin() {
+            if (sessionStorage.getItem('adminLoggedIn') === 'true') {
+                showAdminPanel();
+            } else {
+                document.getElementById('loginOverlay').style.display = 'flex';
+                document.getElementById('adminContent').classList.remove('visible');
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', function () {
+            checkLogin();
+
+            var selects = document.querySelectorAll('.form-group select');
+            selects.forEach(function (select) {
+                function checkValue() {
+                    if (select.value && select.value !== '') {
+                        select.classList.add('has-value');
+                    } else {
+                        select.classList.remove('has-value');
+                    }
+                }
+                checkValue();
+                select.addEventListener('change', checkValue);
+            });
+        });
+    </script>
+</body>
+
+</html>

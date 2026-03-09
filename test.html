@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Admin Panel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .test-section {
+            background: #f5f5f5;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        .success {
+            color: green;
+        }
+
+        .error {
+            color: red;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+        }
+
+        #console {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Admin Panel Test</h1>
+
+    <div class="test-section">
+        <h2>1. Script yuklandi mi?</h2>
+        <div id="scriptTest">Tekshirilmoqda...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. LocalStorage ishlayaptimi?</h2>
+        <div id="localStorageTest">Tekshirilmoqda...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Mahsulotlar</h2>
+        <div id="productsTest">Tekshirilmoqda...</div>
+        <button onclick="testAddProduct()">Test: Mahsulot qo'shish</button>
+        <button onclick="testViewProducts()">Mahsulotlarni ko'rish</button>
+        <button onclick="testClearProducts()">Hammasini o'chirish</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Console Log:</h2>
+        <div id="console"></div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Custom console
+        function log(message, type = 'info') {
+            const consoleDiv = document.getElementById('console');
+            const time = new Date().toLocaleTimeString();
+            const color = type === 'error' ? '#f00' : '#0f0';
+            consoleDiv.innerHTML += `<div style="color: ${color}">[${time}] ${message}</div>`;
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+            console.log(message);
+        }
+
+        // Test 1: Scripts loaded
+        window.addEventListener('DOMContentLoaded', function () {
+            log('DOM Content Loaded');
+
+            // Test script.js
+            const scriptTest = document.getElementById('scriptTest');
+            if (typeof window.saveProduct === 'function') {
+                scriptTest.innerHTML = '<span class="success">✅ script.js yuklandi</span>';
+                log('script.js yuklandi - saveProduct funksiyasi mavjud');
+            } else {
+                scriptTest.innerHTML = '<span class="error">❌ script.js yuklanmadi yoki saveProduct funksiyasi yo\'q</span>';
+                log('ERROR: script.js yuklanmadi', 'error');
+            }
+
+            // Test localStorage
+            const localStorageTest = document.getElementById('localStorageTest');
+            try {
+                localStorage.setItem('test', 'working');
+                const value = localStorage.getItem('test');
+                localStorage.removeItem('test');
+
+                if (value === 'working') {
+                    localStorageTest.innerHTML = '<span class="success">✅ localStorage ishlayapti</span>';
+                    log('localStorage ishlayapti');
+                } else {
+                    throw new Error('localStorage test failed');
+                }
+            } catch (error) {
+                localStorageTest.innerHTML = '<span class="error">❌ localStorage ishlamayapti: ' + error.message + '</span>';
+                log('ERROR: localStorage - ' + error.message, 'error');
+            }
+
+            // Test products
+            testViewProducts();
+        });
+
+        function testAddProduct() {
+            log('Test mahsulot qo\'shilmoqda...');
+
+            const testProduct = {
+                name: 'Test Mahsulot ' + Date.now(),
+                category: 'kosmetika',
+                price: 100000,
+                description: 'Bu test mahsuloti',
+                image: 'https://via.placeholder.com/300',
+                badge: 'Test'
+            };
+
+            try {
+                if (typeof window.saveProduct === 'function') {
+                    const result = window.saveProduct(testProduct);
+                    log('Mahsulot qo\'shildi: ' + testProduct.name);
+                    testViewProducts();
+                } else {
+                    // Manual save
+                    const products = JSON.parse(localStorage.getItem('products')) || [];
+                    testProduct.id = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
+                    products.push(testProduct);
+                    localStorage.setItem('products', JSON.stringify(products));
+                    log('Mahsulot qo\'shildi (manual): ' + testProduct.name);
+                    testViewProducts();
+                }
+            } catch (error) {
+                log('ERROR: Mahsulot qo\'shishda xatolik - ' + error.message, 'error');
+            }
+        }
+
+        function testViewProducts() {
+            log('Mahsulotlar yuklanmoqda...');
+
+            const productsTest = document.getElementById('productsTest');
+
+            try {
+                let products;
+
+                if (typeof window.getProducts === 'function') {
+                    products = window.getProducts();
+                    log('Mahsulotlar olindi (getProducts funksiyasi)');
+                } else {
+                    products = JSON.parse(localStorage.getItem('products')) || [];
+                    log('Mahsulotlar olindi (localStorage)');
+                }
+
+                if (products.length === 0) {
+                    productsTest.innerHTML = '<p>⚠️ Hech qanday mahsulot yo\'q. "Test: Mahsulot qo\'shish" tugmasini bosing.</p>';
+                    log('Mahsulotlar soni: 0');
+                } else {
+                    let html = `<p class="success">✅ Jami ${products.length} ta mahsulot topildi:</p><ul>`;
+                    products.forEach(p => {
+                        html += `<li><strong>${p.name}</strong> - ${p.price} so'm (${p.category})</li>`;
+                    });
+                    html += '</ul>';
+                    productsTest.innerHTML = html;
+                    log('Mahsulotlar soni: ' + products.length);
+                }
+            } catch (error) {
+                productsTest.innerHTML = '<span class="error">❌ Xatolik: ' + error.message + '</span>';
+                log('ERROR: Mahsulotlarni yuklashda xatolik - ' + error.message, 'error');
+            }
+        }
+
+        function testClearProducts() {
+            if (confirm('Barcha mahsulotlarni o\'chirmoqchimisiz?')) {
+                localStorage.setItem('products', JSON.stringify([]));
+                log('Barcha mahsulotlar o\'chirildi');
+                testViewProducts();
+            }
+        }
+    </script>
+</body>
+
+</html>
