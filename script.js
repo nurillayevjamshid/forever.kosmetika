@@ -251,12 +251,28 @@ function createProductCard(product) {
     card.innerHTML = `
         <div class="product-image">
             <img src="${product.image}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/300x300?text=${product.name}'">
+            <button class="favorite-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+            </button>
             ${product.badge ? `<span class="product-badge">${product.badge}</span>` : (isNew ? '<span class="product-badge new">Yangi</span>' : '')}
         </div>
         <div class="product-info">
-            <div class="product-category">${getCategoryName(product.category)}</div>
+            <div class="product-price-row">
+                <span class="product-price">${formatPrice(product.price)} so'm</span>
+            </div>
+            <div class="product-credit">
+                <span class="credit-badge">${formatPrice(Math.floor(product.price / 12))} so'm/oyiga</span>
+            </div>
             <h3 class="product-name">${product.name}</h3>
-            <p class="product-description">${product.description}</p>
+            <div class="product-rating">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="#FFB547" stroke="#FFB547">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+                <span class="rating-score">4.9</span>
+                <span class="rating-count">(99 ta sharh)</span>
+            </div>
             <div class="product-footer" id="footer-${product.id}">
                 ${getProductFooterHTML(product)}
             </div>
@@ -269,36 +285,26 @@ function createProductCard(product) {
 function getProductFooterHTML(product) {
     const cartItem = cart.find(item => item.id.toString() === product.id.toString());
 
-    // Narx va Tugma (yonma-yon)
-    let html = `<div class="product-price">${formatPrice(product.price)} so'm</div>`;
-
     if (cartItem) {
-        // 2-holat: Savatda bor (count controls only)
-        html += `
-            <div class="qty-control-wrapper">
-                <div class="qty-counter">
-                    <button class="qty-btn" onclick="changeQuantity('${product.id}', -1)">−</button>
-                    <span class="qty-display">${cartItem.quantity}</span>
-                    <button class="qty-btn" onclick="changeQuantity('${product.id}', 1)">+</button>
-                </div>
+        // Savatda bor (count controls)
+        return `
+            <div class="qty-counter full-width-qty">
+                <button class="qty-btn" onclick="changeQuantity('${product.id}', -1)">−</button>
+                <span class="qty-display">${cartItem.quantity}</span>
+                <button class="qty-btn" onclick="changeQuantity('${product.id}', 1)">+</button>
             </div>
         `;
     } else {
-        // 1-holat: Savatda yo'q (Add button only)
-        html += `
-            <div class="btn-container">
-                 <button class="btn-add-main" onclick="addToCart('${product.id}')">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;">
-                        <path d="M9 20a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"></path>
-                        <path d="M20 20a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"></path>
-                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                    </svg>
-                    <span class="btn-text">Savatga</span>
-                </button>
-            </div>
+        // Savatda yo'q (Add button only)
+        return `
+            <button class="btn-add-uzum" onclick="addToCart('${product.id}')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;">
+                    <path d="M16 11V7a4 4 0 0 0-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                </svg>
+                <span>Ertaga</span>
+            </button>
         `;
     }
-    return html;
 }
 
 function updateProductUI(productId) {
