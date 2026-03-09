@@ -5,7 +5,7 @@
 // Barcha mahsulotlarni olish
 async function firebaseGetProducts() {
     try {
-        const snapshot = await productsCollection.orderBy('createdAt', 'desc').get();
+        const snapshot = await productsCollection.get();
         const products = [];
         snapshot.forEach(doc => {
             const data = doc.data();
@@ -14,7 +14,8 @@ async function firebaseGetProducts() {
                 products.push({ id: doc.id, ...data });
             }
         });
-        return products;
+        // So'nggi qo'shilganlar yuqorida bo'lishi uchun sort qilish (ixtiyoriy)
+        return products.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
     } catch (error) {
         console.error('Mahsulotlarni olishda xatolik:', error);
         return [];
@@ -174,7 +175,7 @@ async function firebaseUploadBase64Image(base64String) {
 
 // Mahsulotlar o'zgarishini kuzatish
 function firebaseListenProducts(callback) {
-    return productsCollection.orderBy('createdAt', 'desc').onSnapshot(
+    return productsCollection.onSnapshot(
         (snapshot) => {
             const products = [];
             snapshot.forEach(doc => {
@@ -183,7 +184,8 @@ function firebaseListenProducts(callback) {
                     products.push({ id: doc.id, ...data });
                 }
             });
-            callback(products);
+            // Client-side sort
+            callback(products.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)));
         },
         (error) => {
             console.error('Real-time xatolik:', error);

@@ -8,81 +8,8 @@ let products = [];
 // Firebase ulangan yoki yo'qligini tekshirish
 const isFirebaseReady = typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length > 0;
 
-// Default mahsulotlar (Firebase ulanmaganda)
-const defaultProducts = [
-    {
-        id: 1,
-        name: "Luxury Face Cream",
-        category: "parvarish",
-        price: 250000,
-        description: "Premium teri parvarish kremi - yumshoq va silliq teri uchun",
-        image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=500&q=80",
-        badge: "Yangi"
-    },
-    {
-        id: 2,
-        name: "Rose Perfume",
-        category: "atir",
-        price: 350000,
-        description: "Eksklyuziv atirgul hidli atir - uzun muddatli hid",
-        image: "https://images.unsplash.com/photo-1541643600914-78b084683601?w=500&q=80",
-        badge: "Top"
-    },
-    {
-        id: 3,
-        name: "Matte Lipstick Set",
-        category: "kosmetika",
-        price: 180000,
-        description: "6 ta rangdagi mat lab bo'yoqlari to'plami",
-        image: "https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=500&q=80",
-        badge: "Set"
-    },
-    {
-        id: 4,
-        name: "Professional Hair Dryer",
-        category: "soch",
-        price: 450000,
-        description: "Yuqori quvvatli ionli fen - tez va xavfsiz quritish",
-        image: "https://images.unsplash.com/photo-1522338140262-f46f5913618a?w=500&q=80",
-        badge: "Premium"
-    },
-    {
-        id: 5,
-        name: "Vitamin C Serum",
-        category: "parvarish",
-        price: 280000,
-        description: "Teri uchun Vitamin C serumi - yorqinlik va namlik",
-        image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=500&q=80",
-        badge: "Ommabop"
-    },
-    {
-        id: 6,
-        name: "Eye Shadow Palette",
-        category: "kosmetika",
-        price: 220000,
-        description: "20 ta rang palitasi - kundalik va kechki makiyaj uchun",
-        image: "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=500&q=80",
-        badge: "Yangi"
-    },
-    {
-        id: 7,
-        name: "Oud Perfume",
-        category: "atir",
-        price: 520000,
-        description: "Sharq hidlari - Ajoyib Oud atiri",
-        image: "https://images.unsplash.com/photo-1588405748880-12d1d2a59bd9?w=500&q=80",
-        badge: "Lux"
-    },
-    {
-        id: 8,
-        name: "Hair Straightener",
-        category: "soch",
-        price: 380000,
-        description: "Keramik soch dazoli - harorat nazorati bilan",
-        image: "https://images.unsplash.com/photo-1526045478516-99145907023c?w=500&q=80",
-        badge: "Yangi"
-    }
-];
+// Default mahsulotlar olib tashlandi (Faqat CRM dan keladi)
+const defaultProducts = [];
 
 // Cart state
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -137,20 +64,14 @@ async function loadProducts() {
         try {
             console.log('🔥 Firebase\'dan mahsulotlar yuklanmoqda...');
             products = await firebaseGetProducts();
-
-            if (products.length === 0) {
-                console.log('📦 Firebase\'da mahsulotlar yo\'q, default mahsulotlar ko\'rsatilmoqda');
-                products = defaultProducts;
-            }
-
             console.log(`✅ ${products.length} ta mahsulot yuklandi`);
         } catch (error) {
-            console.error('Firebase xatolik, localStorage\'dan yuklanmoqda:', error);
-            products = JSON.parse(localStorage.getItem('products')) || defaultProducts;
+            console.error('Firebase xatolik:', error);
+            products = [];
         }
     } else {
-        console.log('⚠️ Firebase ulanmagan, localStorage\'dan yuklanmoqda');
-        products = JSON.parse(localStorage.getItem('products')) || defaultProducts;
+        console.log('⚠️ Firebase ulanmagan');
+        products = [];
     }
 
     // Mahsulotlarni ko'rsatish
