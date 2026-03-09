@@ -63,7 +63,9 @@ async function loadProducts() {
     if (isFirebaseReady && typeof firebaseGetProducts === 'function') {
         try {
             console.log('🔥 Firebase\'dan mahsulotlar yuklanmoqda...');
-            products = await firebaseGetProducts();
+            const loadedProducts = await firebaseGetProducts();
+            console.log('📦 Bazadan kelgan mahsulotlar:', loadedProducts);
+            products = loadedProducts;
             console.log(`✅ ${products.length} ta mahsulot yuklandi`);
         } catch (error) {
             console.error('Firebase xatolik:', error);
@@ -128,9 +130,16 @@ function displayProducts(filter = 'all') {
         : products.filter(p => {
             const cat = (p.category || '').toLowerCase();
             const f = filter.toLowerCase();
-            // Mappings if necessary
-            if (f === 'parvarish' && (cat.includes('parvarish') || cat.includes('krem'))) return true;
-            if (f === 'atir' && (cat === 'atir' || cat === 'parfyumeriya')) return true;
+
+            // CRM dagi "Soch parvarishi" -> websitedagi "soch"
+            if (f === 'soch' && cat.includes('soch')) return true;
+            // CRM dagi "Tana parvarishi" -> websitedagi "parvarish"
+            if (f === 'parvarish' && (cat.includes('tana') || cat.includes('parvarish') || cat.includes('krem'))) return true;
+            // CRM dagi "Atir" yoki "Parfyumeriya" -> websitedagi "atir"
+            if (f === 'atir' && (cat.includes('atir') || cat.includes('parfyumeriya'))) return true;
+            // Kosmetika
+            if (f === 'kosmetika' && cat.includes('kosmetika')) return true;
+
             return cat === f;
         });
 
@@ -182,7 +191,7 @@ function createProductCard(product) {
                         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                     </svg>
                 </button>
-                ${product.badge ? `<span class="product-badge">${product.badge}</span>` : (isNew ? '<span class="product-badge new">Yangi</span>' : '')}
+                ${product.badge ? `<span class="product-badge">${product.badge}</span>` : ''}
             </div>
             <div class="product-info">
                 <div class="product-price-row">
