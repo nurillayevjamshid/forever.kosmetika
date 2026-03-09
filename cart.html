@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Savat - For.Ever Cosmetics</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        .checkout-page {
+            padding-top: 100px;
+            padding-bottom: 60px;
+            min-height: 100vh;
+            background: #f8f9fe;
+        }
+
+        .checkout-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .checkout-header {
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .checkout-header h1 {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            color: var(--text-primary);
+        }
+
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: var(--primary-color);
+        }
+
+        .step-container {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .step-container.active {
+            display: block;
+        }
+
+        .empty-cart-page {
+            text-align: center;
+            padding: 5rem 0;
+        }
+
+        .empty-cart-page h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .empty-cart-page p {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        /* Adjustments for standalone page */
+        .cart-full-modal,
+        .order-full-modal {
+            box-shadow: none !important;
+            border: none !important;
+            max-width: 100% !important;
+            width: 100% !important;
+            background: transparent !important;
+            animation: none !important;
+        }
+
+        .modal-header {
+            background: transparent !important;
+            padding: 0 0 1.5rem 0 !important;
+            border: none !important;
+        }
+
+        .modal-body-layout {
+            padding: 0 !important;
+        }
+
+        .modal-header-right .modal-close {
+            display: none !important;
+        }
+
+        /* Success Page */
+        .success-page-content {
+            background: white;
+            border-radius: 24px;
+            padding: 4rem 2rem;
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: var(--shadow-md);
+        }
+
+        @media (max-width: 768px) {
+            .checkout-page {
+                padding-top: 80px;
+            }
+
+            .checkout-header h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav-container">
+            <div class="logo">
+                <a href="index.html" style="text-decoration: none;">
+                    <h1>For.Ever</h1>
+                    <span class="logo-subtitle">Cosmetics</span>
+                </a>
+            </div>
+            <div class="header-actions">
+                <a href="index.html" class="back-link">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"></path>
+                    </svg>
+                    <span>Dukonga qaytish</span>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="checkout-page">
+        <div class="checkout-container">
+
+            <!-- Step 1: Cart View -->
+            <div id="cartStep" class="step-container">
+                <div class="checkout-header">
+                    <h1>Savatingiz</h1>
+                    <span class="cart-items-count-badge" id="cartBadgeCountPage">0 ta mahsulot</span>
+                </div>
+
+                <div class="modal-body-layout">
+                    <div class="modal-main-content">
+                        <div class="order-section-card" style="margin-bottom: 1.5rem;">
+                            <div class="modal-header" style="justify-content: flex-end; padding-bottom: 0 !important;">
+                                <button class="clear-cart-btn" onclick="clearCart()">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <path
+                                            d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                        </path>
+                                    </svg>
+                                    Savatni tozalash
+                                </button>
+                            </div>
+                            <div id="cartItemsListPage" class="cart-items-list">
+                                <!-- Cart items will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-sidebar">
+                        <div class="order-summary-card">
+                            <h3>Buyurtma xulosasi</h3>
+                            <div id="cartSummaryItemsPage" class="summary-items-list">
+                                <!-- Summary items will be loaded here -->
+                            </div>
+                            <div class="summary-total">
+                                <span>Jami:</span>
+                                <span id="cartTotalPricePage">0 so'm</span>
+                            </div>
+                            <button class="btn btn-primary btn-full checkout-btn" onclick="goToOrderStep()">
+                                Buyurtma berish
+                            </button>
+                            <a href="index.html" class="continue-shopping">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M19 12H5M12 19l-7-7 7-7"></path>
+                                </svg>
+                                Xarid davom ettirish
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Order Form -->
+            <div id="orderStep" class="step-container">
+                <div class="checkout-header">
+                    <button class="back-link" onclick="goToCartStep()"
+                        style="background: none; border: none; cursor: pointer; padding: 0;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M19 12H5M12 19l-7-7 7-7"></path>
+                        </svg>
+                        <span>Savatga qaytish</span>
+                    </button>
+                    <h1>Buyurtma berish</h1>
+                </div>
+
+                <form id="orderFormPage" onsubmit="submitOrder(event, true)">
+                    <div class="modal-body-layout">
+                        <div class="modal-main-content">
+                            <!-- Personal Info Card -->
+                            <div class="order-section-card">
+                                <div class="section-title-row">
+                                    <div class="section-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                            <circle cx="12" cy="7" r="4"></circle>
+                                        </svg>
+                                    </div>
+                                    <h3>Shaxsiy ma'lumotlar</h3>
+                                </div>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="orderNamePage">Ism *</label>
+                                        <input type="text" id="orderNamePage" required placeholder="Masalan: Jamshid">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="orderPhonePage">Telefon raqam *</label>
+                                        <div class="phone-input-wrapper">
+                                            <span class="country-code">+998</span>
+                                            <input type="tel" id="orderPhonePage" required placeholder="90 123 45 67"
+                                                maxlength="9">
+                                        </div>
+                                        <span class="input-hint">Masalan: +998 90 123 45 67</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Address Card -->
+                            <div class="order-section-card">
+                                <div class="section-title-row">
+                                    <div class="section-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                            <circle cx="12" cy="10" r="3"></circle>
+                                        </svg>
+                                    </div>
+                                    <h3>Manzil</h3>
+                                </div>
+                                <div class="form-grid two-cols">
+                                    <div class="form-group">
+                                        <label for="orderViloyatPage">Viloyat *</label>
+                                        <select id="orderViloyatPage" required onchange="handleViloyatChange(true)">
+                                            <option value="" disabled selected>Viloyatni tanlang</option>
+                                            <option value="Toshkent shahri">Toshkent shahri</option>
+                                            <option value="Toshkent viloyati">Toshkent viloyati</option>
+                                            <option value="Andijon">Andijon</option>
+                                            <option value="Buxoro">Buxoro</option>
+                                            <option value="Farg'ona">Farg'ona</option>
+                                            <option value="Jizzax">Jizzax</option>
+                                            <option value="Xorazm">Xorazm</option>
+                                            <option value="Namangan">Namangan</option>
+                                            <option value="Navoiy">Navoiy</option>
+                                            <option value="Qashqadaryo">Qashqadaryo</option>
+                                            <option value="Qoraqalpog'iston">Qoraqalpog'iston</option>
+                                            <option value="Samarqand">Samarqand</option>
+                                            <option value="Sirdaryo">Sirdaryo</option>
+                                            <option value="Surxondaryo">Surxondaryo</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="orderTumanPage">Tuman *</label>
+                                        <select id="orderTumanPage" required disabled>
+                                            <option value="" disabled selected>Tumanni tanlang</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-sidebar">
+                            <div class="order-summary-card">
+                                <h3>Buyurtma tafsilotlari</h3>
+                                <div id="checkoutSummaryItemsPage" class="summary-items-list">
+                                    <!-- Items will be populated -->
+                                </div>
+                                <div class="summary-total">
+                                    <span>Jami:</span>
+                                    <span id="orderTotalPricePage">0 so'm</span>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-full checkout-btn">
+                                    Buyurtmani yuborish
+                                </button>
+                                <p class="summary-note">Buyurtmangiz qabul qilinganidan so'ng, siz bilan bog'lanamiz.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Step 3: Success -->
+            <div id="successStep" class="step-container">
+                <div class="success-page-content">
+                    <div class="success-icon-wrapper">
+                        <div class="success-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="3">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        </div>
+                    </div>
+                    <h2>Buyurtmangiz qabul qilindi!</h2>
+                    <p>Muvaffaqiyatli buyurtma berdingiz. Tez orada operatorimiz siz bilan aloqaga chiqadi.</p>
+                    <a href="index.html" class="btn btn-primary">Asosiy sahifaga qaytish</a>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyCartStep" class="step-container">
+                <div class="empty-cart-page">
+                    <div class="empty-cart-icon">🛒</div>
+                    <h2>Savatchangiz bo'sh</h2>
+                    <p>Xaridni davom ettirish uchun asosiy sahifaga o'ting.</p>
+                    <a href="index.html" class="btn btn-primary">Xarid qilish</a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="telegram-config.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // Page specific initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            if (cart.length === 0) {
+                showStep('emptyCartStep');
+            } else {
+                showStep('cartStep');
+                updateCartPageUI();
+            }
+        });
+
+        function showStep(stepId) {
+            document.querySelectorAll('.step-container').forEach(step => {
+                step.classList.remove('active');
+            });
+            document.getElementById(stepId).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        function goToOrderStep() {
+            showStep('orderStep');
+            updateOrderPageUI();
+        }
+
+        function goToCartStep() {
+            showStep('cartStep');
+        }
+
+        function updateCartPageUI() {
+            const itemsList = document.getElementById('cartItemsListPage');
+            const summaryList = document.getElementById('cartSummaryItemsPage');
+            const batchCount = document.getElementById('cartBadgeCountPage');
+
+            if (cart.length === 0) {
+                showStep('emptyCartStep');
+                return;
+            }
+
+            const totalQty = cart.reduce((sum, item) => sum + item.quantity, 0);
+            batchCount.textContent = `${totalQty} ta mahsulot`;
+
+            itemsList.innerHTML = cart.map(item => `
+                <div class="cart-item">
+                    <img src="${item.imageUrl || item.image}" alt="${item.name}" class="cart-item-image" onerror="this.src='https://via.placeholder.com/100'">
+                    <div class="cart-item-info">
+                        <h4>${item.name}</h4>
+                        <div class="cart-item-price">${formatPrice(item.price)} so'm</div>
+                        <div class="cart-item-controls">
+                            <div class="qty-counter">
+                                <button class="qty-btn" onclick="changeQuantityPage('${item.id}', -1)">−</button>
+                                <span class="qty-display">${item.quantity}</span>
+                                <button class="qty-btn" onclick="changeQuantityPage('${item.id}', 1)">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="cart-item-remove-icon" onclick="removeFromCartPage('${item.id}')" title="O'chirish">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                    </button>
+                </div>
+            `).join('');
+
+            summaryList.innerHTML = cart.map(item => `
+                <div class="summary-item-row">
+                    <span>${item.name} (${item.quantity} ta)</span>
+                    <span>${formatPrice(item.price * item.quantity)} so'm</span>
+                </div>
+            `).join('');
+
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            document.getElementById('cartTotalPricePage').textContent = formatPrice(total) + ' so\'m';
+        }
+
+        function updateOrderPageUI() {
+            const summaryItems = document.getElementById('checkoutSummaryItemsPage');
+            const totalPriceEl = document.getElementById('orderTotalPricePage');
+
+            summaryItems.innerHTML = cart.map(item => `
+                <div class="summary-item-row">
+                    <span>${item.name} x${item.quantity}</span>
+                    <span>${formatPrice(item.price * item.quantity)} so'm</span>
+                </div>
+            `).join('');
+
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            totalPriceEl.textContent = formatPrice(total) + ' so\'m';
+        }
+
+        function changeQuantityPage(id, change) {
+            changeQuantity(id, change);
+            updateCartPageUI();
+        }
+
+        function removeFromCartPage(id) {
+            removeFromCart(id);
+            updateCartPageUI();
+        }
+    </script>
+</body>
+
+</html>

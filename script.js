@@ -525,58 +525,8 @@ document.getElementById('cartBtn')?.addEventListener('click', function () {
 });
 
 function openCartModal() {
-    if (cart.length === 0) {
-        showNotification('Savatchada mahsulotlar yo\'q');
-        return;
-    }
-
-    const modal = document.getElementById('cartModal');
-    const itemsList = document.getElementById('cartItemsList');
-    const summaryList = document.getElementById('cartSummaryItems');
-    const batchCount = document.getElementById('cartBadgeCount');
-
-    // Update batch count
-    const totalQty = cart.reduce((sum, item) => sum + item.quantity, 0);
-    batchCount.textContent = `${totalQty} ta mahsulot`;
-
-    // Render main items list
-    itemsList.innerHTML = cart.map(item => `
-        <div class="cart-item">
-            <img src="${item.imageUrl || item.image}" alt="${item.name}" class="cart-item-image" onerror="this.src='https://via.placeholder.com/100'">
-            <div class="cart-item-info">
-                <h4>${item.name}</h4>
-                <div class="cart-item-price">${formatPrice(item.price)} so'm</div>
-                <div class="cart-item-controls">
-                    <div class="qty-counter">
-                        <button class="qty-btn" onclick="changeQuantity('${item.id}', -1)">−</button>
-                        <span class="qty-display">${item.quantity}</span>
-                        <button class="qty-btn" onclick="changeQuantity('${item.id}', 1)">+</button>
-                    </div>
-                </div>
-            </div>
-            <button class="cart-item-remove-icon" onclick="removeFromCart('${item.id}')" title="O'chirish">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                </svg>
-            </button>
-        </div>
-    `).join('');
-
-    // Render summary list
-    summaryList.innerHTML = cart.map(item => `
-        <div class="summary-item-row">
-            <span>${item.name} (${item.quantity} ta)</span>
-            <span>${formatPrice(item.price * item.quantity)} so'm</span>
-        </div>
-    `).join('');
-
-    // Update total
-    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    document.getElementById('cartTotalPrice').textContent = formatPrice(total) + ' so\'m';
-
-    // Show modal
-    modal.classList.add('active');
-    document.body.style.overflow = 'hidden';
+    // Endi modal o'rniga yangi page ochiladi
+    window.location.href = 'cart.html';
 }
 
 function clearCart() {
@@ -584,11 +534,18 @@ function clearCart() {
         cart = [];
         localStorage.setItem('cart', JSON.stringify(cart));
         updateCartCount();
-        closeCartModal();
-        showNotification('Savatcha tozalandi');
+
+        // Agar savat sahifasida bo'lsa, UI ni yangilash
+        if (window.location.pathname.includes('cart.html')) {
+            if (typeof updateCartPageUI === 'function') updateCartPageUI();
+        } else {
+            showNotification('Savatcha tozalandi');
+        }
 
         // Update all product cards to show "Add" button
-        products.forEach(p => updateProductUI(p.id));
+        if (typeof products !== 'undefined') {
+            products.forEach(p => updateProductUI(p.id));
+        }
     }
 }
 
@@ -603,17 +560,13 @@ function removeFromCart(productId) {
     updateCartCount();
 
     // Update UI for this product
-    updateProductUI(productId);
+    if (typeof updateProductUI === 'function') updateProductUI(productId);
 
-    const modal = document.getElementById('cartModal');
-    const isModalOpen = modal.classList.contains('active');
-
-    if (cart.length === 0) {
-        if (isModalOpen) closeCartModal();
-        showNotification('Savatcha bo\'shatildi');
+    // Agar savat sahifasida bo'lsa, UI ni yangilash
+    if (window.location.pathname.includes('cart.html')) {
+        if (typeof updateCartPageUI === 'function') updateCartPageUI();
     } else {
-        if (isModalOpen) openCartModal(); // Refresh cart display only if open
-        if (!isModalOpen) showNotification('Mahsulot o\'chirildi'); // Notification only if modal closed
+        showNotification('Mahsulot o\'chirildi');
     }
 }
 
@@ -633,6 +586,11 @@ function changeQuantity(productId, change) {
         const modal = document.getElementById('cartModal');
         if (modal.classList.contains('active')) {
             openCartModal();
+        }
+
+        // Agar savat sahifasida bo'lsa, UI ni yangilash
+        if (window.location.pathname.includes('cart.html')) {
+            if (typeof updateCartPageUI === 'function') updateCartPageUI();
         }
 
         // Update main UI (product card)
@@ -712,9 +670,10 @@ function openOrderModal() {
     document.body.style.overflow = 'hidden';
 }
 
-function handleViloyatChange() {
-    const viloyat = document.getElementById('orderViloyat').value;
-    const tumanSelect = document.getElementById('orderTuman');
+function handleViloyatChange(isPage = false) {
+    const suffix = isPage ? 'Page' : '';
+    const viloyat = document.getElementById('orderViloyat' + suffix).value;
+    const tumanSelect = document.getElementById('orderTuman' + suffix);
 
     // Clear current tumanlar
     tumanSelect.innerHTML = '<option value="" disabled selected>Tumanni tanlang</option>';
@@ -738,24 +697,22 @@ function backToCart() {
 }
 
 function closeOrderModal() {
-    const modal = document.getElementById('orderModal');
-    modal.classList.remove('active');
-    document.getElementById('orderForm').reset();
-    document.body.style.overflow = '';
+    // Standalone page da bu kerak emas
 }
 
 // ================================
 // TELEGRAM ORDER SUBMISSION
 // ================================
 
-async function submitOrder(event) {
+async function submitOrder(event, isPage = false) {
     event.preventDefault();
 
-    const name = document.getElementById('orderName').value;
-    const phoneInput = document.getElementById('orderPhone').value;
+    const suffix = isPage ? 'Page' : '';
+    const name = document.getElementById('orderName' + suffix).value;
+    const phoneInput = document.getElementById('orderPhone' + suffix).value;
     const phone = "+998 " + phoneInput;
-    const viloyat = document.getElementById('orderViloyat').value;
-    const tuman = document.getElementById('orderTuman').value;
+    const viloyat = document.getElementById('orderViloyat' + suffix).value;
+    const tuman = document.getElementById('orderTuman' + suffix).value;
 
     // Get Telegram config
     const BOT_TOKEN = window.TELEGRAM_CONFIG?.BOT_TOKEN;
@@ -811,11 +768,18 @@ async function submitOrder(event) {
             cart = [];
             localStorage.setItem('cart', JSON.stringify(cart));
             updateCartCount();
-            closeOrderModal();
-            showSuccessModal();
+
+            if (isPage) {
+                if (typeof showStep === 'function') showStep('successStep');
+            } else {
+                closeOrderModal();
+                showSuccessModal();
+            }
 
             // Update all product cards
-            products.forEach(p => updateProductUI(p.id));
+            if (typeof products !== 'undefined') {
+                products.forEach(p => updateProductUI(p.id));
+            }
         } else {
             console.error('Telegram error:', data);
             alert(`Xatolik: ${data.description}`);
