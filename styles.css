@@ -1360,18 +1360,21 @@ body {
 .clear-cart-btn {
     display: flex;
     align-items: center;
-    gap: 6px;
-    background: none;
-    border: none;
+    gap: 8px;
+    background: #fff5f5;
+    border: 1px solid #ffebeb;
     color: #ff4d4d;
-    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-weight: 600;
     cursor: pointer;
-    font-size: 0.9rem;
-    transition: opacity 0.2s;
+    font-size: 0.85rem;
+    transition: all 0.2s;
 }
 
 .clear-cart-btn:hover {
-    opacity: 0.7;
+    background: #ffeded;
+    transform: translateY(-1px);
 }
 
 .modal-close {
@@ -1407,7 +1410,7 @@ body {
 .modal-main-content {
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
+    gap: 1.5rem;
 }
 
 .modal-sidebar {
@@ -1595,19 +1598,19 @@ body {
 .form-grid {
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
+    gap: 1.5rem;
 }
 
 .form-grid.two-cols {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1rem;
+    gap: 1.25rem;
 }
 
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
 }
 
 .form-group label {
