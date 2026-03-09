@@ -721,10 +721,10 @@ body {
 }
 
 .product-info {
-    padding: 12px 0;
+    padding: 8px 0;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
     flex: 1;
 }
 
@@ -762,7 +762,6 @@ body {
 }
 
 .product-price-container {
-    margin-top: auto;
     display: flex;
     flex-direction: column;
 }
@@ -1245,7 +1244,8 @@ body {
     }
 
     .product-info {
-        padding: 0.75rem;
+        padding: 4px;
+        gap: 2px;
     }
 
     .product-description {
@@ -1888,7 +1888,7 @@ body {
 
 .btn-ertaga {
     width: 100%;
-    height: 36px;
+    height: 32px;
     background: #7000ff;
     color: white;
     border: none;
@@ -2143,7 +2143,7 @@ body {
 }
 
 .product-footer-container {
-    padding: 0 12px 12px 12px;
+    padding: 0 12px 6px 12px;
 }
 
 .btn-add-uzum {
@@ -2283,7 +2283,7 @@ body {
 }
 
 .product-footer-container {
-    padding: 0 12px 12px 12px;
+    padding: 0 12px 6px 12px;
 }
 
 @media (max-width: 768px) {
