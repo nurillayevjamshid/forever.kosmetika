@@ -1901,9 +1901,14 @@ function renderCustomers(searchQuery) {
                         '<span class="status-badge">Yangi</span>';
 
                 var phoneDisplay = '<div>' + escapeHtml(c.phone) + '</div>';
+                var socialsHTML = '';
                 if (c.telegram) {
                     var tgLink = c.telegram.startsWith('@') ? c.telegram.substring(1) : c.telegram;
-                    phoneDisplay += '<a href="https://t.me/' + tgLink + '" target="_blank" style="color: #0088cc; font-size: 0.85rem;"><i class="fab fa-telegram"></i> ' + escapeHtml(c.telegram) + '</a>';
+                    socialsHTML += '<a href="https://t.me/' + tgLink + '" target="_blank" style="color: #0088cc; font-size: 0.85rem; display: block; margin-bottom: 4px;"><i class="fab fa-telegram"></i> ' + escapeHtml(c.telegram) + '</a>';
+                }
+                if (c.instagram) {
+                    var igLink = c.instagram.startsWith('@') ? c.instagram.substring(1) : c.instagram;
+                    socialsHTML += '<a href="https://instagram.com/' + igLink + '" target="_blank" style="color: #e1306c; font-size: 0.85rem; display: block;"><i class="fab fa-instagram"></i> ' + escapeHtml(c.instagram) + '</a>';
                 }
 
                 var debt = c.debt || 0;
@@ -1953,11 +1958,11 @@ function renderCustomers(searchQuery) {
                     '<tr>' +
                     '<td data-label="#">' + (i + 1) + '</td>' +
                     '<td data-label="Mijoz ismi"><div style="font-weight:600">' + escapeHtml(c.name) + '</div>' + (c.birthday ? '<div style="font-size:0.75rem; color:var(--text-muted)"><i class="fas fa-birthday-cake"></i> ' + c.birthday + '</div>' : '') + '</td>' +
-                    '<td data-label="Telefon / Telegram">' + phoneDisplay + '</td>' +
+                    '<td data-label="Telefon">' + phoneDisplay + '</td>' +
                     '<td data-label="Viloyat / Tuman">' + regionDisplay + '</td>' +
                     '<td data-label="Sotuvlar soni">' + (c.salesCount || 0) + '</td>' +
                     '<td data-label="Umumiy savdo">' + formatMoney(totalSpent) + '</td>' +
-                    '<td data-label="Qarz" class="' + debtClass + '">' + formatMoney(debt) + '</td>' +
+                    '<td data-label="Telegram / Instagram">' + socialsHTML + '</td>' +
                     '<td data-label="Status">' + vipBadge + '</td>' +
                     '<td data-label="Amallar">' +
                     '<button class="btn-icon info customer-history-btn" data-id="' + c.id + '" data-name="' + escapeHtml(c.name) + '" title="Xaridlar tarixi"><i class="fas fa-history"></i></button>' +
@@ -1988,6 +1993,7 @@ document.getElementById('customerForm').addEventListener('submit', function (e) 
         name: document.getElementById('customerName').value.trim(),
         phone: document.getElementById('customerPhone').value.trim(),
         telegram: document.getElementById('customerTelegram').value.trim(),
+        instagram: document.getElementById('customerInstagram').value.trim(),
         birthday: document.getElementById('customerBirthday').value,
         region: document.getElementById('customerRegion').value,
         viloyat: document.getElementById('customerRegion').value,
@@ -2023,6 +2029,7 @@ document.addEventListener('click', function (e) {
                 document.getElementById('customerName').value = c.name;
                 document.getElementById('customerPhone').value = c.phone;
                 document.getElementById('customerTelegram').value = c.telegram || '';
+                document.getElementById('customerInstagram').value = c.instagram || '';
                 document.getElementById('customerBirthday').value = c.birthday || '';
                 document.getElementById('customerAddress').value = c.address || '';
                 document.getElementById('customerNote').value = c.note || '';
