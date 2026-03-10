@@ -660,6 +660,24 @@ body {
     white-space: nowrap;
 }
 
+.region-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    line-height: 1.1;
+    white-space: normal;
+}
+
+.region-stack .region-name {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.region-stack .district-name {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
 /* Rounded corners for the "Card" rows */
 .data-table tbody tr td:first-child {
     border-left: 1px solid rgba(255, 255, 255, 0.03);

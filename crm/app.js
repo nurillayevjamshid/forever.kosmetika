@@ -1909,12 +1909,52 @@ function renderCustomers(searchQuery) {
                 var debt = c.debt || 0;
                 var debtClass = debt > 0 ? 'amount-negative' : '';
 
+                var regionValue = c.viloyat || c.region || '';
+                var districtValue = c.tuman || '';
+                if ((!regionValue || regionValue === '-') && !districtValue) {
+                    var addressValue = c.address || c.customerAddress || '';
+                    if (addressValue && addressValue.indexOf(',') !== -1) {
+                        var addressParts = addressValue.split(',');
+                        regionValue = regionValue || (addressParts[0] || '').trim();
+                        districtValue = districtValue || addressParts.slice(1).join(',').trim();
+                    } else if (addressValue && !regionValue) {
+                        regionValue = addressValue.trim();
+                    }
+                }
+                regionValue = regionValue || '-';
+                districtValue = districtValue || '—';
+
+                // Normalize placeholders and fill from address if needed
+                var normalizedRegion = regionValue;
+                var normalizedDistrict = districtValue;
+                if (normalizedRegion === '-' || normalizedRegion === '—' || normalizedRegion === '–') normalizedRegion = '';
+                if (normalizedDistrict === '-' || normalizedDistrict === '—' || normalizedDistrict === '–') normalizedDistrict = '';
+
+                var addressValue = (c.address || c.customerAddress || '').toString().trim();
+                if (addressValue) {
+                    if (addressValue.indexOf(',') !== -1) {
+                        var addressParts = addressValue.split(',');
+                        if (!normalizedRegion) normalizedRegion = (addressParts[0] || '').trim();
+                        if (!normalizedDistrict) normalizedDistrict = addressParts.slice(1).join(',').trim();
+                    } else if (!normalizedRegion) {
+                        normalizedRegion = addressValue.trim();
+                    }
+                }
+
+                regionValue = normalizedRegion || '-';
+                districtValue = normalizedDistrict || '—';
+                var regionDisplay = '' +
+                    '<div class="region-stack">' +
+                    '<div class="region-name">' + escapeHtml(regionValue) + '</div>' +
+                    '<div class="district-name">' + escapeHtml(districtValue) + '</div>' +
+                    '</div>';
+
                 return '' +
                     '<tr>' +
                     '<td data-label="#">' + (i + 1) + '</td>' +
                     '<td data-label="Mijoz ismi"><div style="font-weight:600">' + escapeHtml(c.name) + '</div>' + (c.birthday ? '<div style="font-size:0.75rem; color:var(--text-muted)"><i class="fas fa-birthday-cake"></i> ' + c.birthday + '</div>' : '') + '</td>' +
                     '<td data-label="Telefon / Telegram">' + phoneDisplay + '</td>' +
-                    '<td data-label="Viloyat">' + escapeHtml(c.region || '-') + '</td>' +
+                    '<td data-label="Viloyat / Tuman">' + regionDisplay + '</td>' +
                     '<td data-label="Sotuvlar soni">' + (c.salesCount || 0) + '</td>' +
                     '<td data-label="Umumiy savdo">' + formatMoney(totalSpent) + '</td>' +
                     '<td data-label="Qarz" class="' + debtClass + '">' + formatMoney(debt) + '</td>' +
@@ -1950,6 +1990,7 @@ document.getElementById('customerForm').addEventListener('submit', function (e) 
         telegram: document.getElementById('customerTelegram').value.trim(),
         birthday: document.getElementById('customerBirthday').value,
         region: document.getElementById('customerRegion').value,
+        viloyat: document.getElementById('customerRegion').value,
         address: document.getElementById('customerAddress').value.trim(),
         note: document.getElementById('customerNote').value.trim(),
         updatedAt: new Date().toISOString()
@@ -1985,7 +2026,7 @@ document.addEventListener('click', function (e) {
                 document.getElementById('customerBirthday').value = c.birthday || '';
                 document.getElementById('customerAddress').value = c.address || '';
                 document.getElementById('customerNote').value = c.note || '';
-                setSelectValue('customerRegionPicker', c.region, c.region);
+                setSelectValue('customerRegionPicker', c.region || c.viloyat, c.region || c.viloyat);
                 document.getElementById('customerModalTitle').innerHTML = '<i class="fas fa-pen"></i> Mijozni tahrirlash';
                 openModal('customerModal');
             }
