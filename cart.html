@@ -14,7 +14,7 @@
     <style>
         .checkout-page {
             padding-top: 100px;
-            padding-bottom: 60px;
+            padding-bottom: 32px;
             min-height: 100vh;
             background: #f8f9fe;
         }
@@ -23,6 +23,17 @@
             max-width: 1100px;
             margin: 0 auto;
             padding: 0 20px;
+        }
+
+        /* Checkout sahifasida ichki scrollni olib tashlash
+           va select dropdownlari kartadan chiroyli tashqariga chiqishi uchun */
+        .checkout-page .modal-body-layout {
+            overflow: visible;
+        }
+
+        .checkout-page .order-section-card,
+        .checkout-page .order-summary-card {
+            overflow: visible;
         }
 
         .checkout-header {
