@@ -2406,3 +2406,117 @@ body {
         font-size: 1.5rem;
     }
 }
+
+/* ================================
+   SIMPLE PRODUCT CARD OVERRIDES
+   ================================ */
+
+.products-grid {
+    gap: 18px;
+}
+
+.product-card {
+    background: #ffffff;
+    border-radius: 18px;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    border: 1px solid #ececf2;
+    box-shadow: 0 6px 18px rgba(17, 17, 26, 0.06);
+}
+
+.product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 28px rgba(17, 17, 26, 0.12);
+    border-color: #dedee6;
+}
+
+.product-image {
+    background: #f6f6f8;
+    border-radius: 16px;
+    margin: 12px 12px 0 12px;
+}
+
+.product-info {
+    padding: 10px 14px 0 14px !important;
+    gap: 6px;
+}
+
+.product-name {
+    font-size: 0.98rem !important;
+    line-height: 1.35;
+    font-weight: 500 !important;
+    min-height: 2.7rem;
+}
+
+.product-rating {
+    display: none !important;
+}
+
+.favorite-btn {
+    display: none !important;
+}
+
+.current-price {
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    color: #1a1a2e;
+}
+
+.product-footer-container {
+    padding: 6px 14px 14px 14px !important;
+}
+
+.product-footer {
+    height: auto !important;
+}
+
+.btn-ertaga {
+    height: 40px;
+    border-radius: 12px;
+    background: #2a2a33;
+    font-size: 0.95rem;
+    gap: 10px;
+}
+
+.btn-ertaga:hover {
+    opacity: 1;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 20px rgba(17, 17, 26, 0.16);
+}
+
+.qty-counter-uzum {
+    height: 40px;
+    border-radius: 12px;
+    border: 1px solid #e6e6ef;
+    background: #fafafe;
+    padding: 0 6px;
+}
+
+.qty-counter-uzum .qty-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    background: #ffffff;
+    border: 1px solid #e4e4ee;
+}
+
+.qty-counter-uzum .qty-display {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1a1a2e;
+}
+
+@media (max-width: 768px) {
+    .product-image {
+        margin: 10px 10px 0 10px;
+    }
+
+    .product-info {
+        padding: 8px 12px 0 12px !important;
+    }
+
+    .product-footer-container {
+        padding: 6px 12px 12px 12px !important;
+    }
+}
