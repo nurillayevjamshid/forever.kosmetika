@@ -193,6 +193,16 @@
                             <div id="cartSummaryItemsPage" class="summary-items-list">
                                 <!-- Summary items will be loaded here -->
                             </div>
+                            <div id="cartDeliveryInfo" class="summary-items-list" style="margin-top: 0.25rem;">
+                                <div class="delivery-summary-row">
+                                    <span>Toshkent shahri uchun yetkazib berish</span>
+                                    <span id="deliveryPriceTashkentCart" class="delivery-price-value">-</span>
+                                </div>
+                                <div class="delivery-summary-row">
+                                    <span>Viloyatlarga yetkazib berish</span>
+                                    <span id="deliveryPriceRegionsCart" class="delivery-price-value">-</span>
+                                </div>
+                            </div>
                             <div class="summary-total">
                                 <span>Jami:</span>
                                 <span id="cartTotalPricePage">0 so'm</span>
@@ -467,6 +477,37 @@
 
             const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
             document.getElementById('cartTotalPricePage').textContent = formatPrice(total) + ' so\'m';
+            updateCartDeliveryPrices(total);
+        }
+
+        function calculateDeliveryPrice(total, regionType) {
+            // regionType: 'tashkent' | 'regions'
+            if (regionType === 'tashkent') {
+                if (total < 120000) return 20000;
+                if (total < 220000) return 15000;
+                return 0;
+            } else {
+                if (total < 220000) return 25000;
+                if (total < 320000) return 20000;
+                return 0;
+            }
+        }
+
+        function formatDeliveryPrice(price) {
+            return price === 0 ? 'Tekin' : `${formatPrice(price)} so'm`;
+        }
+
+        function updateCartDeliveryPrices(total) {
+            const tashkentPrice = calculateDeliveryPrice(total, 'tashkent');
+            const regionsPrice = calculateDeliveryPrice(total, 'regions');
+
+            const tashkentEl = document.getElementById('deliveryPriceTashkentCart');
+            const regionsEl = document.getElementById('deliveryPriceRegionsCart');
+
+            if (tashkentEl && regionsEl) {
+                tashkentEl.textContent = formatDeliveryPrice(tashkentPrice);
+                regionsEl.textContent = formatDeliveryPrice(regionsPrice);
+            }
         }
 
         function updateOrderPageUI() {
