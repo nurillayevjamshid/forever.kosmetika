@@ -597,17 +597,14 @@ document.getElementById('productForm').addEventListener('submit', async function
     };
 
     try {
+        // Rasm mavjud bo'lsa, uni Base64 ko'rinishida saqlaymiz (CORS muammosini oldini olish uchun)
         if (file) {
-            document.getElementById('uploadProgress').style.display = 'block';
-            document.getElementById('imageUploadArea').classList.add('uploading');
-
-            const uploadResult = await uploadProductImage(file);
-            if (uploadResult) {
-                data.imageUrl = uploadResult.url;
-                data.imageStoragePath = uploadResult.storagePath;
-            }
+            // Preview'dan Base64 string'ni olamiz
+            var base64Image = document.getElementById('imagePreview').src;
+            data.imageUrl = base64Image;
+            data.imageStoragePath = ''; // Firestore'da saqlangan rasm uchun storage path kerak emas
         } else {
-            // Agar rasm o'zgartirilmagan bo'lsa, eski rasmni saqlab qolish
+            // Agar yangi rasm tanlanmagan bo'lsa, mavjud ma'lumotni saqlab qolamiz
             const existingProduct = productsArr.find(p => p.id === id);
             if (existingProduct) {
                 data.imageUrl = existingProduct.imageUrl || '';
@@ -1755,34 +1752,9 @@ navigateTo('dashboard');
 })();
 
 function uploadProductImage(file) {
-    return new Promise((resolve, reject) => {
-        var storageRef = firebase.storage().ref();
-        var fileName = 'products/' + Date.now() + '_' + file.name;
-        var uploadTask = storageRef.child(fileName).put(file);
-
-        var fill = document.getElementById('progressFill');
-        var text = document.getElementById('progressText');
-
-        uploadTask.on('state_changed',
-            function (snapshot) {
-                var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                if (fill) fill.style.width = progress + '%';
-                if (text) text.textContent = Math.round(progress) + '%';
-            },
-            function (error) {
-                showToast('Rasm yuklashda xatolik: ' + error.message, 'error');
-                reject(error);
-            },
-            function () {
-                uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
-                    resolve({
-                        url: downloadURL,
-                        storagePath: fileName
-                    });
-                });
-            }
-        );
-    });
+    // Firebase Storage CORS muammosi tufayli endi ishlatilmaydi.
+    // O'rniga Base64 orqali Firestore'ga saqlanadi.
+    return Promise.resolve(null);
 }
 
 
