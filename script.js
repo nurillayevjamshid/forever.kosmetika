@@ -358,24 +358,6 @@ function createProductCard(product) {
 
                 <h3 class="product-name">${product.name}</h3>
 
-                <div class="product-price-container">
-
-                    <span class="current-price">${formatPrice(product.price)} so'm</span>
-
-                </div>
-
-                <div class="product-rating">
-
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="#FFB547" stroke="#FFB547">
-
-                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-
-                    </svg>
-
-                    <span class="rating-score">${rating}</span>
-
-                </div>
-
             </div>
 
         </div>
@@ -383,6 +365,11 @@ function createProductCard(product) {
         <div class="product-footer-container">
 
             <div class="product-footer" id="footer-${product.id}">
+
+                <div class="product-price-block">
+                    <span class="price-label">Narxi</span>
+                    <span class="current-price">${formatPrice(product.price)} so'm</span>
+                </div>
 
                 ${getProductFooterHTML(product)}
 
@@ -424,9 +411,9 @@ function getProductFooterHTML(product) {
 
         return `
 
-            <button class="btn-ertaga" onclick="event.stopPropagation(); addToCart('${product.id}')">
+            <button class="cart-icon-btn" onclick="event.stopPropagation(); addToCart('${product.id}')">
 
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 
                     <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4H6z"></path>
 
@@ -435,8 +422,6 @@ function getProductFooterHTML(product) {
                     <path d="M16 10a4 4 0 0 1-8 0"></path>
 
                 </svg>
-
-                <span>Tanlash</span>
 
             </button>
 
