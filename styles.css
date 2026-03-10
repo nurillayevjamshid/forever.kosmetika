@@ -2106,15 +2106,16 @@ body {
     margin: 12px 12px 0 12px;
     aspect-ratio: 4 / 5;
     width: auto;
-    /* Fix overflow by allowing content to resize with margins */
+    /* Barcha product rasmlar uchun bir xil, premium vitrina effekti */
+    overflow: hidden;
 }
 .product-image img {
     width: 100%;
     height: 100%;
-    object-fit: contain !important;
+    object-fit: cover !important;
     object-position: center;
-    padding: 14px;
-    background: #ffffff;
+    padding: 0;
+    background: transparent;
 }
 .product-info {
     padding: 10px 14px 0 14px !important;
