@@ -169,16 +169,32 @@ function buildCustomSelectOptions(selectEl) {
 
     panel.innerHTML = '';
 
+    const isViloyat = selectEl.id.toLowerCase().includes('viloyat');
+
     const options = Array.from(selectEl.options).filter(opt => !opt.disabled || opt.value);
     options.forEach(opt => {
         if (!opt.value && opt.disabled) return;
         const optionBtn = document.createElement('button');
         optionBtn.type = 'button';
-        optionBtn.className = 'custom-select-option';
+        optionBtn.className = 'custom-select-option' + (isViloyat ? ' is-viloyat' : '');
         optionBtn.setAttribute('role', 'option');
         optionBtn.dataset.value = opt.value;
+
+        let iconHtml = '';
+        if (isViloyat) {
+            iconHtml = `
+            <span class="option-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+            </span>`;
+        } else {
+            iconHtml = `<span class="option-bullet"></span>`;
+        }
+
         optionBtn.innerHTML = `
-            <span class="option-bullet"></span>
+            ${iconHtml}
             <span class="option-text">${opt.textContent}</span>
         `;
         optionBtn.addEventListener('click', () => {
@@ -196,13 +212,30 @@ function syncCustomSelectState(selectEl) {
     if (!wrapper) return;
     const trigger = wrapper.querySelector('.custom-select-trigger');
     const valueEl = wrapper.querySelector('.custom-select-value');
+    const isViloyat = selectEl.id.toLowerCase().includes('viloyat');
     const panel = wrapper.querySelector('.custom-select-panel');
     const placeholder = wrapper.getAttribute('data-placeholder') || 'Tanlang...';
 
     const selectedOption = selectEl.options[selectEl.selectedIndex];
     const hasValue = selectedOption && !selectedOption.disabled && selectedOption.value;
     if (valueEl) {
-        valueEl.textContent = hasValue ? selectedOption.textContent : placeholder;
+        if (hasValue) {
+            if (isViloyat) {
+                valueEl.innerHTML = `
+                    <span class="option-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                    </span>
+                    <span class="option-text">${selectedOption.textContent}</span>
+                `;
+            } else {
+                valueEl.textContent = selectedOption.textContent;
+            }
+        } else {
+            valueEl.textContent = placeholder;
+        }
     }
 
     if (trigger) {
