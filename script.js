@@ -1289,6 +1289,10 @@ function handleViloyatChange(isPage = false) {
         syncCustomSelectState(viloyatSelect);
     }
 
+    // Cart/order page: viloyat o'zgarganda dostavka matnini yangilash
+    if (isPage && typeof updateOrderDeliveryTextFromInputs === 'function') {
+        updateOrderDeliveryTextFromInputs();
+    }
 }
 
 function backToCart() {

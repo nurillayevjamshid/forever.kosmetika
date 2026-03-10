@@ -1446,7 +1446,7 @@ body {
 /* Modal Body Layout */
 .modal-body-layout {
     display: grid;
-    grid-template-columns: 1fr 340px;
+    grid-template-columns: 1fr 360px;
     gap: 1.5rem;
     padding: 1.5rem 2rem;
     overflow-y: auto;
@@ -1615,6 +1615,13 @@ body {
     display: flex;
     flex-direction: column;
     gap: 10px;
+}
+
+.delivery-info-text {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #16a34a;
+    margin-bottom: 0.75rem;
 }
 
 .delivery-summary-row {

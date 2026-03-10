@@ -193,16 +193,6 @@
                             <div id="cartSummaryItemsPage" class="summary-items-list">
                                 <!-- Summary items will be loaded here -->
                             </div>
-                            <div id="cartDeliveryInfo" class="summary-items-list" style="margin-top: 0.25rem;">
-                                <div class="delivery-summary-row">
-                                    <span>Toshkent shahri uchun yetkazib berish</span>
-                                    <span id="deliveryPriceTashkentCart" class="delivery-price-value">-</span>
-                                </div>
-                                <div class="delivery-summary-row">
-                                    <span>Viloyatlarga yetkazib berish</span>
-                                    <span id="deliveryPriceRegionsCart" class="delivery-price-value">-</span>
-                                </div>
-                            </div>
                             <div class="summary-total">
                                 <span>Jami:</span>
                                 <span id="cartTotalPricePage">0 so'm</span>
@@ -281,7 +271,7 @@
                                     <h3>Manzil</h3>
                                 </div>
                                 <div class="form-grid two-cols">
-                                    <div class="form-group select-field">
+                                <div class="form-group select-field">
                                         <label for="orderViloyatPage" class="field-label">
                                             <span class="label-icon location-icon" aria-hidden="true">
                                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -329,7 +319,7 @@
                                         <div class="custom-select" data-select="orderTumanPage"
                                             data-placeholder="Tumanni tanlang">
                                             <select id="orderTumanPage" required disabled
-                                                class="select-input native-select">
+                                                class="select-input native-select" onchange="updateOrderDeliveryTextFromInputs()">
                                                 <option value="" disabled selected>Tumanni tanlang</option>
                                             </select>
                                             <button type="button" class="custom-select-trigger" aria-haspopup="listbox"
@@ -350,6 +340,7 @@
                                 <div id="checkoutSummaryItemsPage" class="summary-items-list">
                                     <!-- Items will be populated -->
                                 </div>
+                                <p id="orderDeliveryText" class="delivery-info-text" style="display: none;"></p>
                                 <div class="summary-total">
                                     <span>Jami:</span>
                                     <span id="orderTotalPricePage">0 so'm</span>
@@ -477,7 +468,6 @@
 
             const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
             document.getElementById('cartTotalPricePage').textContent = formatPrice(total) + ' so\'m';
-            updateCartDeliveryPrices(total);
         }
 
         function calculateDeliveryPrice(total, regionType) {
@@ -497,19 +487,6 @@
             return price === 0 ? 'Tekin' : `${formatPrice(price)} so'm`;
         }
 
-        function updateCartDeliveryPrices(total) {
-            const tashkentPrice = calculateDeliveryPrice(total, 'tashkent');
-            const regionsPrice = calculateDeliveryPrice(total, 'regions');
-
-            const tashkentEl = document.getElementById('deliveryPriceTashkentCart');
-            const regionsEl = document.getElementById('deliveryPriceRegionsCart');
-
-            if (tashkentEl && regionsEl) {
-                tashkentEl.textContent = formatDeliveryPrice(tashkentPrice);
-                regionsEl.textContent = formatDeliveryPrice(regionsPrice);
-            }
-        }
-
         function updateOrderPageUI() {
             const summaryItems = document.getElementById('checkoutSummaryItemsPage');
             const totalPriceEl = document.getElementById('orderTotalPricePage');
@@ -523,6 +500,35 @@
 
             const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
             totalPriceEl.textContent = formatPrice(total) + ' so\'m';
+
+            if (typeof updateOrderDeliveryTextFromInputs === 'function') {
+                updateOrderDeliveryTextFromInputs();
+            }
+        }
+
+        function updateOrderDeliveryTextFromInputs() {
+            const viloyatEl = document.getElementById('orderViloyatPage');
+            const tumanEl = document.getElementById('orderTumanPage');
+            const textEl = document.getElementById('orderDeliveryText');
+
+            if (!viloyatEl || !tumanEl || !textEl) return;
+
+            const viloyat = viloyatEl.value;
+            const tuman = tumanEl.value;
+
+            if (!viloyat || !tuman) {
+                textEl.style.display = 'none';
+                textEl.textContent = '';
+                return;
+            }
+
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const regionType = viloyat === 'Toshkent shahri' ? 'tashkent' : 'regions';
+            const deliveryPrice = calculateDeliveryPrice(total, regionType);
+            const priceText = formatDeliveryPrice(deliveryPrice);
+
+            textEl.style.display = 'block';
+            textEl.textContent = `Yetkazib berish ${viloyat}, ${tuman} ga ${priceText} bo'ladi.`;
         }
 
         function changeQuantityPage(id, change) {
