@@ -91,56 +91,20 @@ async function firebaseDeleteProduct(productId) {
 // ================================
 
 // Rasmni Firebase Storage'ga yuklash
-// Rasmni ImgBB'ga yuklash (Firebase Storage o'rniga)
 async function firebaseUploadImage(file) {
-    // ImgBB API Key tekshirish
-    if (typeof IMGBB_API_KEY === 'undefined' || IMGBB_API_KEY === 'SIZNING_IMGBB_KODINGIZ') {
-        alert('❌ Rasm yuklash uchun ImgBB kaliti kerak! imgbb-config.js faylini to\'ldiring.');
-        return null;
-    }
-
     try {
-        const formData = new FormData();
-        formData.append('image', file);
-        formData.append('key', IMGBB_API_KEY);
+        const storageRef = firebase.storage().ref();
+        const fileName = 'products/' + Date.now() + '_' + file.name;
+        const uploadTask = await storageRef.child(fileName).put(file);
+        const downloadURL = await uploadTask.ref.getDownloadURL();
 
-        // Progress bar uchun simulyatsiya
-        const progressBar = document.getElementById('uploadProgress');
-        let progress = 0;
-        const progressInterval = setInterval(() => {
-            progress += 10;
-            if (progress > 90) clearInterval(progressInterval);
-            if (progressBar) {
-                progressBar.style.width = progress + '%';
-                progressBar.textContent = progress + '%';
-            }
-        }, 200);
-
-        const response = await fetch('https://api.imgbb.com/1/upload', {
-            method: 'POST',
-            body: formData
-        });
-
-        clearInterval(progressInterval);
-        if (progressBar) {
-            progressBar.style.width = '100%';
-            progressBar.textContent = '100%';
-        }
-
-        const data = await response.json();
-
-        if (data.success) {
-            console.log('✅ Rasm ImgBB ga yuklandi:', data.data.url);
-            return {
-                url: data.data.url,
-                storagePath: null // ImgBB da path kerak emas
-            };
-        } else {
-            throw new Error(data.error.message || 'ImgBB xatosi');
-        }
+        console.log('✅ Rasm Firebase Storage\'ga yuklandi:', downloadURL);
+        return {
+            url: downloadURL,
+            storagePath: fileName
+        };
     } catch (error) {
         console.error('Rasm yuklashda xatolik:', error);
-        alert('❌ Rasm yuklanmadi: ' + error.message);
         return null;
     }
 }

@@ -274,7 +274,7 @@ function loadUserProfile() {
         if (doc.exists) {
             var data = doc.data();
             if (data.name) document.getElementById('profileName').textContent = data.name;
-            
+
             // Faqat adminlar ruxsatnomalarni ko'ra oladi va o'zgartira oladi
             var isAdmin = (currentUserRole === 'admin');
             var card = document.getElementById('profilePermissionsCard');
@@ -288,7 +288,7 @@ function loadUserProfile() {
                 document.getElementById('profile_perm_products').checked = p.products !== false;
                 document.getElementById('profile_perm_staff').checked = !!p.staff;
                 document.getElementById('profile_perm_settings').checked = !!p.settings;
-                
+
                 // Detallar
                 document.getElementById('profile_perm_show_profit').checked = p.showProfit !== false;
                 document.getElementById('profile_perm_add_expense').checked = p.addExpense !== false;
@@ -300,7 +300,7 @@ function loadUserProfile() {
 }
 
 // Ruxsatnomalarni saqlash
-document.getElementById('saveProfilePermissionsBtn').addEventListener('click', function() {
+document.getElementById('saveProfilePermissionsBtn').addEventListener('click', function () {
     var user = auth.currentUser;
     if (!user) return;
 
@@ -322,12 +322,12 @@ document.getElementById('saveProfilePermissionsBtn').addEventListener('click', f
         deleteCustomer: document.getElementById('profile_perm_delete_customer').checked
     };
 
-    db.collection('users').doc(user.uid).update({ permissions: perms }).then(function() {
+    db.collection('users').doc(user.uid).update({ permissions: perms }).then(function () {
         showToast("Ruxsatnomalar muvaffaqiyatli yangilandi!");
         btn.disabled = false;
         btn.innerHTML = '<i class="fas fa-save"></i> O\'zgarishlarni saqlash';
         updateUIVisibility(); // UI-ni darhol yangilash
-    }).catch(function(err) {
+    }).catch(function (err) {
         showToast("Xatolik: " + err.message, "error");
         btn.disabled = false;
         btn.innerHTML = '<i class="fas fa-save"></i> O\'zgarishlarni saqlash';
@@ -575,11 +575,16 @@ initSelectPicker('productStatusPicker');
 initSelectPicker('newUserRolePicker');
 
 
-document.getElementById('productForm').addEventListener('submit', function (e) {
+document.getElementById('productForm').addEventListener('submit', async function (e) {
     e.preventDefault();
     var id = document.getElementById('productId').value;
     var fileInput = document.getElementById('productImage');
     var file = fileInput.files && fileInput.files[0];
+
+    var btn = document.getElementById('saveProductBtn');
+    var originalBtnText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saqlanmoqda...';
 
     var data = {
         name: document.getElementById('productName').value.trim(),
@@ -591,14 +596,31 @@ document.getElementById('productForm').addEventListener('submit', function (e) {
         updatedAt: new Date().toISOString()
     };
 
-    // Rasm yuklash oвЂchirildi
-    if (file) {
-        data.imageUrl = document.getElementById('imagePreview').src || '';
-        data.imageStoragePath = '';
+    try {
+        // Rasm mavjud bo'lsa, uni Base64 ko'rinishida saqlaymiz (CORS muammosini oldini olish uchun)
+        if (file) {
+            // Preview'dan Base64 string'ni olamiz
+            var base64Image = document.getElementById('imagePreview').src;
+            data.imageUrl = base64Image;
+            data.imageStoragePath = ''; // Firestore'da saqlangan rasm uchun storage path kerak emas
+        } else {
+            // Agar yangi rasm tanlanmagan bo'lsa, mavjud ma'lumotni saqlab qolamiz
+            const existingProduct = productsArr.find(p => p.id === id);
+            if (existingProduct) {
+                data.imageUrl = existingProduct.imageUrl || '';
+                data.imageStoragePath = existingProduct.imageStoragePath || '';
+            }
+        }
+
+        await saveProductData(id, data);
+    } catch (error) {
+        showToast('Xatolik yuz berdi: ' + error.message, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalBtnText;
+        document.getElementById('uploadProgress').style.display = 'none';
+        document.getElementById('imageUploadArea').classList.remove('uploading');
     }
-    document.getElementById('uploadProgress').style.display = 'none';
-    document.getElementById('imageUploadArea').classList.remove('uploading');
-    saveProductData(id, data);
 });
 
 
@@ -1425,7 +1447,7 @@ function editUser(id) {
     var roleVal = u.role || 'manager';
     var roleLab = roleVal === 'admin' ? 'Admin (To\'liq huquq)' : 'Manager (Cheklangan)';
     setSelectValue('newUserRolePicker', roleVal, roleLab);
-    
+
     // Ruxsatnomalarni to'ldirish
     var perms = u.permissions || { sales: true, customers: true, finance: true, products: true, staff: false, settings: false };
     document.getElementById('perm_sales').checked = perms.sales !== false;
@@ -1729,26 +1751,40 @@ navigateTo('dashboard');
     });
 })();
 
-// ==========================================
-// === FIREBASE STORAGE - RASM YUKLASH ===
-// Stub: rasm yuklash endi ishlatilmaydi
-function uploadProductImage(file, callback) {
-    if (typeof callback === 'function') callback('', '');
+function uploadProductImage(file) {
+    // Firebase Storage CORS muammosi tufayli endi ishlatilmaydi.
+    // O'rniga Base64 orqali Firestore'ga saqlanadi.
+    return Promise.resolve(null);
 }
 
 
-// Mahsulot ma'lumotlarini Firestore ga saqlash
 function saveProductData(id, data) {
-    if (id) {
-        db.collection('products').doc(id).update(data)
-            .then(function () { showToast('Mahsulot yangilandi!'); closeModal('productModal'); })
-            .catch(function (err) { showToast('Xatolik: ' + err.message, 'error'); });
-    } else {
-        data.createdAt = new Date().toISOString();
-        db.collection('products').add(data)
-            .then(function () { showToast("Yangi mahsulot qo'shildi!"); closeModal('productModal'); })
-            .catch(function (err) { showToast('Xatolik: ' + err.message, 'error'); });
-    }
+    return new Promise((resolve, reject) => {
+        if (id) {
+            db.collection('products').doc(id).update(data)
+                .then(function () {
+                    showToast('Mahsulot yangilandi!');
+                    closeModal('productModal');
+                    resolve();
+                })
+                .catch(function (err) {
+                    showToast('Xatolik: ' + err.message, 'error');
+                    reject(err);
+                });
+        } else {
+            data.createdAt = new Date().toISOString();
+            db.collection('products').add(data)
+                .then(function () {
+                    showToast("Yangi mahsulot qo'shildi!");
+                    closeModal('productModal');
+                    resolve();
+                })
+                .catch(function (err) {
+                    showToast('Xatolik: ' + err.message, 'error');
+                    reject(err);
+                });
+        }
+    });
 }
 
 // Rasm input ni reset qilish yordamchi funksiyasi
