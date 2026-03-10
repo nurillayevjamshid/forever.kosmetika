@@ -441,7 +441,14 @@ function updateProductUI(productId) {
 
         if (product) {
 
-            footer.innerHTML = getProductFooterHTML(product);
+            // Footer ichida har doim narx qismi ham, cart / qty qismi ham bo'lishi uchun
+            footer.innerHTML = `
+                <div class="product-price-block">
+                    <span class="price-label">Narxi</span>
+                    <span class="current-price">${formatPrice(product.price)} so'm</span>
+                </div>
+                ${getProductFooterHTML(product)}
+            `;
 
             // Agar detail modal ochiq bo'lsa, uni ham yangilash
 
