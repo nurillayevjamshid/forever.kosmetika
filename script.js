@@ -82,6 +82,9 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     initContactForm();
 
+    // Initialize custom selects (viloyat/tuman)
+    initCustomSelects();
+
     // Update cart count
 
     updateCartCount();
@@ -115,6 +118,104 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
 });
+
+// ================================
+// CUSTOM SELECTS (VILOYAT/TUMAN)
+// ================================
+function initCustomSelects() {
+    const wrappers = document.querySelectorAll('.custom-select');
+    if (!wrappers.length) return;
+
+    wrappers.forEach(wrapper => {
+        const select = wrapper.querySelector('select');
+        const trigger = wrapper.querySelector('.custom-select-trigger');
+        const panel = wrapper.querySelector('.custom-select-panel');
+        if (!select || !trigger || !panel) return;
+
+        buildCustomSelectOptions(select);
+        syncCustomSelectState(select);
+
+        trigger.addEventListener('click', () => {
+            if (select.disabled) return;
+            const isOpen = wrapper.classList.contains('is-open');
+            closeAllCustomSelects();
+            if (!isOpen) {
+                wrapper.classList.add('is-open');
+                trigger.setAttribute('aria-expanded', 'true');
+            }
+        });
+    });
+
+    document.addEventListener('click', (event) => {
+        if (!event.target.closest('.custom-select')) {
+            closeAllCustomSelects();
+        }
+    });
+}
+
+function closeAllCustomSelects() {
+    document.querySelectorAll('.custom-select.is-open').forEach(wrapper => {
+        wrapper.classList.remove('is-open');
+        const trigger = wrapper.querySelector('.custom-select-trigger');
+        if (trigger) trigger.setAttribute('aria-expanded', 'false');
+    });
+}
+
+function buildCustomSelectOptions(selectEl) {
+    const wrapper = selectEl.closest('.custom-select');
+    if (!wrapper) return;
+    const panel = wrapper.querySelector('.custom-select-panel');
+    if (!panel) return;
+
+    panel.innerHTML = '';
+
+    const options = Array.from(selectEl.options).filter(opt => !opt.disabled || opt.value);
+    options.forEach(opt => {
+        if (!opt.value && opt.disabled) return;
+        const optionBtn = document.createElement('button');
+        optionBtn.type = 'button';
+        optionBtn.className = 'custom-select-option';
+        optionBtn.setAttribute('role', 'option');
+        optionBtn.dataset.value = opt.value;
+        optionBtn.innerHTML = `
+            <span class="option-bullet"></span>
+            <span class="option-text">${opt.textContent}</span>
+        `;
+        optionBtn.addEventListener('click', () => {
+            selectEl.value = opt.value;
+            selectEl.dispatchEvent(new Event('change', { bubbles: true }));
+            syncCustomSelectState(selectEl);
+            closeAllCustomSelects();
+        });
+        panel.appendChild(optionBtn);
+    });
+}
+
+function syncCustomSelectState(selectEl) {
+    const wrapper = selectEl.closest('.custom-select');
+    if (!wrapper) return;
+    const trigger = wrapper.querySelector('.custom-select-trigger');
+    const valueEl = wrapper.querySelector('.custom-select-value');
+    const panel = wrapper.querySelector('.custom-select-panel');
+    const placeholder = wrapper.getAttribute('data-placeholder') || 'Tanlang...';
+
+    const selectedOption = selectEl.options[selectEl.selectedIndex];
+    const hasValue = selectedOption && !selectedOption.disabled && selectedOption.value;
+    if (valueEl) {
+        valueEl.textContent = hasValue ? selectedOption.textContent : placeholder;
+    }
+
+    if (trigger) {
+        trigger.disabled = selectEl.disabled;
+        trigger.setAttribute('aria-disabled', selectEl.disabled ? 'true' : 'false');
+    }
+
+    if (panel) {
+        panel.querySelectorAll('.custom-select-option').forEach(opt => {
+            opt.classList.toggle('is-selected', opt.dataset.value === selectEl.value);
+        });
+    }
+}
 
 // ================================
 
@@ -1147,6 +1248,14 @@ function handleViloyatChange(isPage = false) {
 
         tumanSelect.disabled = true;
 
+    }
+
+    // Sync custom select UI
+    buildCustomSelectOptions(tumanSelect);
+    syncCustomSelectState(tumanSelect);
+    const viloyatSelect = document.getElementById('orderViloyat' + suffix);
+    if (viloyatSelect) {
+        syncCustomSelectState(viloyatSelect);
     }
 
 }

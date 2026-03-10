@@ -272,33 +272,52 @@
                                             </span>
                                             Viloyat *
                                         </label>
-                                        <select id="orderViloyatPage" required onchange="handleViloyatChange(true)"
-                                            class="select-input">
-                                            <option value="" disabled selected>Viloyatni tanlang</option>
-                                            <option value="Toshkent shahri">Toshkent shahri</option>
-                                            <option value="Toshkent viloyati">Toshkent viloyati</option>
-                                            <option value="Andijon">Andijon</option>
-                                            <option value="Buxoro">Buxoro</option>
-                                            <option value="Farg'ona">Farg'ona</option>
-                                            <option value="Jizzax">Jizzax</option>
-                                            <option value="Xorazm">Xorazm</option>
-                                            <option value="Namangan">Namangan</option>
-                                            <option value="Navoiy">Navoiy</option>
-                                            <option value="Qashqadaryo">Qashqadaryo</option>
-                                            <option value="Qoraqalpog'iston">Qoraqalpog'iston</option>
-                                            <option value="Samarqand">Samarqand</option>
-                                            <option value="Sirdaryo">Sirdaryo</option>
-                                            <option value="Surxondaryo">Surxondaryo</option>
-                                        </select>
+                                        <div class="custom-select" data-select="orderViloyatPage"
+                                            data-placeholder="Viloyatni tanlang">
+                                            <select id="orderViloyatPage" required onchange="handleViloyatChange(true)"
+                                                class="select-input native-select">
+                                                <option value="" disabled selected>Viloyatni tanlang</option>
+                                                <option value="Toshkent shahri">Toshkent shahri</option>
+                                                <option value="Toshkent viloyati">Toshkent viloyati</option>
+                                                <option value="Andijon">Andijon</option>
+                                                <option value="Buxoro">Buxoro</option>
+                                                <option value="Farg'ona">Farg'ona</option>
+                                                <option value="Jizzax">Jizzax</option>
+                                                <option value="Xorazm">Xorazm</option>
+                                                <option value="Namangan">Namangan</option>
+                                                <option value="Navoiy">Navoiy</option>
+                                                <option value="Qashqadaryo">Qashqadaryo</option>
+                                                <option value="Qoraqalpog'iston">Qoraqalpog'iston</option>
+                                                <option value="Samarqand">Samarqand</option>
+                                                <option value="Sirdaryo">Sirdaryo</option>
+                                                <option value="Surxondaryo">Surxondaryo</option>
+                                            </select>
+                                            <button type="button" class="custom-select-trigger" aria-haspopup="listbox"
+                                                aria-expanded="false">
+                                                <span class="custom-select-value">Viloyatni tanlang</span>
+                                                <span class="custom-select-caret" aria-hidden="true"></span>
+                                            </button>
+                                            <div class="custom-select-panel" role="listbox" tabindex="-1"></div>
+                                        </div>
                                     </div>
                                     <div class="form-group select-field">
                                         <label for="orderTumanPage" class="field-label">
                                             <span class="label-icon dot-icon" aria-hidden="true"></span>
                                             Tuman *
                                         </label>
-                                        <select id="orderTumanPage" required disabled class="select-input">
-                                            <option value="" disabled selected>Tumanni tanlang</option>
-                                        </select>
+                                        <div class="custom-select" data-select="orderTumanPage"
+                                            data-placeholder="Tumanni tanlang">
+                                            <select id="orderTumanPage" required disabled
+                                                class="select-input native-select">
+                                                <option value="" disabled selected>Tumanni tanlang</option>
+                                            </select>
+                                            <button type="button" class="custom-select-trigger" aria-haspopup="listbox"
+                                                aria-expanded="false" disabled>
+                                                <span class="custom-select-value">Tumanni tanlang</span>
+                                                <span class="custom-select-caret" aria-hidden="true"></span>
+                                            </button>
+                                            <div class="custom-select-panel" role="listbox" tabindex="-1"></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -465,3 +484,4 @@
 </body>
 
 </html>
+
