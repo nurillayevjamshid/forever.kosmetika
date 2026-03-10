@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil - For.Ever Cosmetics</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="profile.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body class="bg-secondary">
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav-container">
+            <div class="logo">
+                <a href="index.html" style="text-decoration: none;">
+                    <h1>For.Ever</h1>
+                    <span class="logo-subtitle">Cosmetics</span>
+                </a>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html#home" class="nav-link">Bosh sahifa</a></li>
+                <li><a href="index.html#products" class="nav-link">Mahsulotlar</a></li>
+                <li><a href="index.html#about" class="nav-link">Biz haqimizda</a></li>
+                <li><a href="index.html#contact" class="nav-link">Bog'lanish</a></li>
+                <li>
+                    <a href="profile.html" class="nav-link profile-nav-icon active">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="profile-page-container">
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="profile-cover"></div>
+                <div class="profile-avatar-container">
+                    <img id="profileAvatar" src="https://via.placeholder.com/150" alt="Avatar">
+                    <label for="avatarInput" class="avatar-edit-btn">
+                        <i class="fas fa-camera"></i>
+                    </label>
+                    <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+                </div>
+            </div>
+
+            <div class="profile-content">
+                <h2 class="profile-name-display" id="profileNameDisplay">Mijoz Ismi</h2>
+                <p class="profile-role">Doimiy mijoz</p>
+
+                <form id="profileForm" class="profile-form">
+                    <div class="input-group">
+                        <div class="input-icon"><i class="fas fa-user"></i></div>
+                        <input type="text" id="profileName" placeholder="Ismingiz" required>
+                    </div>
+
+                    <div class="input-group">
+                        <div class="input-icon"><i class="fas fa-phone"></i></div>
+                        <input type="tel" id="profilePhone" placeholder="Telefon raqamingiz" required>
+                    </div>
+
+                    <div class="input-row">
+                        <div class="input-group half">
+                            <div class="input-icon"><i class="fas fa-map-marker-alt"></i></div>
+                            <select id="profileViloyat" required>
+                                <option value="">Viloyat</option>
+                            </select>
+                        </div>
+                        <div class="input-group half">
+                            <div class="input-icon"><i class="fas fa-map-pin"></i></div>
+                            <select id="profileTuman" required>
+                                <option value="">Tuman</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="input-row">
+                        <div class="input-group half">
+                            <div class="input-icon"><i class="fab fa-instagram"></i></div>
+                            <input type="text" id="profileInstagram" placeholder="Instagram">
+                        </div>
+                        <div class="input-group half">
+                            <div class="input-icon"><i class="fab fa-telegram"></i></div>
+                            <input type="text" id="profileTelegram" placeholder="Telegram">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="save-btn" id="saveProfileBtn">
+                        <span class="btn-text">Saqlash</span>
+                        <div class="spinner" style="display: none;"></div>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <div class="mobile-bottom-nav">
+        <a href="index.html#home" class="nav-item">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+            <span>Bosh sahifa</span>
+        </a>
+        <a href="index.html#products" class="nav-item">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            <span>Katalog</span>
+        </a>
+        <a href="cart.html" class="nav-item cart-btn-mobile">
+            <div class="nav-icon-wrapper">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4H6z"></path>
+                    <path d="M3 6h18"></path>
+                    <path d="M16 10a4 4 0 0 1-8 0"></path>
+                </svg>
+                <span class="cart-count">0</span>
+            </div>
+            <span>Savat</span>
+        </a>
+        <a href="profile.html" class="nav-item active">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>Profil</span>
+        </a>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+
+    <script src="firebase-config.js"></script>
+    <script src="firebase-db.js"></script>
+    <script src="profile.js"></script>
+    <script>
+        // Use cart data to populate cart count badge
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+        document.querySelectorAll('.cart-count').forEach(el => el.textContent = totalItems);
+    </script>
+</body>
+
+</html>

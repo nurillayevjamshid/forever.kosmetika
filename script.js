@@ -1291,7 +1291,33 @@ async function submitOrder(event, isPage = false) {
 
         // ============================
 
-        // 3. TELEGRAM: Guruhga xabar yuborish
+        // 3. FIREBASE: Sotuvni saqlash (CRM sales)
+
+        // ============================
+
+        if (typeof firebaseSaveSale === 'function') {
+
+            const saleId = await firebaseSaveSale({
+
+                customerName: name,
+
+                viloyat: viloyat,
+
+                items: cart,
+
+                totalAmount: total,
+
+                orderNumber: orderResult?.orderNumber || ''
+
+            });
+
+            console.log('🛒 Sotuv Firebase ga saqlandi:', saleId);
+
+        }
+
+        // ============================
+
+        // 4. TELEGRAM: Guruhga xabar yuborish
 
         // ============================
 
@@ -1377,7 +1403,7 @@ async function submitOrder(event, isPage = false) {
 
         // ============================
 
-        // 4. NATIJA: Muvaffaqiyat
+        // 5. NATIJA: Muvaffaqiyat
 
         // ============================
 

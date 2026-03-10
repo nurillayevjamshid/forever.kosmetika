@@ -301,6 +301,43 @@ async function firebaseUpdateOrderStatus(orderId, status) {
 }
 
 // ================================
+// SOTUVLARNI SAQLASH (Sales - CRM)
+// ================================
+
+async function firebaseSaveSale(saleData) {
+    try {
+        const nowIso = new Date().toISOString();
+        const saleDate = saleData.date || nowIso.split('T')[0];
+
+        const items = (saleData.items || []).map(item => ({
+            productId: item.id || item.productId || '',
+            quantity: item.quantity || 1,
+            price: item.price || 0
+        })).filter(it => it.productId && it.quantity > 0);
+
+        const sale = {
+            date: saleDate,
+            name: saleData.customerName || saleData.name || '',
+            region: saleData.viloyat || saleData.region || '',
+            items: items,
+            totalAmount: saleData.totalAmount || 0,
+            note: saleData.note || '',
+            source: saleData.source || 'website',
+            orderNumber: saleData.orderNumber || '',
+            createdAt: nowIso,
+            updatedAt: nowIso
+        };
+
+        const docRef = await db.collection('sales').add(sale);
+        console.log('✅ Sotuv saqlandi, ID:', docRef.id);
+        return docRef.id;
+    } catch (error) {
+        console.error('Sotuv saqlashda xatolik:', error);
+        return null;
+    }
+}
+
+// ================================
 // MIJOZLAR BAZASI (Customers)
 // ================================
 
@@ -403,6 +440,53 @@ async function firebaseDeleteCustomer(customerId) {
     }
 }
 
+// Profil ma'lumotlarini saqlash
+async function firebaseSaveProfile(profileData) {
+    try {
+        let docRef;
+        const nowIso = new Date().toISOString();
+
+        const dataToSave = {
+            name: profileData.name || '',
+            phone: profileData.phone || '',
+            viloyat: profileData.viloyat || '',
+            tuman: profileData.tuman || '',
+            instagram: profileData.instagram || '',
+            telegram: profileData.telegram || '',
+            avatar: profileData.avatar || '',
+            updatedAt: nowIso
+        };
+
+        if (profileData.id) {
+            docRef = customersCollection.doc(profileData.id);
+            await docRef.update(dataToSave);
+            console.log('✅ Profil yangilandi:', profileData.id);
+            return profileData.id;
+        } else {
+            // Agar id yo'q bo'lsa telefon orqali qidirish
+            const existingCustomer = await customersCollection
+                .where('phone', '==', profileData.phone)
+                .get();
+
+            if (!existingCustomer.empty && profileData.phone && profileData.phone.length > 5) {
+                docRef = existingCustomer.docs[0].ref;
+                await docRef.update(dataToSave);
+                console.log('✅ Mavjud profil yangilandi:', docRef.id);
+                return docRef.id;
+            } else {
+                dataToSave.source = 'website_profile';
+                dataToSave.createdAt = nowIso;
+                docRef = await customersCollection.add(dataToSave);
+                console.log('✅ Yangi profil yaratildi:', docRef.id);
+                return docRef.id;
+            }
+        }
+    } catch (error) {
+        console.error('❌ Profil saqlashda xatolik:', error);
+        return null;
+    }
+}
+
 // Global qilish
 window.firebaseGetProducts = firebaseGetProducts;
 window.firebaseGetProduct = firebaseGetProduct;
@@ -419,6 +503,8 @@ window.migrateLocalStorageToFirebase = migrateLocalStorageToFirebase;
 window.firebaseSaveOrder = firebaseSaveOrder;
 window.firebaseGetOrders = firebaseGetOrders;
 window.firebaseUpdateOrderStatus = firebaseUpdateOrderStatus;
+window.firebaseSaveSale = firebaseSaveSale;
 window.firebaseSaveCustomer = firebaseSaveCustomer;
 window.firebaseGetCustomers = firebaseGetCustomers;
 window.firebaseDeleteCustomer = firebaseDeleteCustomer;
+window.firebaseSaveProfile = firebaseSaveProfile;
