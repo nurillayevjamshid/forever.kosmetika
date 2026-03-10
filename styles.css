@@ -1916,8 +1916,12 @@ body {
     padding: 8px;
     max-height: 260px;
     overflow-y: auto;
-    z-index: 20;
+    z-index: 1000;
     display: none;
+}
+
+.custom-select.is-open {
+    z-index: 1100;
 }
 
 .custom-select.is-open .custom-select-panel {
