@@ -255,6 +255,8 @@ body {
 .sidebar-back {
     display: flex;
     align-items: center;
+    width: 100%;
+    justify-content: flex-start;
     gap: 10px;
     padding: 10px 12px;
     margin-bottom: 10px;
@@ -3485,7 +3487,9 @@ html[data-theme="light"] .gallery-item {
 
 .sidebar-footer {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
 }
 
 /* ===========================
@@ -3948,4 +3952,7 @@ html[data-theme="light"] .profile-tab-btn.active {
   }
 }
 }
+
+
+
 
