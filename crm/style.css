@@ -252,6 +252,31 @@ body {
     border-radius: 0 3px 3px 0;
 }
 
+.sidebar-back {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    background: var(--surface-light);
+    border: 1px solid var(--border);
+    transition: var(--transition-fast);
+}
+
+.sidebar-back:hover {
+    color: var(--text);
+    background: var(--surface-hover);
+}
+
+.sidebar-back i {
+    width: 20px;
+    text-align: center;
+}
 /* Sidebar Footer */
 .sidebar-footer {
     padding: 16px 20px;
@@ -3923,3 +3948,4 @@ html[data-theme="light"] .profile-tab-btn.active {
   }
 }
 }
+
