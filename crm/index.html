@@ -492,10 +492,12 @@
                                         <th>Amallar</th>
                                     </tr>
                                 </thead>
-                                <tbody id="financeBody">
-                                    <!-- Dynamic content -->
                                 </tbody>
                             </table>
+                        </div>
+                        <!-- Mobile friendly finance list (cards) -->
+                        <div class="finance-mobile-list" id="financeMobileList">
+                            <!-- Dynamic mobile cards -->
                         </div>
                         <div class="empty-state" id="financeEmpty" style="display:none;">
                             <i class="fas fa-wallet"></i>
@@ -1326,6 +1328,25 @@
                 <div style="margin-left:auto; display:flex; gap:10px;">
                     <button class="btn btn-info" id="detailHistoryBtn"><i class="fas fa-history"></i> Tarix</button>
                     <button class="btn btn-primary" id="detailEditBtn"><i class="fas fa-pen"></i> Tahrirlash</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Finance Details Modal -->
+    <div class="modal-overlay" id="financeDetailsModal">
+        <div class="modal" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-file-invoice-dollar"></i> Amaliyot tafsilotlari</h2>
+                <button class="modal-close" data-modal="financeDetailsModal"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="financeDetailsBody">
+                <!-- Dynamic details -->
+            </div>
+            <div class="modal-footer" style="display:flex; gap:10px; flex-wrap:wrap">
+                <button type="button" class="btn btn-secondary" data-modal="financeDetailsModal">Yopish</button>
+                <div style="margin-left:auto; display:flex; gap:10px;">
+                    <button class="btn btn-primary" id="financeDetailEditBtn"><i class="fas fa-pen"></i> Tahrirlash</button>
                 </div>
             </div>
         </div>

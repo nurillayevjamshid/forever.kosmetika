@@ -1460,6 +1460,7 @@ function populateFinanceCategories(type) {
 function renderFinance(searchTerm) {
     searchTerm = searchTerm || '';
     var tbody = document.getElementById('financeBody');
+    var mobileList = document.getElementById('financeMobileList');
     var empty = document.getElementById('financeEmpty');
     var filtered = financesArr.slice().sort(function (a, b) { return new Date(b.date) - new Date(a.date); });
     if (searchTerm) {
@@ -1492,24 +1493,55 @@ function renderFinance(searchTerm) {
     document.getElementById('financeIncome').textContent = formatMoney(totalIncome);
     document.getElementById('financeExpense').textContent = formatMoney(totalExpense);
     document.getElementById('financeBalance').textContent = formatMoney(totalIncome - totalExpense);
-    if (filtered.length === 0) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
+    if (filtered.length === 0) {
+        tbody.innerHTML = '';
+        if (mobileList) mobileList.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+    }
     empty.style.display = 'none';
-    tbody.innerHTML = filtered.map(function (f, i) {
+
+    var rowsHtml = [];
+    var cardsHtml = [];
+
+    filtered.forEach(function (f, i) {
         var isInc = f.type === 'income';
-        return '' +
+        
+        // Desktop row
+        rowsHtml.push(
             '<tr>' +
             '<td data-label="#">' + (i + 1) + '</td>' +
             '<td data-label="Sana">' + formatDate(f.date) + '</td>' +
             '<td data-label="Turi"><span class="type-badge ' + f.type + '"><i class="fas fa-' + (isInc ? 'arrow-down' : 'arrow-up') + '"></i> ' + (isInc ? 'Kirim' : 'Chiqim') + '</span></td>' +
             '<td data-label="Kategoriya">' + escapeHtml(f.category) + '</td>' +
-            '<td data-label="Tavsif">' + escapeHtml(f.description || 'вЂ”') + '</td>' +
+            '<td data-label="Tavsif">' + escapeHtml(f.description || '—') + '</td>' +
             '<td data-label="Summa" class="' + (isInc ? 'amount-positive' : 'amount-negative') + '">' + (isInc ? '+' : '-') + formatMoney(f.amount) + '</td>' +
             '<td data-label="Amallar">' +
             '<button class="btn-icon edit finance-edit-btn" data-id="' + f.id + '" title="Tahrirlash"><i class="fas fa-pen"></i></button>' +
             '<button class="btn-icon delete finance-delete-btn" data-id="' + f.id + '" title="O\'chirish"><i class="fas fa-trash"></i></button>' +
             '</td>' +
-            '</tr>';
-    }).join('');
+            '</tr>'
+        );
+
+        // Mobile card
+        if (mobileList) {
+            cardsHtml.push(
+                '<button class="finance-mobile-card type-' + f.type + '" data-id="' + f.id + '">' +
+                '<div class="finance-mobile-top-row">' +
+                '<span class="finance-mobile-category">' + escapeHtml(f.category) + '</span>' +
+                '<span class="finance-mobile-amount">' + (isInc ? '+' : '-') + formatMoney(f.amount) + '</span>' +
+                '</div>' +
+                '<div class="finance-mobile-bottom-row">' +
+                '<span class="finance-mobile-date"><i class="far fa-calendar-alt"></i> ' + formatDate(f.date) + '</span>' +
+                '<span class="finance-mobile-desc">' + escapeHtml(f.description || '') + '</span>' +
+                '</div>' +
+                '</button>'
+            );
+        }
+    });
+
+    tbody.innerHTML = rowsHtml.join('');
+    if (mobileList) mobileList.innerHTML = cardsHtml.join('');
 }
 
 function editFinance(id) {
@@ -1647,6 +1679,66 @@ document.addEventListener('click', function (e) {
     if (btn) {
         var fdelId = btn.getAttribute('data-id');
         deleteItem('finances', fdelId, 'bu yozuvni');
+        return;
+    }
+
+    // Finance Mobile Card Click
+    btn = e.target.closest('.finance-mobile-card');
+    if (btn) {
+        var fid = btn.dataset.id;
+        var f = financesArr.find(function(x) { return x.id === fid; });
+        if (f) {
+            var isInc = f.type === 'income';
+            var html = 
+                '<div class="finance-detail-body">' +
+                    '<div class="finance-detail-item">' +
+                        '<i class="fas fa-tag"></i>' +
+                        '<div>' +
+                            '<span class="label">Kategoriya</span>' +
+                            '<span class="value">' + escapeHtml(f.category) + '</span>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="finance-detail-item">' +
+                        '<i class="fas fa-money-bill-wave"></i>' +
+                        '<div>' +
+                            '<span class="label">Summa</span>' +
+                            '<span class="value ' + (isInc ? 'amount-positive' : 'amount-negative') + '">' + 
+                                (isInc ? '+' : '-') + formatMoney(f.amount) + 
+                            '</span>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="finance-detail-item">' +
+                        '<i class="far fa-calendar-alt"></i>' +
+                        '<div>' +
+                            '<span class="label">Sana</span>' +
+                            '<span class="value">' + formatDate(f.date) + '</span>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="finance-detail-item">' +
+                        '<i class="fas fa-align-left"></i>' +
+                        '<div>' +
+                            '<span class="label">Tavsif</span>' +
+                            '<span class="value">' + escapeHtml(f.description || '—') + '</span>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="finance-detail-item">' +
+                        '<i class="fas fa-' + (isInc ? 'arrow-down' : 'arrow-up') + '"></i>' +
+                        '<div>' +
+                            '<span class="label">Turi</span>' +
+                            '<span class="value">' + (isInc ? 'Kirim' : 'Chiqim') + '</span>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+            
+            document.getElementById('financeDetailsBody').innerHTML = html;
+            
+            document.getElementById('financeDetailEditBtn').onclick = function() {
+                closeModal('financeDetailsModal');
+                setTimeout(function() { editFinance(fid); }, 100);
+            };
+
+            openModal('financeDetailsModal');
+        }
         return;
     }
 });

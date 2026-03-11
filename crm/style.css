@@ -2198,15 +2198,141 @@ html[data-theme="light"] .customer-detail-item {
     color: var(--text-secondary);
 }
 
+/* ===========================
+   Finance - Mobile Card View
+   =========================== */
+
+.finance-mobile-list {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.finance-mobile-card {
+    width: 100%;
+    border: none;
+    outline: none;
+    text-align: left;
+    border-radius: 20px;
+    padding: 14px 16px;
+    color: #0f172a;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.10);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.finance-mobile-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 26px rgba(15, 23, 42, 0.18);
+}
+
+.finance-mobile-card.type-income {
+    background: linear-gradient(135deg, #dcfce7, #ecfdf5); /* Light green */
+}
+
+.finance-mobile-card.type-expense {
+    background: linear-gradient(135deg, #fee2e2, #fef2f2); /* Light red/pink */
+}
+
+.finance-mobile-top-row,
+.finance-mobile-bottom-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+}
+
+.finance-mobile-category {
+    font-size: 15px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.finance-mobile-amount {
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.finance-mobile-card.type-income .finance-mobile-amount {
+    color: #15803d;
+}
+
+.finance-mobile-card.type-expense .finance-mobile-amount {
+    color: #b91c1c;
+}
+
+.finance-mobile-date {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #4b5563;
+}
+
+.finance-mobile-desc {
+    color: #6b7280;
+    font-style: italic;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+
+/* Finance details modal styles */
+.finance-detail-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.finance-detail-item {
+    padding: 12px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.finance-detail-item i {
+    font-size: 20px;
+    color: var(--accent);
+    width: 24px;
+    text-align: center;
+}
+
+.finance-detail-item .label {
+    display: block;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+}
+
+.finance-detail-item .value {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+html[data-theme="light"] .finance-detail-item {
+    background: #f8fafc;
+}
+
+
 @media (max-width: 768px) {
-    /* Sales & Customers: hide table, show cards on mobile */
+    /* Sales, Customers & Finance: hide table, show cards on mobile */
     #page-sales .table-responsive,
-    #page-customers .table-responsive {
+    #page-customers .table-responsive,
+    #page-finance .table-responsive {
         display: none;
     }
 
     #page-sales .sales-mobile-list,
-    #page-customers .customers-mobile-list {
+    #page-customers .customers-mobile-list,
+    #page-finance .finance-mobile-list {
         display: flex;
     }
 }
