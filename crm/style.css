@@ -438,7 +438,7 @@ body {
    =========================== */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 24px;
     margin-bottom: 32px;
 }
@@ -473,6 +473,10 @@ body {
 
 .stat-total-expense {
     background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+}
+
+.stat-total-cost {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
 }
 
 .stat-card-header {
@@ -2701,6 +2705,57 @@ html[data-theme="light"] .sale-items-add-btn {
     margin-bottom: 24px;
 }
 
+.dashboard-split-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: stretch;
+}
+
+.dashboard-split-grid .card {
+    height: 360px;
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard-split-grid .card-body {
+    flex: 1;
+    overflow: hidden;
+}
+
+.muted-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 6px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+html[data-theme="light"] .muted-chip {
+    background: #f1f5f9;
+    border-color: #e2e8f0;
+    color: #475569;
+}
+
+@media (max-width: 1100px) {
+    .dashboard-split-grid {
+        grid-template-columns: 1fr;
+    }
+    .dashboard-split-grid .card {
+        height: auto;
+        min-height: 320px;
+    }
+    .dashboard-split-grid .card-body {
+        overflow: visible;
+    }
+}
+
 .dashboard-main-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -2747,7 +2802,7 @@ html[data-theme="light"] .sale-items-add-btn {
 
 /* Limit expense list height so only ~2 items are visible, rest via scroll */
 .expense-card {
-    height: 280px;
+    height: 360px;
     display: flex;
     flex-direction: column;
     position: relative;
@@ -2756,6 +2811,138 @@ html[data-theme="light"] .sale-items-add-btn {
 .expense-card .card-body {
     flex: 1;
     overflow-y: auto;
+}
+
+/* Cost table (Tannarxlar) */
+.cost-table-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: 14px;
+    height: 100%;
+    overflow: hidden;
+}
+
+.cost-table-list {
+    overflow-y: auto;
+    padding-right: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.cost-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.cost-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--accent-border-soft);
+    transform: translateY(-1px);
+}
+
+.cost-item.active {
+    background: var(--accent-bg-mid);
+    border-color: var(--accent-border-strong);
+    box-shadow: var(--shadow-sm);
+}
+
+.cost-item-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: baseline;
+    margin-bottom: 6px;
+}
+
+.cost-item-title {
+    font-weight: 800;
+    color: var(--text);
+    font-size: 0.92rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.cost-item-sum {
+    font-weight: 900;
+    color: #fff;
+    white-space: nowrap;
+}
+
+html[data-theme="light"] .cost-item-sum {
+    color: #0f172a;
+}
+
+.cost-item-sub {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.cost-table-details {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 18px;
+    overflow-y: auto;
+    padding: 14px;
+}
+
+html[data-theme="light"] .cost-item,
+html[data-theme="light"] .cost-table-details {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+}
+
+@media (max-width: 768px) {
+    .cost-table-wrap {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Sales status select */
+.status-select {
+    width: 100%;
+    min-width: 140px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text);
+    font-weight: 700;
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.status-select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.status-select.status-kutilmoqda {
+    border-color: rgba(251, 191, 36, 0.35);
+}
+
+.status-select.status-atkaz {
+    border-color: rgba(244, 63, 94, 0.35);
+}
+
+.status-select.status-sotildi {
+    border-color: rgba(16, 185, 129, 0.35);
+}
+
+html[data-theme="light"] .status-select {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    color: #0f172a;
 }
 
 .expense-row {

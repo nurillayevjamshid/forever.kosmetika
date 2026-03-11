@@ -52,6 +52,10 @@ function formatMoney(amount) {
     return new Intl.NumberFormat('uz-UZ').format(amount || 0) + " so'm";
 }
 
+function formatPlainMoney(amount) {
+    return new Intl.NumberFormat('uz-UZ').format(amount || 0);
+}
+
 function formatDate(dateStr) {
     if (!dateStr) return '';
     var d = new Date(dateStr);
@@ -68,6 +72,62 @@ function escapeHtml(text) {
     var div = document.createElement('div');
     div.textContent = text || '';
     return div.innerHTML;
+}
+
+// ==========================================
+// DELIVERY (DOSTAVKA) RULES (same as cart.html)
+// ==========================================
+function getRegionType(region) {
+    return (region === 'Toshkent shahri') ? 'tashkent' : 'regions';
+}
+
+function calculateDeliveryPrice(subtotal, regionType) {
+    subtotal = parseFloat(subtotal) || 0;
+    if (regionType === 'tashkent') {
+        if (subtotal < 120000) return 20000;
+        if (subtotal < 220000) return 15000;
+        return 0;
+    } else {
+        if (subtotal < 220000) return 25000;
+        if (subtotal < 320000) return 20000;
+        return 0;
+    }
+}
+
+function formatDeliveryPrice(price) {
+    price = parseFloat(price) || 0;
+    return price === 0 ? 'Tekin' : (formatMoney(price));
+}
+
+// ==========================================
+// SALES DERIVED HELPERS
+// ==========================================
+function computeSaleSubtotal(items) {
+    var subtotal = 0;
+    (items || []).forEach(function (it) {
+        var qty = parseFloat(it.quantity) || 0;
+        var price = parseFloat(it.price) || 0;
+        subtotal += qty * price;
+    });
+    return subtotal;
+}
+
+function computeSaleCostTotal(items) {
+    var costTotal = 0;
+    (items || []).forEach(function (it) {
+        var p = productsArr.find(function (px) { return px.id === it.productId; });
+        var qty = parseFloat(it.quantity) || 0;
+        var cost = p ? (parseFloat(p.cost) || 0) : 0;
+        costTotal += qty * cost;
+    });
+    return costTotal;
+}
+
+function normalizeSaleStatus(status) {
+    status = (status || '').toString().trim().toLowerCase();
+    if (status === 'sotildi' || status === 'sold') return 'sotildi';
+    if (status === 'atkaz' || status === 'otkaz' || status === 'отказ' || status === 'reject') return 'atkaz';
+    return 'kutilmoqda';
 }
 
 // ==========================================
@@ -835,16 +895,19 @@ function addSaleItemRow(itemData) {
 }
 
 function updateSaleTotal() {
-    var total = 0;
+    var subtotal = 0;
     document.querySelectorAll('.sale-item-row').forEach(function (row) {
         var productSelect = row.querySelector('.item-product-select');
         var pid = productSelect ? productSelect.value : '';
         if (!pid) return;
         var qty = parseFloat(row.querySelector('.item-qty-input').value) || 0;
         var price = parseFloat(row.querySelector('.item-price-input').value) || 0;
-        total += qty * price;
+        subtotal += qty * price;
     });
-    document.getElementById('saleTotalDisplay').textContent = formatMoney(total);
+    var region = (document.getElementById('saleRegion') && document.getElementById('saleRegion').value) || '';
+    var delivery = region ? calculateDeliveryPrice(subtotal, getRegionType(region)) : 0;
+    var grandTotal = subtotal + delivery;
+    document.getElementById('saleTotalDisplay').textContent = formatMoney(grandTotal);
 }
 
 var addSaleItemBtn = document.getElementById('addSaleItemBtn');
@@ -877,6 +940,12 @@ function renderSales(searchTerm) {
     empty.style.display = 'none';
     tbody.innerHTML = filtered.map(function (s, i) {
         var items = s.items || [];
+        var status = normalizeSaleStatus(s.status);
+        var subtotal = (typeof s.subtotalAmount === 'number') ? s.subtotalAmount : computeSaleSubtotal(items);
+        var deliveryAmount = (typeof s.deliveryAmount === 'number') ? s.deliveryAmount : calculateDeliveryPrice(subtotal, getRegionType(s.region));
+        var totalAmount = (typeof s.totalAmount === 'number') ? s.totalAmount : (subtotal + deliveryAmount);
+        var costTotal = (typeof s.costTotal === 'number') ? s.costTotal : computeSaleCostTotal(items);
+
         var tagsHtml = items.map(function (it) {
             var p = productsArr.find(function (px) { return px.id === it.productId; });
             var pname = p ? escapeHtml(p.name) : '—';
@@ -903,12 +972,159 @@ function renderSales(searchTerm) {
             '<td data-label="Nomi"><span class="sale-user-name">' + escapeHtml(s.name || '—') + '</span></td>' +
             '<td data-label="Viloyat"><div class="sale-region-badge"><i class="fas fa-location-dot"></i> ' + escapeHtml(s.region || '—') + '</div></td>' +
             '<td data-label="Mahsulotlar" title="' + fullItemsText + '"><div class="sale-items-wrap">' + itemsHtml + '</div></td>' +
-            '<td data-label="Jami summa" class="amount-highlight">' + formatMoney(s.totalAmount) + '</td>' +
+            '<td data-label="Jami summa" class="amount-highlight">' + formatMoney(totalAmount) + '</td>' +
+            '<td data-label="Tannarx">' + (costTotal ? formatMoney(costTotal) : '—') + '</td>' +
+            '<td data-label="Dostavka">' + (deliveryAmount === 0 ? '<span class="status-badge info">Tekin</span>' : formatMoney(deliveryAmount)) + '</td>' +
+            '<td data-label="Status">' +
+            '<select class="status-select status-' + status + '" data-id="' + s.id + '" data-prev="' + status + '">' +
+            '<option value="kutilmoqda"' + (status === 'kutilmoqda' ? ' selected' : '') + '>Kutilmoqda</option>' +
+            '<option value="atkaz"' + (status === 'atkaz' ? ' selected' : '') + '>Atkáz</option>' +
+            '<option value="sotildi"' + (status === 'sotildi' ? ' selected' : '') + '>Sotildi</option>' +
+            '</select>' +
+            '</td>' +
             '<td data-label="Amallar"><div class="sale-actions-wrap"><button class="btn-icon edit sale-edit-btn" data-id="' + s.id + '" title="Tahrirlash"><i class="fas fa-pen"></i></button>' +
             '<button class="btn-icon delete sale-delete-btn" data-id="' + s.id + '" title="O\'chirish"><i class="fas fa-trash"></i></button></div></td>' +
             '</tr>';
     }).join('');
     updateUIVisibility('sales');
+}
+
+// Status change handler (event delegation)
+document.addEventListener('change', function (e) {
+    var sel = e.target.closest('.status-select');
+    if (!sel) return;
+    var saleId = sel.getAttribute('data-id');
+    var prev = sel.getAttribute('data-prev') || 'kutilmoqda';
+    var next = normalizeSaleStatus(sel.value);
+    sel.value = next;
+    if (!saleId || prev === next) return;
+    updateSaleStatus(saleId, prev, next, sel);
+});
+
+async function updateSaleStatus(saleId, prevStatus, nextStatus, selectEl) {
+    try {
+        var sale = salesArr.find(function (x) { return x.id === saleId; });
+        if (!sale) throw new Error('Sotuv topilmadi');
+
+        var items = sale.items || [];
+        var subtotal = (typeof sale.subtotalAmount === 'number') ? sale.subtotalAmount : computeSaleSubtotal(items);
+        var deliveryAmount = (typeof sale.deliveryAmount === 'number') ? sale.deliveryAmount : calculateDeliveryPrice(subtotal, getRegionType(sale.region));
+        var totalAmount = (typeof sale.totalAmount === 'number') ? sale.totalAmount : (subtotal + deliveryAmount);
+        var costTotal = (typeof sale.costTotal === 'number') ? sale.costTotal : computeSaleCostTotal(items);
+
+        // Always persist normalized status, and lock derived fields when sold
+        var saleUpdate = { status: nextStatus, updatedAt: new Date().toISOString() };
+        if (nextStatus === 'sotildi') {
+            saleUpdate.soldAt = sale.soldAt || new Date().toISOString();
+            saleUpdate.subtotalAmount = subtotal;
+            saleUpdate.deliveryAmount = deliveryAmount;
+            saleUpdate.totalAmount = totalAmount;
+            saleUpdate.costTotal = costTotal;
+        }
+
+        await db.collection('sales').doc(saleId).update(saleUpdate);
+
+        if (prevStatus !== 'sotildi' && nextStatus === 'sotildi') {
+            await ensureFinanceEntriesForSoldSale(Object.assign({}, sale, saleUpdate));
+            showToast('Status "Sotildi" qilindi. Dashboard yangilandi!', 'success');
+        }
+
+        if (prevStatus === 'sotildi' && nextStatus !== 'sotildi') {
+            await deleteAutoFinanceEntriesForSale(saleId);
+            showToast('Status qaytarildi. Avto kirim/chiqim o\'chirildi.', 'info');
+        }
+
+        if (selectEl) selectEl.setAttribute('data-prev', nextStatus);
+    } catch (err) {
+        console.error(err);
+        showToast('Statusni o\'zgartirishda xatolik: ' + (err.message || err), 'error');
+        // revert UI
+        if (selectEl) {
+            selectEl.value = prevStatus;
+            selectEl.setAttribute('data-prev', prevStatus);
+        }
+    }
+}
+
+function buildSaleFinanceDescription(sale) {
+    var items = sale.items || [];
+    var desc = (sale.name || '') + ': ';
+    desc += items.map(function (it) {
+        var p = productsArr.find(function (px) { return px.id === it.productId; });
+        return (p ? p.name : 'Mahs') + ' (x' + it.quantity + ')';
+    }).join(', ');
+    return desc.trim();
+}
+
+async function ensureFinanceEntriesForSoldSale(sale) {
+    // Prevent duplicates: if any autoGenerated record exists for this sale, skip creation per kind.
+    var snap = await db.collection('finances').where('saleId', '==', sale.id).get();
+    var hasSaleIncome = false;
+    var hasDeliveryExpense = false;
+    snap.forEach(function (doc) {
+        var d = doc.data() || {};
+        // New format (recommended)
+        if (d.autoGenerated && d.autoKind === 'sale_income') hasSaleIncome = true;
+        if (d.autoGenerated && d.autoKind === 'delivery_expense') hasDeliveryExpense = true;
+        // Backward compatibility: older records had no auto flags
+        if (d.type === 'income' && d.category === 'Sotuv daromadi') hasSaleIncome = true;
+        if (d.type === 'expense' && (d.category === 'Yandex' || d.category === 'Pochta') && (d.description || '').toLowerCase().includes('dostavka')) {
+            hasDeliveryExpense = true;
+        }
+    });
+
+    var nowIso = new Date().toISOString();
+    var subtotal = (typeof sale.subtotalAmount === 'number') ? sale.subtotalAmount : computeSaleSubtotal(sale.items || []);
+    var deliveryAmount = (typeof sale.deliveryAmount === 'number') ? sale.deliveryAmount : calculateDeliveryPrice(subtotal, getRegionType(sale.region));
+    var totalAmount = (typeof sale.totalAmount === 'number') ? sale.totalAmount : (subtotal + deliveryAmount);
+
+    var desc = buildSaleFinanceDescription(sale);
+
+    if (!hasSaleIncome) {
+        await db.collection('finances').add({
+            date: sale.date,
+            type: 'income',
+            category: 'Sotuv daromadi',
+            description: desc,
+            amount: totalAmount,
+            saleId: sale.id,
+            autoGenerated: true,
+            autoKind: 'sale_income',
+            createdAt: nowIso
+        });
+    }
+
+    if (deliveryAmount > 0 && !hasDeliveryExpense) {
+        var isTashkent = getRegionType(sale.region) === 'tashkent';
+        var category = isTashkent ? 'Yandex' : 'Pochta';
+        var deliveryDesc = (isTashkent ? 'Yandex dostavka' : 'Pochta dostavka') + ' — ' + (sale.name || 'Sotuv') + ' (mijoz tomonidan to\'landi)';
+        await db.collection('finances').add({
+            date: sale.date,
+            type: 'expense',
+            category: category,
+            description: deliveryDesc,
+            amount: deliveryAmount,
+            saleId: sale.id,
+            autoGenerated: true,
+            autoKind: 'delivery_expense',
+            paidByCustomer: true,
+            createdAt: nowIso
+        });
+    }
+}
+
+async function deleteAutoFinanceEntriesForSale(saleId) {
+    var snap = await db.collection('finances').where('saleId', '==', saleId).get();
+    var batch = db.batch();
+    var count = 0;
+    snap.forEach(function (doc) {
+        var d = doc.data() || {};
+        if (d.autoGenerated) {
+            batch.delete(doc.ref);
+            count += 1;
+        }
+    });
+    if (count > 0) await batch.commit();
 }
 
 // Global viewer logic
@@ -947,7 +1163,7 @@ function editSale(id) {
     document.getElementById('saleId').value = s.id;
     document.getElementById('saleDate').value = s.date;
     document.getElementById('saleName').value = s.name || '';
-    initSelectPicker('saleRegionPicker', allRegions);
+    initSelectPicker('saleRegionPicker', allRegions, function () { updateSaleTotal(); });
     setSelectValue('saleRegionPicker', s.region || '', s.region || 'Tanlang...');
     document.getElementById('saleNote').value = s.note || '';
 
@@ -972,7 +1188,7 @@ document.getElementById('addSaleBtn').addEventListener('click', function () {
     document.getElementById('saleDate').value = getTodayStr();
     document.getElementById('saleItemsList').innerHTML = '';
     addSaleItemRow();
-    initSelectPicker('saleRegionPicker', allRegions);
+    initSelectPicker('saleRegionPicker', allRegions, function () { updateSaleTotal(); });
     setSelectValue('saleRegionPicker', '', 'Tanlang...');
     document.getElementById('saleTotalDisplay').textContent = "0 so'm";
     document.getElementById('saleModalTitle').innerHTML = '<i class="fas fa-shopping-cart"></i> Yangi Sotuv';
@@ -987,7 +1203,7 @@ document.getElementById('saleForm').addEventListener('submit', function (e) {
     e.preventDefault();
     var id = document.getElementById('saleId').value;
     var items = [];
-    var totalAmount = 0;
+    var subtotalAmount = 0;
 
     document.querySelectorAll('.sale-item-row').forEach(function (row) {
         var productSelect = row.querySelector('.item-product-select');
@@ -996,17 +1212,23 @@ document.getElementById('saleForm').addEventListener('submit', function (e) {
         var price = parseFloat(row.querySelector('.item-price-input').value) || 0;
         if (pid && qty > 0) {
             items.push({ productId: pid, quantity: qty, price: price });
-            totalAmount += qty * price;
+            subtotalAmount += qty * price;
         }
     });
 
     if (items.length === 0) { showToast('Kamida bitta mahsulot tanlang!', 'error'); return; }
 
+    var region = document.getElementById('saleRegion').value;
+    var deliveryAmount = calculateDeliveryPrice(subtotalAmount, getRegionType(region));
+    var totalAmount = subtotalAmount + deliveryAmount;
+
     var data = {
         date: document.getElementById('saleDate').value,
         name: document.getElementById('saleName').value.trim(),
-        region: document.getElementById('saleRegion').value,
+        region: region,
         items: items,
+        subtotalAmount: subtotalAmount,
+        deliveryAmount: deliveryAmount,
         totalAmount: totalAmount,
         note: document.getElementById('saleNote').value.trim(),
         updatedAt: new Date().toISOString()
@@ -1016,24 +1238,8 @@ document.getElementById('saleForm').addEventListener('submit', function (e) {
         db.collection("sales").doc(id).update(data).then(function () { showToast('Sotuv yangilandi!'); closeModal('saleModal'); }).catch(function (err) { showToast('Xatolik: ' + err.message, 'error'); });
     } else {
         data.createdAt = new Date().toISOString();
+        data.status = 'kutilmoqda';
         db.collection("sales").add(data).then(function (docRef) {
-            // Auto add income to finance
-            var desc = (data.name || '') + ': ';
-            desc += items.map(function (it) {
-                var p = productsArr.find(function (px) { return px.id === it.productId; });
-                return (p ? p.name : 'Mahs') + ' (x' + it.quantity + ')';
-            }).join(', ');
-
-            db.collection("finances").add({
-                date: data.date,
-                type: 'income',
-                category: 'Sotuv daromadi',
-                description: desc,
-                amount: totalAmount,
-                saleId: docRef.id,
-                createdAt: new Date().toISOString()
-            });
-
             showToast("Yangi sotuv qo'shildi!");
             closeModal('saleModal');
             // Update customer stats if applicable
@@ -1269,14 +1475,24 @@ function refreshDashboard() {
     var inc = financesArr.filter(function (f) { return f.type === 'income'; }).reduce(function (s, f) { return s + f.amount; }, 0);
     var exp = financesArr.filter(function (f) { return f.type === 'expense'; }).reduce(function (s, f) { return s + f.amount; }, 0);
 
-    document.getElementById('totalIncome').textContent = formatMoney(inc);
+    var balance = inc - exp;
+
+    // Tannarx faqat sotilgan sotuvlardan yig'iladi
+    var soldSales = salesArr.filter(function (s) { return normalizeSaleStatus(s.status) === 'sotildi'; });
+    var totalCost = soldSales.reduce(function (sum, s) {
+        if (typeof s.costTotal === 'number') return sum + s.costTotal;
+        return sum + computeSaleCostTotal(s.items || []);
+    }, 0);
+
+    document.getElementById('totalIncome').textContent = formatMoney(balance);
     document.getElementById('totalExpense').textContent = formatMoney(exp);
-    document.getElementById('totalProfit').textContent = formatMoney(inc - exp);
+    document.getElementById('totalCost').textContent = formatMoney(totalCost);
+    document.getElementById('totalProfit').textContent = formatMoney(balance - totalCost);
 
     // 1. REGION STATS
     var regionCount = {};
     var regionSum = {};
-    salesArr.forEach(function (s) {
+    soldSales.forEach(function (s) {
         var r = s.region || "Noma'lum";
         regionCount[r] = (regionCount[r] || 0) + 1;
         regionSum[r] = (regionSum[r] || 0) + (s.totalAmount || 0);
@@ -1291,7 +1507,7 @@ function refreshDashboard() {
             demoList.innerHTML = sortedRegions.map(function (r) {
                 var count = regionCount[r];
                 var sum = regionSum[r] || 0;
-                var percent = Math.round((count / (salesArr.length || 1)) * 100);
+                var percent = Math.round((count / (soldSales.length || 1)) * 100);
                 return '<div class="demographic-item">' +
                     '<div class="region-icon"><i class="fas fa-location-dot"></i></div>' +
                     '<div class="region-info">' +
@@ -1310,7 +1526,7 @@ function refreshDashboard() {
 
     // 2. TOP PRODUCTS
     var prodStats = {};
-    salesArr.forEach(function (s) {
+    soldSales.forEach(function (s) {
         (s.items || []).forEach(function (it) {
             prodStats[it.productId] = (prodStats[it.productId] || 0) + (it.quantity || 0);
         });
@@ -1369,10 +1585,14 @@ function refreshDashboard() {
                     typeClass = "service";
                 }
 
+                var paidByCustomerTag = (f.paidByCustomer || (f.description || '').toLowerCase().includes('mijoz tomonidan')) ?
+                    '<div style="margin-top:6px; font-size:11px; color:var(--text-muted); display:flex; align-items:center; gap:6px;"><i class="fas fa-circle-check" style="color:var(--success); opacity:0.9"></i> mijoz tomonidan to\'landi</div>' : '';
+
                 return '<div class="expense-row">' +
                     '<div class="expense-icon-wrap ' + typeClass + '"><i class="fas ' + icon + '"></i></div>' +
                     '<div class="expense-details">' +
                     '<span class="expense-title">' + escapeHtml(f.description || '—') + '</span>' +
+                    paidByCustomerTag +
                     '<span class="expense-date">' + formatDate(f.date) + '</span>' +
                     '</div>' +
                     '<div class="expense-value-wrap">' +
@@ -1382,7 +1602,132 @@ function refreshDashboard() {
             }).join('');
         }
     }
+
+    // 5. COST TABLE (Tannarxlar jadvali)
+    renderDashboardCostTable(soldSales);
 }
+
+var dashSelectedCostSaleId = '';
+function renderDashboardCostTable(soldSales) {
+    var listEl = document.getElementById('dashCostList');
+    var detailsEl = document.getElementById('dashCostDetails');
+    var emptyEl = document.getElementById('dashEmptyCost');
+    if (!listEl || !detailsEl || !emptyEl) return;
+
+    var list = soldSales.slice().sort(function (a, b) {
+        var da = new Date(b.soldAt || b.date || 0).getTime();
+        var dbb = new Date(a.soldAt || a.date || 0).getTime();
+        return da - dbb;
+    });
+
+    if (list.length === 0) {
+        listEl.innerHTML = '';
+        emptyEl.style.display = 'block';
+        return;
+    }
+    emptyEl.style.display = 'none';
+
+    listEl.innerHTML = list.map(function (s) {
+        var items = s.items || [];
+        var costTotal = (typeof s.costTotal === 'number') ? s.costTotal : computeSaleCostTotal(items);
+        var subtotal = (typeof s.subtotalAmount === 'number') ? s.subtotalAmount : computeSaleSubtotal(items);
+        var deliveryAmount = (typeof s.deliveryAmount === 'number') ? s.deliveryAmount : calculateDeliveryPrice(subtotal, getRegionType(s.region));
+        var totalAmount = (typeof s.totalAmount === 'number') ? s.totalAmount : (subtotal + deliveryAmount);
+        var isActive = (dashSelectedCostSaleId && dashSelectedCostSaleId === s.id);
+
+        return '' +
+            '<div class="cost-item' + (isActive ? ' active' : '') + '" data-sale-id="' + s.id + '">' +
+            '<div class="cost-item-top">' +
+            '<div class="cost-item-title"><i class="fas fa-bag-shopping" style="opacity:0.85; margin-right:8px;"></i>' + escapeHtml(s.name || '—') + '</div>' +
+            '<div class="cost-item-sum">' + formatMoney(costTotal) + '</div>' +
+            '</div>' +
+            '<div class="cost-item-sub">' +
+            '<span><i class="far fa-calendar"></i> ' + escapeHtml(formatDate(s.date)) + '</span>' +
+            '<span><i class="fas fa-location-dot"></i> ' + escapeHtml(s.region || '—') + '</span>' +
+            '<span><i class="fas fa-wallet"></i> ' + formatMoney(totalAmount) + '</span>' +
+            '</div>' +
+            '</div>';
+    }).join('');
+
+    // Keep selection valid
+    if (!dashSelectedCostSaleId || !list.some(function (s) { return s.id === dashSelectedCostSaleId; })) {
+        dashSelectedCostSaleId = list[0].id;
+    }
+    renderCostDetailsBySaleId(dashSelectedCostSaleId);
+}
+
+function renderCostDetailsBySaleId(saleId) {
+    var detailsEl = document.getElementById('dashCostDetails');
+    if (!detailsEl) return;
+    var s = salesArr.find(function (x) { return x.id === saleId; });
+    if (!s) return;
+
+    var items = s.items || [];
+    var subtotal = (typeof s.subtotalAmount === 'number') ? s.subtotalAmount : computeSaleSubtotal(items);
+    var deliveryAmount = (typeof s.deliveryAmount === 'number') ? s.deliveryAmount : calculateDeliveryPrice(subtotal, getRegionType(s.region));
+    var totalAmount = (typeof s.totalAmount === 'number') ? s.totalAmount : (subtotal + deliveryAmount);
+    var costTotal = (typeof s.costTotal === 'number') ? s.costTotal : computeSaleCostTotal(items);
+
+    var itemsHtml = items.map(function (it) {
+        var p = productsArr.find(function (px) { return px.id === it.productId; });
+        var name = p ? p.name : '—';
+        var qty = it.quantity || 0;
+        var price = parseFloat(it.price) || 0;
+        var rowSum = price * (parseFloat(qty) || 0);
+        var cost = p ? (parseFloat(p.cost) || 0) : 0;
+        var rowCost = cost * (parseFloat(qty) || 0);
+        return '<div style="display:flex; justify-content:space-between; gap:12px; padding:10px 12px; border-radius:14px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.05); margin-bottom:8px;">' +
+            '<div style="min-width:0;">' +
+            '<div style="font-weight:800; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><i class="fas fa-box" style="opacity:0.7; margin-right:8px;"></i>' + escapeHtml(name) + ' <span class="status-badge info" style="margin-left:8px;">x' + escapeHtml(String(qty)) + '</span></div>' +
+            '<div style="font-size:12px; color:var(--text-muted); margin-top:4px;">Narx: ' + formatMoney(price) + ' • Tannarx: ' + formatMoney(cost) + '</div>' +
+            '</div>' +
+            '<div style="text-align:right; white-space:nowrap;">' +
+            '<div style="font-weight:900;">' + formatMoney(rowSum) + '</div>' +
+            '<div style="font-size:12px; color:var(--text-muted); margin-top:4px;">Tannarx: ' + formatMoney(rowCost) + '</div>' +
+            '</div>' +
+            '</div>';
+    }).join('') || '<div class="empty-state" style="padding: 30px 20px;"><i class="fas fa-box-open"></i><p>Mahsulotlar topilmadi</p></div>';
+
+    detailsEl.innerHTML = '' +
+        '<div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:12px;">' +
+        '<div style="min-width:0;">' +
+        '<div style="font-weight:900; font-size:1.05rem; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><i class="fas fa-bag-shopping" style="opacity:0.85; margin-right:8px;"></i>' + escapeHtml(s.name || '—') + '</div>' +
+        '<div style="font-size:12px; color:var(--text-muted); margin-top:4px;"><i class="far fa-calendar"></i> ' + escapeHtml(formatDate(s.date)) + ' • <i class="fas fa-location-dot"></i> ' + escapeHtml(s.region || '—') + '</div>' +
+        '</div>' +
+        '<div style="text-align:right; white-space:nowrap;">' +
+        '<div class="status-badge active" style="font-weight:900;"><i class="fas fa-check"></i> Sotildi</div>' +
+        '</div>' +
+        '</div>' +
+        '<div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:14px;">' +
+        '<div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:16px; padding:12px;">' +
+        '<div style="font-size:12px; color:var(--text-muted); font-weight:800; text-transform:uppercase; letter-spacing:0.8px;">Jami summa</div>' +
+        '<div style="font-size:1.15rem; font-weight:900; margin-top:6px;">' + formatMoney(totalAmount) + '</div>' +
+        '<div style="font-size:12px; color:var(--text-muted); margin-top:6px;">Subtotal: ' + formatMoney(subtotal) + '</div>' +
+        '</div>' +
+        '<div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:16px; padding:12px;">' +
+        '<div style="font-size:12px; color:var(--text-muted); font-weight:800; text-transform:uppercase; letter-spacing:0.8px;">Tannarx</div>' +
+        '<div style="font-size:1.15rem; font-weight:900; margin-top:6px;">' + formatMoney(costTotal) + '</div>' +
+        '<div style="font-size:12px; color:var(--text-muted); margin-top:6px;">Dostavka: ' + escapeHtml(formatDeliveryPrice(deliveryAmount)) + '</div>' +
+        '</div>' +
+        '</div>' +
+        '<div style="margin-top:10px;">' +
+        '<div style="font-weight:900; margin-bottom:10px; color:var(--text);"><i class="fas fa-list"></i> Mahsulotlar</div>' +
+        itemsHtml +
+        '</div>';
+}
+
+// Cost item click (event delegation)
+document.addEventListener('click', function (e) {
+    var item = e.target.closest('.cost-item');
+    if (!item) return;
+    var sid = item.getAttribute('data-sale-id');
+    if (!sid) return;
+    dashSelectedCostSaleId = sid;
+    document.querySelectorAll('.cost-item').forEach(function (el) {
+        el.classList.toggle('active', el.getAttribute('data-sale-id') === sid);
+    });
+    renderCostDetailsBySaleId(sid);
+});
 // ==========================================
 // === SETTINGS: THEME MODE ===
 // ==========================================

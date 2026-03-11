@@ -145,6 +145,25 @@
                         </div>
                         <div class="stat-decoration"></div>
                     </div>
+                    <!-- Card 2: Tannarx ro'yxati -->
+                    <div class="stat-card stat-total-cost">
+                        <div class="stat-card-inner">
+                            <div class="stat-card-header">
+                                <span class="stat-label">Tannarx ro'yxati</span>
+                                <div class="stat-card-icon">
+                                    <i class="fas fa-receipt"></i>
+                                </div>
+                            </div>
+                            <div class="stat-card-body">
+                                <span class="stat-value" id="totalCost">0</span>
+                                <div class="stat-trend">
+                                    <i class="fas fa-boxes-stacked"></i>
+                                    <span>Sotildi bo'lganda yoziladi</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stat-decoration"></div>
+                    </div>
                     <!-- Card 2: Sof Foyda -->
                     <div class="stat-card stat-net-profit">
                         <div class="stat-card-inner">
@@ -185,9 +204,35 @@
                     </div>
                 </div>
 
-                <!-- Top Section: Full Width Expenses -->
-                <div class="dashboard-top-section">
-                    <div class="card expense-card full-width-card">
+                <!-- Top Section: Tannarx + Xarajatlar (col-6 / col-6) -->
+                <div class="dashboard-top-section dashboard-split-grid">
+                    <div class="card cost-card">
+                        <div class="card-header">
+                            <h2><i class="fas fa-receipt"></i> Tannarxlar jadvali</h2>
+                            <div class="header-actions">
+                                <span class="muted-chip"><i class="fas fa-circle-info"></i> Faqat "Sotildi"</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="cost-table-wrap">
+                                <div class="cost-table-list" id="dashCostList"></div>
+                                <div class="cost-table-details" id="dashCostDetails">
+                                    <div class="empty-state" style="padding: 40px 20px;">
+                                        <i class="fas fa-hand-pointer"></i>
+                                        <p>Tannarx yozuvini tanlang</p>
+                                        <span style="font-size: 13px; color: var(--text-muted);">Tanlangan sotuv
+                                            ma'lumotlari shu yerda chiqadi.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="empty-state" id="dashEmptyCost" style="display:none;">
+                                <i class="fas fa-receipt"></i>
+                                <p>Hali tannarxlar mavjud emas</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card expense-card">
                         <div class="card-header">
                             <h2><i class="fas fa-wallet"></i> Xarajatlar bo'limi</h2>
                             <div class="header-actions">
@@ -260,6 +305,9 @@
                                         <th>Viloyat / Tuman</th>
                                         <th>Mahsulotlar</th>
                                         <th>Jami summa</th>
+                                        <th>Tannarx</th>
+                                        <th>Dostavka</th>
+                                        <th>Status</th>
                                         <th>Amallar</th>
                                     </tr>
                                 </thead>
