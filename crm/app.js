@@ -1041,12 +1041,47 @@ function renderSales(searchTerm) {
 // Mobile: open sale detail modal on card tap
 document.addEventListener('click', function (e) {
     var card = e.target.closest('.sale-mobile-card');
-    if (!card) return;
-    var saleId = card.getAttribute('data-sale-id');
-    if (!saleId) return;
-    var sale = salesArr.find(function (s) { return s.id === saleId; });
-    if (!sale) return;
-    openSaleDetailModal(sale);
+    if (card) {
+        var saleId = card.getAttribute('data-sale-id');
+        if (!saleId) return;
+        var sale = salesArr.find(function (s) { return s.id === saleId; });
+        if (!sale) return;
+        openSaleDetailModal(sale);
+        return;
+    }
+
+    // Product name click inside sale detail modal -> show images (reuse global viewer)
+    var prodBtn = e.target.closest('.btn-link-product');
+    if (prodBtn) {
+        var row = prodBtn.closest('.sale-detail-product-row');
+        if (!row) return;
+        var sid = row.getAttribute('data-sale-id');
+        if (!sid) return;
+        var saleForImages = salesArr.find(function (x) { return x.id === sid; });
+        if (!saleForImages || !saleForImages.items) return;
+
+        var gallery = document.getElementById('saleImagesGallery');
+        if (!gallery) return;
+
+        gallery.innerHTML = '<div class="loader-placeholder" style="text-align:center; padding:20px; width:100%"><i class="fas fa-spinner fa-spin"></i> Yuklanmoqda...</div>';
+        openModal('viewSaleImagesModal');
+
+        var imagesHtml = saleForImages.items.map(function (it) {
+            var p = productsArr.find(function (px) { return px.id === it.productId; });
+            if (p && p.imageUrl) {
+                return '<div class="gallery-item">' +
+                    '<img src="' + p.imageUrl + '" alt="' + escapeHtml(p.name) + '">' +
+                    '<div class="gallery-item-info">' + escapeHtml(p.name) + ' (x' + it.quantity + ')</div>' +
+                    '</div>';
+            }
+            return '<div class="gallery-item no-img">' +
+                '<div class="placeholder"><i class="fas fa-image"></i></div>' +
+                '<div class="gallery-item-info">' + (p ? escapeHtml(p.name) : '—') + ' (x' + it.quantity + ')</div>' +
+                '</div>';
+        }).join('');
+
+        gallery.innerHTML = imagesHtml || '<p style="text-align:center; padding:20px; color:var(--text-muted)">Rasmlar mavjud emas</p>';
+    }
 });
 
 function openSaleDetailModal(sale) {
@@ -1088,7 +1123,13 @@ function openSaleDetailModal(sale) {
             productsListEl.innerHTML = items.map(function (it) {
                 var p = productsArr.find(function (px) { return px.id === it.productId; });
                 var pname = p ? p.name : 'Mahsulot';
-                return '<li><span class="p-name">' + escapeHtml(pname) + '</span><span class="p-qty">x' + it.quantity + '</span><span class="p-price">' + (it.price ? formatMoney(it.price * it.quantity) : '') + '</span></li>';
+                var countLabel = (it.quantity >= 10) ? (it.quantity + ' ta') : (it.quantity + ' ta');
+                return '' +
+                    '<li class="sale-detail-product-row" data-sale-id="' + sale.id + '" data-product-id="' + (it.productId || '') + '">' +
+                    '<button type="button" class="p-name btn-link-product">' + escapeHtml(pname) + '</button>' +
+                    '<span class="p-qty">' + countLabel + '</span>' +
+                    '<span class="p-price">' + (it.price ? formatMoney(it.price * it.quantity) : '') + '</span>' +
+                    '</li>';
             }).join('');
         }
 
