@@ -1349,6 +1349,14 @@ async function submitOrder(event, isPage = false) {
 
     const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
+    // Calculate delivery price to include in the order total
+    let deliveryPrice = 0;
+    if (typeof calculateDeliveryPrice === 'function' && viloyat && tuman) {
+        const regionType = viloyat === 'Toshkent shahri' ? 'tashkent' : 'regions';
+        deliveryPrice = calculateDeliveryPrice(total, regionType);
+    }
+    const grandTotal = total + deliveryPrice;
+
     try {
 
         // ============================
@@ -1375,7 +1383,9 @@ async function submitOrder(event, isPage = false) {
 
                 items: cart,
 
-                totalAmount: total
+                totalAmount: grandTotal,
+
+                deliveryPrice: deliveryPrice
 
             });
 
@@ -1403,7 +1413,7 @@ async function submitOrder(event, isPage = false) {
 
                 tuman: tuman,
 
-                orderAmount: total,
+                orderAmount: grandTotal,
 
                 orderNumber: orderResult?.orderNumber || '',
 
@@ -1441,7 +1451,7 @@ async function submitOrder(event, isPage = false) {
 
                 items: cart,
 
-                totalAmount: total,
+                totalAmount: grandTotal,
 
                 orderNumber: orderResult?.orderNumber || ''
 
@@ -1491,7 +1501,13 @@ async function submitOrder(event, isPage = false) {
 
             message += `━━━━━━━━━━━━━━━━\n`;
 
-            message += `💰 *JAMI: ${formatPrice(total)} so'm*\n\n`;
+            if (deliveryPrice > 0) {
+                message += `🚚 *Yetkazib berish:* ${formatPrice(deliveryPrice)} so'm\n`;
+            } else if (viloyat && tuman) {
+                message += `🚚 *Yetkazib berish:* Tekin\n`;
+            }
+
+            message += `💰 *JAMI: ${formatPrice(grandTotal)} so'm*\n\n`;
 
             message += `📅 Sana: ${new Date().toLocaleString('uz-UZ')}`;
 

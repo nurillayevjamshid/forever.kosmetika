@@ -335,20 +335,57 @@
                         </div>
 
                         <div class="modal-sidebar">
-                            <div class="order-summary-card">
-                                <h3>Buyurtma tafsilotlari</h3>
-                                <div id="checkoutSummaryItemsPage" class="summary-items-list">
+                            <div class="order-summary-card order-summary-premium">
+                                <div class="summary-header-premium">
+                                    <div class="summary-header-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"></path>
+                                            <rect x="9" y="3" width="6" height="4" rx="2"></rect>
+                                        </svg>
+                                    </div>
+                                    <h3>Buyurtma tafsilotlari</h3>
+                                </div>
+                                <div id="checkoutSummaryItemsPage" class="summary-items-list summary-items-premium">
                                     <!-- Items will be populated -->
                                 </div>
-                                <p id="orderDeliveryText" class="delivery-info-text" style="display: none;"></p>
-                                <div class="summary-total">
+                                <div id="orderDeliverySection" class="delivery-section-premium" style="display: none;">
+                                    <div class="delivery-badge-premium">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="1" y="3" width="15" height="13"></rect>
+                                            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                                            <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                                            <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                                        </svg>
+                                        <span id="orderDeliveryText"></span>
+                                    </div>
+                                </div>
+                                <div class="summary-breakdown-premium">
+                                    <div class="breakdown-row">
+                                        <span>Mahsulotlar:</span>
+                                        <span id="orderSubtotalPrice">0 so'm</span>
+                                    </div>
+                                    <div class="breakdown-row delivery-row" id="deliveryBreakdownRow" style="display: none;">
+                                        <span>Yetkazib berish:</span>
+                                        <span id="orderDeliveryPrice" class="delivery-price-tag">0 so'm</span>
+                                    </div>
+                                </div>
+                                <div class="summary-total summary-total-premium">
                                     <span>Jami:</span>
                                     <span id="orderTotalPricePage">0 so'm</span>
                                 </div>
-                                <button type="submit" class="btn btn-primary btn-full checkout-btn">
+                                <button type="submit" class="btn btn-primary btn-full checkout-btn checkout-btn-premium">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                    </svg>
                                     Buyurtmani yuborish
                                 </button>
-                                <p class="summary-note">Buyurtmangiz qabul qilinganidan so'ng, siz bilan bog'lanamiz.
+                                <p class="summary-note summary-note-premium">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <path d="M12 16v-4M12 8h.01"></path>
+                                    </svg>
+                                    Buyurtmangiz qabul qilinganidan so'ng, siz bilan bog'lanamiz.
                                 </p>
                             </div>
                         </div>
@@ -490,16 +527,21 @@
         function updateOrderPageUI() {
             const summaryItems = document.getElementById('checkoutSummaryItemsPage');
             const totalPriceEl = document.getElementById('orderTotalPricePage');
+            const subtotalEl = document.getElementById('orderSubtotalPrice');
 
             summaryItems.innerHTML = cart.map(item => `
-                <div class="summary-item-row">
-                    <span>${item.name} x${item.quantity}</span>
-                    <span>${formatPrice(item.price * item.quantity)} so'm</span>
+                <div class="summary-item-row summary-item-row-premium">
+                    <span class="item-name-col">
+                        <span class="item-dot"></span>
+                        ${item.name} <span class="item-qty-badge">x${item.quantity}</span>
+                    </span>
+                    <span class="item-price-col">${formatPrice(item.price * item.quantity)} so'm</span>
                 </div>
             `).join('');
 
-            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            totalPriceEl.textContent = formatPrice(total) + ' so\'m';
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            if (subtotalEl) subtotalEl.textContent = formatPrice(subtotal) + ' so\'m';
+            totalPriceEl.textContent = formatPrice(subtotal) + ' so\'m';
 
             if (typeof updateOrderDeliveryTextFromInputs === 'function') {
                 updateOrderDeliveryTextFromInputs();
@@ -510,25 +552,49 @@
             const viloyatEl = document.getElementById('orderViloyatPage');
             const tumanEl = document.getElementById('orderTumanPage');
             const textEl = document.getElementById('orderDeliveryText');
+            const deliverySection = document.getElementById('orderDeliverySection');
+            const deliveryBreakdownRow = document.getElementById('deliveryBreakdownRow');
+            const deliveryPriceEl = document.getElementById('orderDeliveryPrice');
+            const totalPriceEl = document.getElementById('orderTotalPricePage');
+            const subtotalEl = document.getElementById('orderSubtotalPrice');
 
             if (!viloyatEl || !tumanEl || !textEl) return;
 
             const viloyat = viloyatEl.value;
             const tuman = tumanEl.value;
 
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            if (subtotalEl) subtotalEl.textContent = formatPrice(subtotal) + ' so\'m';
+
             if (!viloyat || !tuman) {
-                textEl.style.display = 'none';
+                if (deliverySection) deliverySection.style.display = 'none';
+                if (deliveryBreakdownRow) deliveryBreakdownRow.style.display = 'none';
                 textEl.textContent = '';
+                // Show only subtotal when no delivery selected
+                totalPriceEl.textContent = formatPrice(subtotal) + ' so\'m';
                 return;
             }
 
-            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
             const regionType = viloyat === 'Toshkent shahri' ? 'tashkent' : 'regions';
-            const deliveryPrice = calculateDeliveryPrice(total, regionType);
+            const deliveryPrice = calculateDeliveryPrice(subtotal, regionType);
             const priceText = formatDeliveryPrice(deliveryPrice);
 
-            textEl.style.display = 'block';
-            textEl.textContent = `Yetkazib berish ${viloyat}, ${tuman} ga ${priceText} bo'ladi.`;
+            // Show delivery info text
+            if (deliverySection) deliverySection.style.display = 'block';
+            textEl.textContent = `${viloyat}, ${tuman} ga yetkazib berish — ${priceText}`;
+
+            // Show delivery breakdown row
+            if (deliveryBreakdownRow) {
+                deliveryBreakdownRow.style.display = 'flex';
+            }
+            if (deliveryPriceEl) {
+                deliveryPriceEl.textContent = priceText;
+                deliveryPriceEl.classList.toggle('free-delivery', deliveryPrice === 0);
+            }
+
+            // ADD delivery cost to total!
+            const grandTotal = subtotal + deliveryPrice;
+            totalPriceEl.textContent = formatPrice(grandTotal) + ' so\'m';
         }
 
         function changeQuantityPage(id, change) {
