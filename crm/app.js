@@ -2468,6 +2468,7 @@ imageUploadArea.addEventListener('drop', function (e) {
 
 // Mijozlar ro'yxatini yuklash va ko'rsatish
 function renderCustomers(searchQuery) {
+    searchQuery = searchQuery || '';
     var customersBody = document.getElementById('customersBody');
     var mobileList = document.getElementById('customersMobileList');
     var customersEmpty = document.getElementById('customersEmpty');
