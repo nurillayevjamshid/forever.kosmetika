@@ -922,6 +922,7 @@ if (addSaleItemBtn) {
 function renderSales(searchTerm) {
     searchTerm = searchTerm || '';
     var tbody = document.getElementById('salesBody');
+    var mobileList = document.getElementById('salesMobileList');
     var empty = document.getElementById('salesEmpty');
     var filtered = salesArr.slice().sort(function (a, b) { return new Date(b.date) - new Date(a.date); });
     if (searchTerm) {
@@ -949,9 +950,16 @@ function renderSales(searchTerm) {
             return !s.date || isNaN(toDate.getTime()) ? true : (new Date(s.date) <= toDate);
         });
     }
-    if (filtered.length === 0) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
+    if (filtered.length === 0) {
+        tbody.innerHTML = '';
+        if (mobileList) mobileList.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+    }
     empty.style.display = 'none';
-    tbody.innerHTML = filtered.map(function (s, i) {
+    var rowsHtml = [];
+    var cardsHtml = [];
+    filtered.forEach(function (s, i) {
         var items = s.items || [];
         var status = normalizeSaleStatus(s.status);
         var subtotal = (typeof s.subtotalAmount === 'number') ? s.subtotalAmount : computeSaleSubtotal(items);
@@ -977,8 +985,9 @@ function renderSales(searchTerm) {
             var p = productsArr.find(function (px) { return px.id === it.productId; });
             return (p ? p.name : '—') + ' (x' + it.quantity + ')';
         }).join(', ');
-
-        return '' +
+        var itemCount = items.length;
+        // Desktop row
+        rowsHtml.push(
             '<tr class="sale-data-row">' +
             '<td data-label="#">' + (i + 1) + '</td>' +
             '<td data-label="Sana"><div class="sale-date-cell"><i class="far fa-calendar-alt"></i> ' + formatDate(s.date) + '</div></td>' +
@@ -993,9 +1002,112 @@ function renderSales(searchTerm) {
             '</td>' +
             '<td data-label="Amallar"><div class="sale-actions-wrap"><button class="btn-icon edit sale-edit-btn" data-id="' + s.id + '" title="Tahrirlash"><i class="fas fa-pen"></i></button>' +
             '<button class="btn-icon delete sale-delete-btn" data-id="' + s.id + '" title="O\'chirish"><i class="fas fa-trash"></i></button></div></td>' +
-            '</tr>';
-    }).join('');
+            '</tr>'
+        );
+
+        // Mobile card
+        if (mobileList) {
+            var statusLabel = (status === 'sotildi') ? 'Sotildi' : (status === 'atkaz' ? 'Atkáz' : 'Kutilmoqda');
+            var itemSummary = itemCount === 0
+                ? 'Mahsulot kiritilmagan'
+                : (itemCount === 1 ? '1 ta mahsulot' : (itemCount + ' ta mahsulot'));
+
+            cardsHtml.push(
+                '<button class="sale-mobile-card status-' + status + '" data-sale-id="' + s.id + '">' +
+                '<div class="sale-mobile-top-row">' +
+                '<span class="sale-mobile-time"><i class="far fa-calendar-alt"></i> ' + formatDate(s.date) + '</span>' +
+                '<span class="sale-mobile-status-badge">' + statusLabel + '</span>' +
+                '</div>' +
+                '<div class="sale-mobile-main">' +
+                '<h3 class="sale-mobile-title">' + escapeHtml(s.name || '—') + '</h3>' +
+                '<span class="sale-mobile-amount">' + formatMoney(totalAmount) + '</span>' +
+                '</div>' +
+                '<div class="sale-mobile-bottom-row">' +
+                '<span class="sale-mobile-region"><i class="fas fa-location-dot"></i> ' + escapeHtml(s.region || '—') + '</span>' +
+                '<span class="sale-mobile-items">' + itemSummary + '</span>' +
+                '</div>' +
+                '</button>'
+            );
+        }
+    });
+
+    tbody.innerHTML = rowsHtml.join('');
+    if (mobileList) {
+        mobileList.innerHTML = cardsHtml.join('');
+    }
     updateUIVisibility('sales');
+}
+
+// Mobile: open sale detail modal on card tap
+document.addEventListener('click', function (e) {
+    var card = e.target.closest('.sale-mobile-card');
+    if (!card) return;
+    var saleId = card.getAttribute('data-sale-id');
+    if (!saleId) return;
+    var sale = salesArr.find(function (s) { return s.id === saleId; });
+    if (!sale) return;
+    openSaleDetailModal(sale);
+});
+
+function openSaleDetailModal(sale) {
+    try {
+        var status = normalizeSaleStatus(sale.status);
+        var items = sale.items || [];
+        var subtotal = (typeof sale.subtotalAmount === 'number') ? sale.subtotalAmount : computeSaleSubtotal(items);
+        var deliveryAmount = (typeof sale.deliveryAmount === 'number') ? sale.deliveryAmount : calculateDeliveryPrice(subtotal, getRegionType(sale.region));
+        var totalAmount = (typeof sale.totalAmount === 'number') ? sale.totalAmount : (subtotal + deliveryAmount);
+        var costTotal = (typeof sale.costTotal === 'number') ? sale.costTotal : computeSaleCostTotal(items);
+
+        var statusLabel = (status === 'sotildi') ? 'Sotildi' : (status === 'atkaz' ? 'Atkáz' : 'Kutilmoqda');
+
+        var dateEl = document.getElementById('saleDetailDate');
+        var nameEl = document.getElementById('saleDetailName');
+        var statusBadgeEl = document.getElementById('saleDetailStatusBadge');
+        var totalEl = document.getElementById('saleDetailTotal');
+        var regionEl = document.getElementById('saleDetailRegion');
+        var costEl = document.getElementById('saleDetailCost');
+        var deliveryEl = document.getElementById('saleDetailDelivery');
+        var productsListEl = document.getElementById('saleDetailProductsList');
+        var noteWrapEl = document.getElementById('saleDetailNoteWrap');
+        var noteEl = document.getElementById('saleDetailNote');
+
+        if (!dateEl) return; // modal yo'q bo'lsa jim chiqamiz
+
+        dateEl.textContent = formatDate(sale.date);
+        nameEl.textContent = sale.name || '—';
+        totalEl.textContent = formatMoney(totalAmount);
+        regionEl.textContent = sale.region || '—';
+        costEl.textContent = costTotal ? formatMoney(costTotal) : '—';
+        deliveryEl.textContent = deliveryAmount === 0 ? 'Tekin' : formatMoney(deliveryAmount);
+
+        statusBadgeEl.textContent = statusLabel;
+        statusBadgeEl.className = 'sale-detail-status-badge status-' + status;
+
+        // Products list
+        if (productsListEl) {
+            productsListEl.innerHTML = items.map(function (it) {
+                var p = productsArr.find(function (px) { return px.id === it.productId; });
+                var pname = p ? p.name : 'Mahsulot';
+                return '<li><span class="p-name">' + escapeHtml(pname) + '</span><span class="p-qty">x' + it.quantity + '</span><span class="p-price">' + (it.price ? formatMoney(it.price * it.quantity) : '') + '</span></li>';
+            }).join('');
+        }
+
+        // Note
+        if (noteWrapEl && noteEl) {
+            var note = (sale.note || '').trim();
+            if (note) {
+                noteEl.textContent = note;
+                noteWrapEl.style.display = 'block';
+            } else {
+                noteWrapEl.style.display = 'none';
+                noteEl.textContent = '';
+            }
+        }
+
+        openModal('saleDetailModal');
+    } catch (err) {
+        console.error(err);
+    }
 }
 
 function buildSaleStatusSelectHtml(status, saleId) {
