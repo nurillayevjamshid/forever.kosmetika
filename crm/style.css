@@ -752,13 +752,13 @@ html[data-theme="light"] .data-table tbody tr td:last-child {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 12px;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border);
-    background: var(--surface);
+    padding: 9px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border-light);
+    background: radial-gradient(circle at 0% 0%, rgba(59,130,246,0.35), transparent 55%), var(--surface);
     color: var(--text-secondary);
-    min-width: 150px;
-    box-shadow: var(--shadow-sm);
+    min-width: 170px;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.45);
 }
 
 .date-filter i {
@@ -781,8 +781,21 @@ html[data-theme="light"] .data-table tbody tr td:last-child {
 }
 
 html[data-theme="light"] .date-filter {
-    background: #ffffff;
-    border-color: #e2e8f0;
+    background: radial-gradient(circle at 0% 0%, rgba(59,130,246,0.3), transparent 55%), #ffffff;
+    border-color: #d1d5db;
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12);
+}
+
+/* Finance / Products filter pickers – compact like date filters */
+#page-finance .page-actions .select-picker,
+#page-products .page-actions .select-picker {
+    min-width: 190px;
+    max-width: 220px;
+}
+
+#page-finance .page-actions,
+#page-products .page-actions {
+    gap: 10px;
 }
 
 html[data-theme="light"] .filter-select {
