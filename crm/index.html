@@ -285,9 +285,24 @@
                     <button class="btn btn-primary" id="addSaleBtn">
                         <i class="fas fa-plus"></i> Yangi Sotuv
                     </button>
-                    <select id="salesRegionFilter" class="filter-select">
-                        <option value="all">Barcha viloyatlar</option>
-                    </select>
+                    <div class="select-picker" id="salesRegionFilterPicker">
+                        <input type="hidden" id="salesRegionFilter" value="all">
+                        <button type="button" class="select-trigger">
+                            <span class="select-trigger-label">Barcha viloyatlar</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="select-dropdown"></div>
+                    </div>
+                    <div class="date-filter-group">
+                        <div class="date-filter">
+                            <i class="fas fa-calendar-day"></i>
+                            <input type="date" id="salesDateFrom" placeholder="dan">
+                        </div>
+                        <div class="date-filter">
+                            <i class="fas fa-calendar"></i>
+                            <input type="date" id="salesDateTo" placeholder="gacha">
+                        </div>
+                    </div>
                     <div class="search-box">
                         <i class="fas fa-search"></i>
                         <input type="text" id="salesSearch" placeholder="Qidirish...">
@@ -374,14 +389,32 @@
                     <button class="btn btn-danger" id="addExpenseBtn">
                         <i class="fas fa-minus"></i> Chiqim qo'shish
                     </button>
-                    <select id="financeTypeFilter" class="filter-select">
-                        <option value="all">Barchasi</option>
-                        <option value="income">Faqat kirim</option>
-                        <option value="expense">Faqat chiqim</option>
-                    </select>
-                    <select id="financeCategoryFilter" class="filter-select">
-                        <option value="all">Barcha kategoriyalar</option>
-                    </select>
+                    <div class="select-picker" id="financeTypeFilterPicker">
+                        <input type="hidden" id="financeTypeFilter" value="all">
+                        <button type="button" class="select-trigger">
+                            <span class="select-trigger-label">Barchasi</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="select-dropdown"></div>
+                    </div>
+                    <div class="select-picker" id="financeCategoryFilterPicker">
+                        <input type="hidden" id="financeCategoryFilter" value="all">
+                        <button type="button" class="select-trigger">
+                            <span class="select-trigger-label">Barcha kategoriyalar</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="select-dropdown"></div>
+                    </div>
+                    <div class="date-filter-group">
+                        <div class="date-filter">
+                            <i class="fas fa-calendar-day"></i>
+                            <input type="date" id="financeDateFrom" placeholder="dan">
+                        </div>
+                        <div class="date-filter">
+                            <i class="fas fa-calendar"></i>
+                            <input type="date" id="financeDateTo" placeholder="gacha">
+                        </div>
+                    </div>
                     <div class="search-box">
                         <i class="fas fa-search"></i>
                         <input type="text" id="financeSearch" placeholder="Qidirish...">
@@ -470,14 +503,24 @@
                     <button class="btn btn-primary" id="addProductBtn">
                         <i class="fas fa-plus"></i> Yangi Mahsulot
                     </button>
-                    <select id="productsCategoryFilter" class="filter-select">
-                        <option value="all">Barcha kategoriyalar</option>
-                    </select>
-                    <select id="productsStatusFilter" class="filter-select">
-                        <option value="all">Barcha statuslar</option>
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                    </select>
+                    <div class="select-picker" id="productsCategoryFilterPicker">
+                        <input type="hidden" id="productsCategoryFilter" value="all">
+                        <button type="button" class="select-trigger">
+                            <span class="select-trigger-label">Barcha kategoriyalar</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="select-dropdown"></div>
+                    </div>
+                    <div class="select-picker" id="productsStatusFilterPicker">
+                        <input type="hidden" id="productsStatusFilter" value="all">
+                        <button type="button" class="select-trigger">
+                            <span class="select-trigger-label">Barcha statuslar</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="select-dropdown">
+                            <!-- Static options will be initialized from JS -->
+                        </div>
+                    </div>
                     <div class="search-box">
                         <i class="fas fa-search"></i>
                         <input type="text" id="productsSearch" placeholder="Qidirish...">

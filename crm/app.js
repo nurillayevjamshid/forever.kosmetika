@@ -518,8 +518,8 @@ var financesArr = [];
 var usersArr = [];
 
 // Filter holatlari
-var salesFilter = { region: 'all' };
-var financeFilter = { type: 'all', category: 'all' };
+var salesFilter = { region: 'all', from: '', to: '' };
+var financeFilter = { type: 'all', category: 'all', from: '', to: '' };
 var productsFilter = { category: 'all', status: 'all' };
 
 // ==========================================
@@ -936,6 +936,19 @@ function renderSales(searchTerm) {
     if (salesFilter.region !== 'all') {
         filtered = filtered.filter(function (s) { return (s.region || '') === salesFilter.region; });
     }
+    // Filter: date range
+    if (salesFilter.from) {
+        var fromDate = new Date(salesFilter.from);
+        filtered = filtered.filter(function (s) {
+            return !s.date || isNaN(fromDate.getTime()) ? true : (new Date(s.date) >= fromDate);
+        });
+    }
+    if (salesFilter.to) {
+        var toDate = new Date(salesFilter.to);
+        filtered = filtered.filter(function (s) {
+            return !s.date || isNaN(toDate.getTime()) ? true : (new Date(s.date) <= toDate);
+        });
+    }
     if (filtered.length === 0) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
     empty.style.display = 'none';
     tbody.innerHTML = filtered.map(function (s, i) {
@@ -1301,6 +1314,19 @@ function renderFinance(searchTerm) {
     // Filter: kategoriya
     if (financeFilter.category !== 'all') {
         filtered = filtered.filter(function (f) { return f.category === financeFilter.category; });
+    }
+    // Filter: date range
+    if (financeFilter.from) {
+        var ff = new Date(financeFilter.from);
+        filtered = filtered.filter(function (f) {
+            return !f.date || isNaN(ff.getTime()) ? true : (new Date(f.date) >= ff);
+        });
+    }
+    if (financeFilter.to) {
+        var ft = new Date(financeFilter.to);
+        filtered = filtered.filter(function (f) {
+            return !f.date || isNaN(ft.getTime()) ? true : (new Date(f.date) <= ft);
+        });
     }
     var totalIncome = financesArr.filter(function (f) { return f.type === 'income'; }).reduce(function (sum, f) { return sum + f.amount; }, 0);
     var totalExpense = financesArr.filter(function (f) { return f.type === 'expense'; }).reduce(function (sum, f) { return sum + f.amount; }, 0);
@@ -2051,62 +2077,114 @@ navigateTo('dashboard');
 // === FILTER INIT ===
 // ==========================================
 
-// Sales – region filter selectni to‘ldirish
+// Sales – region + date filters
 (function initSalesFilter() {
-    var sel = document.getElementById('salesRegionFilter');
-    if (!sel) return;
-    allRegions.forEach(function (r) {
-        var opt = document.createElement('option');
-        opt.value = r;
-        opt.textContent = r;
-        sel.appendChild(opt);
-    });
-    sel.addEventListener('change', function () {
-        salesFilter.region = this.value || 'all';
-        renderSales(document.getElementById('salesSearch').value || '');
-    });
+    // Region picker
+    var pickerId = 'salesRegionFilterPicker';
+    var pickerEl = document.getElementById(pickerId);
+    if (pickerEl) {
+        var regionOptions = [{ value: 'all', label: 'Barcha viloyatlar' }]
+            .concat(allRegions.map(function (r) { return { value: r, label: r }; }));
+        initSelectPicker(pickerId, regionOptions, function (val) {
+            salesFilter.region = val || 'all';
+            renderSales(document.getElementById('salesSearch').value || '');
+        });
+        setSelectValue(pickerId, 'all', 'Barcha viloyatlar');
+    }
+
+    // Date range inputs
+    var fromInput = document.getElementById('salesDateFrom');
+    var toInput = document.getElementById('salesDateTo');
+    if (fromInput) {
+        fromInput.addEventListener('change', function () {
+            salesFilter.from = this.value || '';
+            renderSales(document.getElementById('salesSearch').value || '');
+        });
+    }
+    if (toInput) {
+        toInput.addEventListener('change', function () {
+            salesFilter.to = this.value || '';
+            renderSales(document.getElementById('salesSearch').value || '');
+        });
+    }
 })();
 
-// Finance – kategoriya filter
+// Finance – turi, kategoriya va sana filtrlari
 (function initFinanceCategoryFilter() {
-    var sel = document.getElementById('financeCategoryFilter');
-    if (!sel) return;
-    var allCats = incomeCategories.concat(expenseCategories);
-    allCats.forEach(function (c) {
-        var opt = document.createElement('option');
-        opt.value = c;
-        opt.textContent = c;
-        sel.appendChild(opt);
-    });
-    document.getElementById('financeTypeFilter').addEventListener('change', function () {
-        financeFilter.type = this.value || 'all';
-        renderFinance(document.getElementById('financeSearch').value || '');
-    });
-    sel.addEventListener('change', function () {
-        financeFilter.category = this.value || 'all';
-        renderFinance(document.getElementById('financeSearch').value || '');
-    });
+    // Type picker
+    var typePickerId = 'financeTypeFilterPicker';
+    var typePickerEl = document.getElementById(typePickerId);
+    if (typePickerEl) {
+        var typeOpts = [
+            { value: 'all', label: 'Barchasi' },
+            { value: 'income', label: 'Faqat kirim' },
+            { value: 'expense', label: 'Faqat chiqim' }
+        ];
+        initSelectPicker(typePickerId, typeOpts, function (val) {
+            financeFilter.type = val || 'all';
+            renderFinance(document.getElementById('financeSearch').value || '');
+        });
+        setSelectValue(typePickerId, 'all', 'Barchasi');
+    }
+
+    // Category picker
+    var catPickerId = 'financeCategoryFilterPicker';
+    var catPickerEl = document.getElementById(catPickerId);
+    if (catPickerEl) {
+        var allCats = incomeCategories.concat(expenseCategories);
+        var catOpts = [{ value: 'all', label: 'Barcha kategoriyalar' }]
+            .concat(allCats.map(function (c) { return { value: c, label: c }; }));
+        initSelectPicker(catPickerId, catOpts, function (val) {
+            financeFilter.category = val || 'all';
+            renderFinance(document.getElementById('financeSearch').value || '');
+        });
+        setSelectValue(catPickerId, 'all', 'Barcha kategoriyalar');
+    }
+
+    // Date range
+    var fFrom = document.getElementById('financeDateFrom');
+    var fTo = document.getElementById('financeDateTo');
+    if (fFrom) {
+        fFrom.addEventListener('change', function () {
+            financeFilter.from = this.value || '';
+            renderFinance(document.getElementById('financeSearch').value || '');
+        });
+    }
+    if (fTo) {
+        fTo.addEventListener('change', function () {
+            financeFilter.to = this.value || '';
+            renderFinance(document.getElementById('financeSearch').value || '');
+        });
+    }
 })();
 
-// Products – kategoriya va status filtrlar
+// Products – kategoriya va status filtrlar (select-picker)
 (function initProductsFilters() {
-    var catSel = document.getElementById('productsCategoryFilter');
-    var statusSel = document.getElementById('productsStatusFilter');
-    if (!catSel || !statusSel) return;
-    allProductCategories.forEach(function (c) {
-        var opt = document.createElement('option');
-        opt.value = c;
-        opt.textContent = c;
-        catSel.appendChild(opt);
-    });
-    catSel.addEventListener('change', function () {
-        productsFilter.category = this.value || 'all';
-        renderProducts(document.getElementById('productsSearch').value || '');
-    });
-    statusSel.addEventListener('change', function () {
-        productsFilter.status = this.value || 'all';
-        renderProducts(document.getElementById('productsSearch').value || '');
-    });
+    var catPickerId = 'productsCategoryFilterPicker';
+    var statusPickerId = 'productsStatusFilterPicker';
+    var catEl = document.getElementById(catPickerId);
+    var statusEl = document.getElementById(statusPickerId);
+    if (catEl) {
+        var catOpts = [{ value: 'all', label: 'Barcha kategoriyalar' }]
+            .concat(allProductCategories.map(function (c) { return { value: c, label: c }; }));
+        initSelectPicker(catPickerId, catOpts, function (val) {
+            productsFilter.category = val || 'all';
+            renderProducts(document.getElementById('productsSearch').value || '');
+        });
+        setSelectValue(catPickerId, 'all', 'Barcha kategoriyalar');
+    }
+    if (statusEl) {
+        var statusOpts = [
+            { value: 'all', label: 'Barcha statuslar' },
+            { value: 'active', label: 'Active' },
+            { value: 'inactive', label: 'Inactive' }
+        ];
+        initSelectPicker(statusPickerId, statusOpts, function (val, lab) {
+            productsFilter.status = val || 'all';
+            renderProducts(document.getElementById('productsSearch').value || '');
+        });
+        setSelectValue(statusPickerId, 'all', 'Barcha statuslar');
+    }
 })();
 
 function uploadProductImage(file) {
