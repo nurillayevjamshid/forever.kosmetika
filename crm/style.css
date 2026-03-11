@@ -2909,7 +2909,7 @@ html[data-theme="light"] .cost-table-details {
 /* Sales status select */
 .status-select {
     width: 100%;
-    min-width: 140px;
+    min-width: 120px;
     padding: 10px 12px;
     border-radius: 12px;
     border: 1px solid rgba(255, 255, 255, 0.12);
@@ -3497,6 +3497,25 @@ html[data-theme="light"] .select-trigger {
     font-size: 0.95rem;
 }
 
+/* Sales table: fit more columns (col-11) */
+#salesTable thead th,
+#salesTable tbody td {
+    padding: 14px 14px;
+}
+
+/* Nomi column slightly narrower + ellipsis */
+#salesTable thead th:nth-child(3) {
+    width: 170px;
+}
+
+#salesTable tbody td[data-label="Nomi"] .sale-user-name {
+    display: block;
+    max-width: 170px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .sale-region-badge {
     display: inline-flex;
     align-items: center;
@@ -3515,7 +3534,7 @@ html[data-theme="light"] .select-trigger {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
-    width: 280px;
+    width: 220px;
     /* Fixed width to keep column consistent */
 }
 
