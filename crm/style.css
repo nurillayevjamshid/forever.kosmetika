@@ -1939,6 +1939,102 @@ html[data-theme="light"] .form-group select option {
     color: #1d4ed8;
 }
 
+/* ===========================
+   Customers - Mobile Card View
+   =========================== */
+
+.customers-mobile-list {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.customer-mobile-card {
+    width: 100%;
+    border: none;
+    outline: none;
+    text-align: left;
+    border-radius: 20px;
+    padding: 14px 16px;
+    color: #0f172a;
+    background: linear-gradient(135deg, #e0f7fa, #b2ebf2); /* Light blue background */
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.10);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.customer-mobile-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 26px rgba(15, 23, 42, 0.18);
+}
+
+.customer-mobile-top-row,
+.customer-mobile-bottom-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+}
+
+.customer-mobile-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: #006064;
+}
+
+.customer-mobile-phone {
+    font-weight: 600;
+    color: #00838f;
+}
+
+.customer-mobile-region {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #006064;
+    font-size: 13px;
+}
+
+/* Customer details modal styles */
+.customer-detail-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.customer-detail-item {
+    padding: 12px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.customer-detail-item i {
+    font-size: 20px;
+    color: var(--accent);
+    width: 24px;
+    text-align: center;
+}
+.customer-detail-item .label {
+    display: block;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+}
+.customer-detail-item .value {
+    font-weight: 600;
+    font-size: 14px;
+}
+html[data-theme="light"] .customer-detail-item {
+    background: #f8fafc;
+}
+
 /* Sale detail modal (used mainly on mobile) */
 .modal-sale-detail {
     max-width: 480px;
@@ -2103,12 +2199,14 @@ html[data-theme="light"] .form-group select option {
 }
 
 @media (max-width: 768px) {
-    /* Sales: hide table, show cards on mobile */
-    #page-sales .table-responsive {
+    /* Sales & Customers: hide table, show cards on mobile */
+    #page-sales .table-responsive,
+    #page-customers .table-responsive {
         display: none;
     }
 
-    #page-sales .sales-mobile-list {
+    #page-sales .sales-mobile-list,
+    #page-customers .customers-mobile-list {
         display: flex;
     }
 }
@@ -4414,6 +4512,7 @@ html[data-theme="light"] .profile-tab-btn.active {
         opacity: 1;
         transform: translateY(0);
     }
+}
 
    /* ============================
    MOBILE LAYOUT FOR CRM
@@ -4614,8 +4713,3 @@ html[data-theme="light"] .profile-tab-btn.active {
     border-radius: 1rem;
   }
 }
-}
-
-
-
-

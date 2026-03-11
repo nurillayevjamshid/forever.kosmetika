@@ -376,6 +376,10 @@
                                 </tbody>
                             </table>
                         </div>
+                        <!-- Mobile friendly customers list (cards) -->
+                        <div class="customers-mobile-list" id="customersMobileList" style="display: none;">
+                            <!-- Dynamic mobile cards -->
+                        </div>
                         <div class="empty-state" id="customersEmpty" style="display:none;">
                             <i class="fas fa-address-book"></i>
                             <p>Hali mijozlar yo'q. "Yangi Mijoz" tugmasini bosing.</p>
@@ -1302,6 +1306,26 @@
             <div class="modal-body">
                 <div id="saleImagesGallery" class="sale-images-gallery">
                     <!-- Dynamic images -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer Details Modal -->
+    <div class="modal-overlay" id="customerDetailsModal">
+        <div class="modal" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-user-circle"></i> Mijoz ma'lumotlari</h2>
+                <button class="modal-close" data-modal="customerDetailsModal"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="customerDetailsBody">
+                <!-- Dynamic details -->
+            </div>
+            <div class="modal-footer" style="display:flex; gap:10px; flex-wrap:wrap">
+                <button type="button" class="btn btn-secondary" data-modal="customerDetailsModal">Yopish</button>
+                <div style="margin-left:auto; display:flex; gap:10px;">
+                    <button class="btn btn-info" id="detailHistoryBtn"><i class="fas fa-history"></i> Tarix</button>
+                    <button class="btn btn-primary" id="detailEditBtn"><i class="fas fa-pen"></i> Tahrirlash</button>
                 </div>
             </div>
         </div>

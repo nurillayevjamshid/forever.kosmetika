@@ -2469,6 +2469,7 @@ imageUploadArea.addEventListener('drop', function (e) {
 // Mijozlar ro'yxatini yuklash va ko'rsatish
 function renderCustomers(searchQuery) {
     var customersBody = document.getElementById('customersBody');
+    var mobileList = document.getElementById('customersMobileList');
     var customersEmpty = document.getElementById('customersEmpty');
     if (!customersBody) return;
 
@@ -2486,10 +2487,14 @@ function renderCustomers(searchQuery) {
 
         if (customers.length === 0) {
             customersBody.innerHTML = '';
+            if (mobileList) mobileList.innerHTML = '';
             customersEmpty.style.display = 'block';
         } else {
             customersEmpty.style.display = 'none';
-            customersBody.innerHTML = customers.map(function (c, i) {
+            var rowsHtml = [];
+            var cardsHtml = [];
+
+            customers.forEach(function (c, i) {
                 var totalSpent = c.totalSpent || 0;
                 var vipBadge = totalSpent > 5000000 ? '<span class="status-badge active" style="background: linear-gradient(45deg, #ffd700, #ffa500); color: #000; border: none;"><i class="fas fa-crown"></i> VIP</span>' :
                     totalSpent > 1000000 ? '<span class="status-badge info">Doimiy</span>' :
@@ -2549,7 +2554,7 @@ function renderCustomers(searchQuery) {
                     '<div class="district-name">' + escapeHtml(districtValue) + '</div>' +
                     '</div>';
 
-                return '' +
+                rowsHtml.push(
                     '<tr>' +
                     '<td data-label="#">' + (i + 1) + '</td>' +
                     '<td data-label="Mijoz ismi"><div style="font-weight:600">' + escapeHtml(c.name) + '</div>' + (c.birthday ? '<div style="font-size:0.75rem; color:var(--text-muted)"><i class="fas fa-birthday-cake"></i> ' + c.birthday + '</div>' : '') + '</td>' +
@@ -2564,8 +2569,26 @@ function renderCustomers(searchQuery) {
                     '<button class="btn-icon edit customer-edit-btn" data-id="' + c.id + '" title="Tahrirlash"><i class="fas fa-pen"></i></button>' +
                     '<button class="btn-icon delete customer-delete-btn" data-id="' + c.id + '" data-name="' + escapeHtml(c.name) + '" title="O\'chirish"><i class="fas fa-trash"></i></button>' +
                     '</td>' +
-                    '</tr>';
-            }).join('');
+                    '</tr>'
+                );
+
+                if (mobileList) {
+                    var districtDisplay = districtValue !== '—' && districtValue !== '-' ? ', ' + districtValue : '';
+                    cardsHtml.push(
+                        '<button class="customer-mobile-card" data-id="' + c.id + '">' +
+                        '<div class="customer-mobile-top-row">' +
+                        '<span class="customer-mobile-name">' + escapeHtml(c.name) + '</span>' +
+                        '</div>' +
+                        '<div class="customer-mobile-bottom-row">' +
+                        '<span class="customer-mobile-region"><i class="fas fa-location-dot"></i> ' + escapeHtml(regionValue) + escapeHtml(districtDisplay) + '</span>' +
+                        '<span class="customer-mobile-phone"><i class="fas fa-phone"></i> ' + escapeHtml(c.phone) + '</span>' +
+                        '</div>' +
+                        '</button>'
+                    );
+                }
+            });
+            customersBody.innerHTML = rowsHtml.join('');
+            if (mobileList) mobileList.innerHTML = cardsHtml.join('');
             updateUIVisibility('customers');
         }
     });
@@ -2647,6 +2670,109 @@ document.addEventListener('click', function (e) {
     btn = e.target.closest('.customer-delete-btn');
     if (btn) {
         deleteItem('customers', btn.dataset.id, btn.dataset.name);
+        return;
+    }
+
+    btn = e.target.closest('.customer-mobile-card');
+    if (btn) {
+        var id = btn.dataset.id;
+        db.collection('customers').doc(id).get().then(function (doc) {
+            if (doc.exists) {
+                var c = doc.data();
+                var regionValue = c.viloyat || c.region || '';
+                var districtValue = c.tuman || '';
+                if ((!regionValue || regionValue === '-') && !districtValue) {
+                    var addressValue = c.address || c.customerAddress || '';
+                    if (addressValue && addressValue.indexOf(',') !== -1) {
+                        var addressParts = addressValue.split(',');
+                        regionValue = regionValue || (addressParts[0] || '').trim();
+                        districtValue = districtValue || addressParts.slice(1).join(',').trim();
+                    } else if (addressValue && !regionValue) {
+                        regionValue = addressValue.trim();
+                    }
+                }
+                regionValue = regionValue || '-';
+                districtValue = districtValue || '—';
+
+                // Normalize
+                var normalizedRegion = regionValue;
+                var normalizedDistrict = districtValue;
+                if (normalizedRegion === '-' || normalizedRegion === '—' || normalizedRegion === '–') normalizedRegion = '';
+                if (normalizedDistrict === '-' || normalizedDistrict === '—' || normalizedDistrict === '–') normalizedDistrict = '';
+                var addressValue = (c.address || c.customerAddress || '').toString().trim();
+                if (addressValue) {
+                    if (addressValue.indexOf(',') !== -1) {
+                        var addressParts = addressValue.split(',');
+                        if (!normalizedRegion) normalizedRegion = (addressParts[0] || '').trim();
+                        if (!normalizedDistrict) normalizedDistrict = addressParts.slice(1).join(',').trim();
+                    } else if (!normalizedRegion) {
+                        normalizedRegion = addressValue.trim();
+                    }
+                }
+                
+                regionValue = normalizedRegion || '-';
+                districtValue = normalizedDistrict || '—';
+
+                var html = 
+                    '<div class="customer-detail-body">' +
+                        '<div class="customer-detail-item">' +
+                            '<i class="fas fa-user"></i>' +
+                            '<div>' +
+                                '<span class="label">Ismi</span>' +
+                                '<span class="value">' + escapeHtml(c.name) + '</span>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="customer-detail-item">' +
+                            '<i class="fas fa-phone"></i>' +
+                            '<div>' +
+                                '<span class="label">Telefon</span>' +
+                                '<span class="value">' + escapeHtml(c.phone) + '</span>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="customer-detail-item">' +
+                            '<i class="fas fa-map-marker-alt"></i>' +
+                            '<div>' +
+                                '<span class="label">Manzil (Viloyat / Tuman)</span>' +
+                                '<span class="value">' + escapeHtml(regionValue) + (districtValue !== '—' && districtValue !== '-' ? ', ' + escapeHtml(districtValue) : '') + '</span>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="customer-detail-item">' +
+                            '<i class="fas fa-shopping-cart"></i>' +
+                            '<div>' +
+                                '<span class="label">Umumiy xaridlar</span>' +
+                                '<span class="value">' + (c.salesCount || 0) + ' ta (Jami: ' + formatMoney(c.totalSpent || 0) + ')</span>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>';
+                
+                document.getElementById('customerDetailsBody').innerHTML = html;
+                
+                document.getElementById('detailHistoryBtn').onclick = function() {
+                    closeModal('customerDetailsModal');
+                    setTimeout(function() { showCustomerHistory(id, c.name); }, 100);
+                };
+                
+                document.getElementById('detailEditBtn').onclick = function() {
+                    closeModal('customerDetailsModal');
+                    setTimeout(function() {
+                        document.getElementById('customerId').value = id;
+                        document.getElementById('customerName').value = c.name;
+                        document.getElementById('customerPhone').value = c.phone;
+                        document.getElementById('customerTelegram').value = c.telegram || '';
+                        document.getElementById('customerInstagram').value = c.instagram || '';
+                        document.getElementById('customerBirthday').value = c.birthday || '';
+                        document.getElementById('customerAddress').value = c.address || '';
+                        document.getElementById('customerNote').value = c.note || '';
+                        setSelectValue('customerRegionPicker', c.region || c.viloyat, c.region || c.viloyat);
+                        document.getElementById('customerModalTitle').innerHTML = '<i class="fas fa-pen"></i> Mijozni tahrirlash';
+                        openModal('customerModal');
+                    }, 100);
+                };
+
+                openModal('customerDetailsModal');
+            }
+        });
+        return;
     }
 });
 
