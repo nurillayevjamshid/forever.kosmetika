@@ -1038,7 +1038,7 @@ function renderSales(searchTerm) {
     updateUIVisibility('sales');
 }
 
-// Mobile: open sale detail modal on card tap
+// Mobile: open sale detail modal on card tap + product image viewer
 document.addEventListener('click', function (e) {
     var card = e.target.closest('.sale-mobile-card');
     if (card) {
@@ -1050,8 +1050,8 @@ document.addEventListener('click', function (e) {
         return;
     }
 
-    // Product name click inside sale detail modal -> show images (reuse global viewer)
-    var prodBtn = e.target.closest('.btn-link-product');
+    // Mahsulot butun qatori bosilganda -> rasmlar modali (reuse global viewer)
+    var prodBtn = e.target.closest('.btn-product-full');
     if (prodBtn) {
         var row = prodBtn.closest('.sale-detail-product-row');
         if (!row) return;
@@ -1093,11 +1093,9 @@ function openSaleDetailModal(sale) {
         var totalAmount = (typeof sale.totalAmount === 'number') ? sale.totalAmount : (subtotal + deliveryAmount);
         var costTotal = (typeof sale.costTotal === 'number') ? sale.costTotal : computeSaleCostTotal(items);
 
-        var statusLabel = (status === 'sotildi') ? 'Sotildi' : (status === 'atkaz' ? 'Atkáz' : 'Kutilmoqda');
-
         var dateEl = document.getElementById('saleDetailDate');
         var nameEl = document.getElementById('saleDetailName');
-        var statusBadgeEl = document.getElementById('saleDetailStatusBadge');
+        var statusWrapEl = document.getElementById('saleDetailStatusWrap');
         var totalEl = document.getElementById('saleDetailTotal');
         var regionEl = document.getElementById('saleDetailRegion');
         var costEl = document.getElementById('saleDetailCost');
@@ -1115,20 +1113,23 @@ function openSaleDetailModal(sale) {
         costEl.textContent = costTotal ? formatMoney(costTotal) : '—';
         deliveryEl.textContent = deliveryAmount === 0 ? 'Tekin' : formatMoney(deliveryAmount);
 
-        statusBadgeEl.textContent = statusLabel;
-        statusBadgeEl.className = 'sale-detail-status-badge status-' + status;
+        if (statusWrapEl) {
+            statusWrapEl.innerHTML = buildSaleStatusSelectHtml(status, sale.id);
+        }
 
         // Products list
         if (productsListEl) {
             productsListEl.innerHTML = items.map(function (it) {
                 var p = productsArr.find(function (px) { return px.id === it.productId; });
                 var pname = p ? p.name : 'Mahsulot';
-                var countLabel = (it.quantity >= 10) ? (it.quantity + ' ta') : (it.quantity + ' ta');
+                var countLabel = it.quantity + ' ta';
                 return '' +
-                    '<li class="sale-detail-product-row" data-sale-id="' + sale.id + '" data-product-id="' + (it.productId || '') + '">' +
-                    '<button type="button" class="p-name btn-link-product">' + escapeHtml(pname) + '</button>' +
+                    '<li>' +
+                    '<button type="button" class="sale-detail-product-row btn-product-full" data-sale-id="' + sale.id + '" data-product-id="' + (it.productId || '') + '">' +
+                    '<span class="p-name">' + escapeHtml(pname) + '</span>' +
                     '<span class="p-qty">' + countLabel + '</span>' +
                     '<span class="p-price">' + (it.price ? formatMoney(it.price * it.quantity) : '') + '</span>' +
+                    '</button>' +
                     '</li>';
             }).join('');
         }
@@ -1214,6 +1215,11 @@ async function updateSaleStatus(saleId, prevStatus, nextStatus, selectEl) {
         }
 
         if (selectEl) selectEl.setAttribute('data-prev', nextStatus);
+
+        // UI ni yangilab qo'yamiz (jadval + mobil kartalar)
+        var searchInput = document.getElementById('salesSearch');
+        var currentSearch = searchInput ? searchInput.value : '';
+        renderSales(currentSearch);
     } catch (err) {
         console.error(err);
         showToast('Statusni o\'zgartirishda xatolik: ' + (err.message || err), 'error');

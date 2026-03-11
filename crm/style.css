@@ -1912,7 +1912,8 @@ html[data-theme="light"] .form-group select option {
 
 /* Status-based background colors */
 .sale-mobile-card.status-kutilmoqda {
-    background: linear-gradient(135deg, #e0f2fe, #eff6ff);
+    /* yumshoq sariq */
+    background: linear-gradient(135deg, #fef9c3, #fffbeb);
 }
 
 .sale-mobile-card.status-sotildi {
@@ -1989,6 +1990,11 @@ html[data-theme="light"] .form-group select option {
     color: var(--danger);
 }
 
+/* Container for status select inside sale detail modal */
+.sale-detail-status-wrap .status-select-wrap {
+    min-width: 0;
+}
+
 .sale-detail-amount-block {
     padding: 10px 12px;
     border-radius: 14px;
@@ -2045,26 +2051,39 @@ html[data-theme="light"] .form-group select option {
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
 }
 
 .sale-detail-products li {
+    list-style: none;
+}
+
+.btn-product-full {
+    width: 100%;
+    border: none;
+    outline: none;
+    text-align: left;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
     display: grid;
     grid-template-columns: 1.4fr auto auto;
     gap: 8px;
     font-size: 13px;
     align-items: center;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.btn-product-full:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-1px);
 }
 
 .sale-detail-products .p-name {
     font-weight: 700;
     font-size: 14px;
-    text-align: left;
-    background: none;
-    border: none;
-    padding: 0;
     color: var(--accent);
-    cursor: pointer;
 }
 
 .sale-detail-products .p-qty {
@@ -2075,10 +2094,7 @@ html[data-theme="light"] .form-group select option {
 .sale-detail-products .p-price {
     font-weight: 600;
     color: var(--text-secondary);
-}
-
-.btn-link-product {
-    font: inherit;
+    text-align: right;
 }
 
 .sale-detail-note p {
