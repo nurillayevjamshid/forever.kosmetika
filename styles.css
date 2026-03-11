@@ -2378,6 +2378,113 @@ body {
     opacity: 0.6;
 }
 
+/* ================================
+   PREPAYMENT NOTICE STYLES
+   ================================ */
+.prepayment-notice-card {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #fffcf5 0%, #fff9e6 100%);
+    border: 1px solid rgba(217, 119, 6, 0.15);
+    border-left: 5px solid #d97706;
+    border-radius: 20px;
+    box-shadow: 
+        0 10px 25px rgba(217, 119, 6, 0.06),
+        0 4px 6px rgba(0, 0, 0, 0.02);
+    animation: premiumFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.prepayment-notice-card::after {
+    content: '';
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle, rgba(217, 119, 6, 0.05) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+@keyframes premiumFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.prepayment-icon-wrap {
+    width: 48px;
+    height: 48px;
+    background: #fef3c7;
+    color: #d97706;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.12);
+}
+
+.prepayment-main-text {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #92400e;
+    margin-bottom: 0.85rem;
+    font-weight: 500;
+}
+
+.prepayment-main-text strong {
+    font-weight: 800;
+    font-size: 1.25rem;
+    color: #b45309;
+    background: linear-gradient(135deg, #d97706 0%, #92400e 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+}
+
+.prepayment-sub-text {
+    font-size: 0.85rem;
+    color: #b45309;
+    opacity: 0.9;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    padding-top: 0.85rem;
+    border-top: 1px dashed rgba(217, 119, 6, 0.2);
+}
+
+.prepayment-sub-text svg {
+    flex-shrink: 0;
+    opacity: 0.8;
+}
+
+@media (max-width: 600px) {
+    .prepayment-notice-card {
+        padding: 1.25rem;
+        margin-top: 1.5rem;
+        border-radius: 16px;
+    }
+    
+    .prepayment-main-text {
+        font-size: 1rem;
+    }
+    
+    .prepayment-icon-wrap {
+        width: 40px;
+        height: 40px;
+        margin-bottom: 0.75rem;
+    }
+}
+
 .back-to-cart {
     display: flex;
     align-items: center;
