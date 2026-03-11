@@ -976,27 +976,30 @@ function renderSales(searchTerm) {
             '<td data-label="Tannarx">' + (costTotal ? formatMoney(costTotal) : '—') + '</td>' +
             '<td data-label="Dostavka">' + (deliveryAmount === 0 ? '<span class="status-badge info">Tekin</span>' : formatMoney(deliveryAmount)) + '</td>' +
             '<td data-label="Status">' +
-            (function () { 
-                var icon = (status === 'sotildi') ? 'fa-circle-check' : (status === 'atkaz' ? 'fa-circle-xmark' : 'fa-clock');
-                var label = (status === 'sotildi') ? 'Sotildi' : (status === 'atkaz' ? 'Atkáz' : 'Kutilmoqda');
-                return '' +
-                    '<div class="status-select-wrap status-' + status + '" title="Status: ' + label + '">' +
-                    '<span class="status-dot" aria-hidden="true"></span>' +
-                    '<i class="fas ' + icon + ' status-ico" aria-hidden="true"></i>' +
-                    '<select class="status-select" data-id="' + s.id + '" data-prev="' + status + '">' +
-                    '<option value="kutilmoqda"' + (status === 'kutilmoqda' ? ' selected' : '') + '>Kutilmoqda</option>' +
-                    '<option value="atkaz"' + (status === 'atkaz' ? ' selected' : '') + '>Atkáz</option>' +
-                    '<option value="sotildi"' + (status === 'sotildi' ? ' selected' : '') + '>Sotildi</option>' +
-                    '</select>' +
-                    '<i class="fas fa-chevron-down status-caret" aria-hidden="true"></i>' +
-                    '</div>';
-            })()) +
+            buildSaleStatusSelectHtml(status, s.id) +
             '</td>' +
             '<td data-label="Amallar"><div class="sale-actions-wrap"><button class="btn-icon edit sale-edit-btn" data-id="' + s.id + '" title="Tahrirlash"><i class="fas fa-pen"></i></button>' +
             '<button class="btn-icon delete sale-delete-btn" data-id="' + s.id + '" title="O\'chirish"><i class="fas fa-trash"></i></button></div></td>' +
             '</tr>';
     }).join('');
     updateUIVisibility('sales');
+}
+
+function buildSaleStatusSelectHtml(status, saleId) {
+    status = normalizeSaleStatus(status);
+    var icon = (status === 'sotildi') ? 'fa-circle-check' : (status === 'atkaz' ? 'fa-circle-xmark' : 'fa-clock');
+    var label = (status === 'sotildi') ? 'Sotildi' : (status === 'atkaz' ? 'Atkáz' : 'Kutilmoqda');
+    return '' +
+        '<div class="status-select-wrap status-' + status + '" title="Status: ' + label + '">' +
+        '<span class="status-dot" aria-hidden="true"></span>' +
+        '<i class="fas ' + icon + ' status-ico" aria-hidden="true"></i>' +
+        '<select class="status-select" data-id="' + saleId + '" data-prev="' + status + '">' +
+        '<option value="kutilmoqda"' + (status === 'kutilmoqda' ? ' selected' : '') + '>Kutilmoqda</option>' +
+        '<option value="atkaz"' + (status === 'atkaz' ? ' selected' : '') + '>Atkáz</option>' +
+        '<option value="sotildi"' + (status === 'sotildi' ? ' selected' : '') + '>Sotildi</option>' +
+        '</select>' +
+        '<i class="fas fa-chevron-down status-caret" aria-hidden="true"></i>' +
+        '</div>';
 }
 
 // Status change handler (event delegation)
