@@ -1716,8 +1716,270 @@ document.addEventListener('click', function (e) {
     // Staff row click navigation
     var userRow = e.target.closest('.user-data-row');
     if (userRow && !e.target.closest('.btn-icon') && !e.target.closest('.password-eye-btn') && !e.target.closest('.user-edit-btn') && !e.target.closest('.user-delete-btn')) {
-        navigateTo('profile');
+        var editBtn = userRow.querySelector('.user-edit-btn');
+        if (editBtn) {
+            var uid = editBtn.getAttribute('data-id');
+            loadUserProfile(uid);
+        }
     }
+});
+
+// Avatar upload logic
+document.getElementById('avatarUpload').addEventListener('change', function(e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    
+    var reader = new FileReader();
+    reader.onload = function(event) {
+        var base64 = event.target.result;
+        var uid = document.getElementById('infoUid').textContent;
+        if (uid && uid !== '---') {
+            db.collection('users').doc(uid).update({ avatar: base64 }).then(function() {
+                document.getElementById('profileAvatarDisplay').innerHTML = '<img src="' + base64 + '" alt="Avatar">';
+                showToast('Profil rasmi yangilandi!');
+            });
+        }
+    };
+    reader.readAsDataURL(file);
+});
+
+// Profile Tabs Logic
+document.querySelectorAll('.profile-tab-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        var tid = this.getAttribute('data-tab-id');
+        document.querySelectorAll('.profile-tab-btn').forEach(function(b) { b.classList.remove('active'); });
+        document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+        this.classList.add('active');
+        document.getElementById(tid).classList.add('active');
+    });
+});
+
+// Settings Vertical Tabs Logic
+document.querySelectorAll('.set-nav-item').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        var section = this.getAttribute('data-set-section');
+        document.querySelectorAll('.set-nav-item').forEach(function(b) { b.classList.remove('active'); });
+        this.classList.add('active');
+        renderAdminSettingsSection(section);
+    });
+});
+
+function loadUserProfile(uid) {
+    var u = usersArr.find(function(x) { return x.id === uid; });
+    if (!u) return;
+    
+    navigateTo('profile');
+    
+    // Header info
+    document.getElementById('profileName').textContent = u.name || 'Noma\'lum';
+    document.getElementById('profileRoleText').innerHTML = '<i class="fas fa-shield-halved"></i> ' + (u.role === 'admin' ? 'Admin' : 'Menejer');
+    document.getElementById('infoUid').textContent = u.id;
+    document.getElementById('infoEmail').textContent = u.email;
+    document.getElementById('infoRole').textContent = u.role === 'admin' ? 'Admin' : 'Menejer';
+    document.getElementById('infoJoinDate').textContent = formatDate(u.createdAt);
+    
+    // Avatar
+    var avatarEl = document.getElementById('profileAvatarDisplay');
+    if (u.avatar) {
+        avatarEl.innerHTML = '<img src="' + u.avatar + '" alt="Avatar">';
+    } else {
+        avatarEl.innerHTML = '<i class="fas fa-user-astronaut"></i>';
+    }
+    
+    // Stats calculation
+    var uSales = salesArr.filter(function(s) { return s.status === 'sotildi' && s.createdBy === u.id; }); // Assuming createdBy exists
+    // If createdBy doesn't exist yet, we'll need to add it to sales data in future. 
+    // For now, let's use a mock or filter by name if name matches
+    if (uSales.length === 0) {
+        uSales = salesArr.filter(function(s) { return s.status === 'sotildi' && s.sellerName === u.name; });
+    }
+    
+    var totalVol = uSales.reduce(function(sum, s) { return sum + (s.totalAmount || 0); }, 0);
+    document.getElementById('infoSalesCount').textContent = uSales.length;
+    document.getElementById('statSalesCount').textContent = uSales.length;
+    document.getElementById('statSalesVolume').textContent = formatMoney(totalVol);
+    
+    // Rating (Mock logic based on sales)
+    var rating = Math.min(5, (uSales.length / 10) + 1);
+    renderStarRating(rating);
+    document.getElementById('infoRatingScore').textContent = (rating * 100).toFixed(0);
+    
+    // Permissions visibility
+    var isAdmin = currentUserRole === 'admin';
+    document.getElementById('adminSettingsSidebar').style.display = isAdmin ? 'flex' : 'none';
+    document.getElementById('saveProfilePermissionsBtn').style.display = isAdmin ? 'block' : 'none';
+    document.getElementById('personalSettingsSection').style.display = (!isAdmin || u.id === auth.currentUser.uid) ? 'block' : 'none';
+    
+    if (isAdmin) {
+        renderAdminSettingsSection('dash', u.permissions);
+    }
+    
+    // Render profile sales list
+    renderProfileSales(uSales);
+}
+
+function renderProfileSales(sales) {
+    var container = document.getElementById('profileSalesList');
+    if (!container) return;
+    
+    if (sales.length === 0) {
+        container.innerHTML = '<div class="empty-state" style="padding: 20px;"><p>Sotuvlar topilmadi.</p></div>';
+        return;
+    }
+    
+    container.innerHTML = sales.map(function(s) {
+        return '<div class="achievement-item" style="margin-bottom: 10px; cursor: pointer;" onclick="viewSaleDetails(\'' + s.id + '\')">' +
+               '<div class="ach-icon"><i class="fas fa-shopping-cart"></i></div>' +
+               '<div class="ach-text">' +
+               '<span class="ach-label">' + formatDate(s.createdAt) + '</span>' +
+               '<span class="ach-value">' + formatMoney(s.totalAmount) + '</span>' +
+               '</div>' +
+               '<div style="margin-left: auto;"><i class="fas fa-chevron-right" style="opacity: 0.3;"></i></div>' +
+               '</div>';
+    }).join('');
+}
+
+// Personal password update
+document.getElementById('updateProfilePassBtn').addEventListener('click', function() {
+    var newPass = document.getElementById('newProfilePass').value;
+    if (!newPass || newPass.length < 6) {
+        showToast('Parol kamida 6 ta belgidan iborat bo\'lishi kerak!', 'error');
+        return;
+    }
+    
+    var user = auth.currentUser;
+    var uid = document.getElementById('infoUid').textContent;
+    
+    if (user && user.uid === uid) {
+        user.updatePassword(newPass).then(function() {
+            return db.collection('users').doc(uid).update({ 
+                password: newPass,
+                passUpdated: new Date().toISOString() 
+            });
+        }).then(function() {
+            showToast('Parolingiz muvaffaqiyatli yangilandi!');
+            document.getElementById('newProfilePass').value = '';
+        }).catch(function(error) {
+            showToast('Xatolik: ' + error.message, 'error');
+        });
+    }
+});
+
+// Admin alert for password changes
+db.collection('users').onSnapshot(function(snapshot) {
+    if (currentUserRole !== 'admin') return;
+    
+    snapshot.docChanges().forEach(function(change) {
+        if (change.type === "modified") {
+            var data = change.doc.data();
+            if (data.passUpdated && (!u.lastAlertTime || data.passUpdated > u.lastAlertTime)) {
+                // Show alert for admin
+                if (data.id !== auth.currentUser.uid) {
+                    showToast(data.name + ' parolini o\'zgartirdi!', 'info');
+                }
+            }
+        }
+    });
+});
+
+function renderStarRating(rating) {
+    var container = document.getElementById('profileStarRating');
+    var html = '';
+    for (var i = 1; i <= 5; i++) {
+        if (i <= Math.floor(rating)) html += '<i class="fas fa-star"></i>';
+        else if (i - 0.5 <= rating) html += '<i class="fas fa-star-half-alt"></i>';
+        else html += '<i class="far fa-star"></i>';
+    }
+    html += '<span class="rating-value">' + rating.toFixed(1) + '</span>';
+    container.innerHTML = html;
+}
+
+function renderAdminSettingsSection(section, perms) {
+    var main = document.getElementById('adminSettingsMain');
+    var uid = document.getElementById('infoUid').textContent;
+    var u = usersArr.find(function(x) { return x.id === uid; });
+    var p = perms || (u ? u.permissions : {});
+    
+    var html = '';
+    switch(section) {
+        case 'dash':
+            html = '<h3>Dashboard Ruxsatlari</h3>' +
+                   createPermSwitch('Dashboard bo\'limi', 'view_dash', p.view_dash !== false) +
+                   '<div class="sub-perms">' +
+                   createPermSwitch('Sof foyda ko\'rinishi', 'dash_profit', p.dash_profit !== false) +
+                   '</div>';
+            break;
+        case 'sales':
+            html = '<h3>Sotuvlar Ruxsatlari</h3>' +
+                   createPermSwitch('Sotuvlar bo\'limi', 'view_sales', p.view_sales !== false) +
+                   '<div class="sub-perms">' +
+                   createPermSwitch('Sotuvni tahrirlash', 'edit_sale', p.edit_sale !== false) +
+                   createPermSwitch('Sotuvni o\'chirish', 'delete_sale', p.delete_sale !== false) +
+                   '</div>';
+            break;
+        case 'customers':
+            html = '<h3>Mijozlar Ruxsatlari</h3>' +
+                   createPermSwitch('Mijozlar bo\'limi', 'view_customers', p.view_customers !== false) +
+                   '<div class="sub-perms">' +
+                   createPermSwitch('Mijozni o\'chirish', 'delete_customer', p.delete_customer !== false) +
+                   '</div>';
+            break;
+        case 'finance':
+            html = '<h3>Moliya Ruxsatlari</h3>' +
+                   createPermSwitch('Moliya bo\'limi', 'view_finance', p.view_finance !== false) +
+                   '<div class="sub-perms">' +
+                   createPermSwitch('Chiqim qo\'shish', 'add_expense', p.add_expense !== false) +
+                   '</div>';
+            break;
+        case 'products':
+            html = '<h3>Mahsulotlar Ruxsatlari</h3>' +
+                   createPermSwitch('Mahsulotlar bo\'limi', 'view_products', p.view_products !== false) +
+                   '<div class="sub-perms">' +
+                   createPermSwitch('Tannarxni ko\'rish', 'view_cost', p.view_cost !== false) +
+                   '</div>';
+            break;
+        case 'staff':
+            html = '<h3>Xodimlar Ruxsatlari</h3>' +
+                   createPermSwitch('Xodimlar bo\'limi (Admin)', 'view_staff', !!p.view_staff) +
+                   createPermSwitch('Sozlamalar bo\'limi', 'view_settings', !!p.view_settings);
+            break;
+    }
+    main.innerHTML = html;
+}
+
+function createPermSwitch(label, id, checked) {
+    return '<label class="perm-switch">' +
+           '<span>' + label + '</span>' +
+           '<input type="checkbox" id="perm_' + id + '" ' + (checked ? 'checked' : '') + ' onchange="updateLivePermission(\'' + id + '\', this.checked)">' +
+           '<span class="slider"></span>' +
+           '</label>';
+}
+
+function updateLivePermission(key, val) {
+    var uid = document.getElementById('infoUid').textContent;
+    if (!uid || uid === '---') return;
+    // We'll save all at once with the save button as requested, 
+    // but this could also be live-updated.
+}
+
+document.getElementById('saveProfilePermissionsBtn').addEventListener('click', function() {
+    var uid = document.getElementById('infoUid').textContent;
+    if (!uid || uid === '---') return;
+    
+    var u = usersArr.find(function(x) { return x.id === uid; });
+    var newPerms = Object.assign({}, u.permissions || {});
+    
+    // Collect all checkboxes from the current view and potentially others if we cached them
+    // For simplicity, let's collect common ones
+    var keys = ['view_dash', 'dash_profit', 'view_sales', 'edit_sale', 'delete_sale', 'view_customers', 'delete_customer', 'view_finance', 'add_expense', 'view_products', 'view_cost', 'view_staff', 'view_settings'];
+    keys.forEach(function(k) {
+        var el = document.getElementById('perm_' + k);
+        if (el) newPerms[k] = el.checked;
+    });
+    
+    db.collection('users').doc(uid).update({ permissions: newPerms }).then(function() {
+        showToast('Ruxsatnomalar saqlandi!');
+    });
 });
 
 // ==========================================
