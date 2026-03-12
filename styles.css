@@ -3088,6 +3088,29 @@ body {
         max-height: 300px;
     }
 
+    .image-nav {
+        width: 28px;
+        height: 28px;
+    }
+
+    .image-nav svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    .product-detail-image .image-nav {
+        width: 34px;
+        height: 34px;
+    }
+
+    .product-detail-image .image-nav.prev {
+        left: 10px;
+    }
+
+    .product-detail-image .image-nav.next {
+        right: 10px;
+    }
+
     .product-detail-info {
         padding: 1.5rem;
     }
@@ -3137,6 +3160,80 @@ body {
     object-position: center;
     padding: 0;
     background: transparent;
+}
+
+.product-image {
+    position: relative;
+}
+
+.detail-image-slider {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.image-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    border: 1px solid rgba(17, 17, 26, 0.08);
+    background: rgba(255, 255, 255, 0.92);
+    color: #2c2c3a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 18px rgba(17, 17, 26, 0.15);
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, opacity 0.18s ease;
+    z-index: 2;
+}
+
+.image-nav svg {
+    width: 16px;
+    height: 16px;
+}
+
+.image-nav.prev {
+    left: 8px;
+}
+
+.image-nav.next {
+    right: 8px;
+}
+
+.product-image .image-nav {
+    opacity: 0.88;
+}
+
+.product-image:hover .image-nav {
+    opacity: 1;
+    transform: translateY(-50%) scale(1.03);
+    box-shadow: 0 10px 22px rgba(17, 17, 26, 0.2);
+}
+
+.product-detail-image .image-nav {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.product-detail-image .image-nav svg {
+    width: 18px;
+    height: 18px;
+}
+
+.product-detail-image .image-nav.prev {
+    left: 16px;
+}
+
+.product-detail-image .image-nav.next {
+    right: 16px;
 }
 
 .product-info {

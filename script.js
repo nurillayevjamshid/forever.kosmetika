@@ -8,6 +8,10 @@
 
 let products = [];
 
+// Mahsulot rasmlari slider holati
+const productImageState = new Map();
+let modalImageState = null;
+
 // Firebase ulangan yoki yo'qligini tekshirish
 
 const isFirebaseReady = typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length > 0;
@@ -115,6 +119,34 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         });
 
+    }
+
+    // Product image slider navigation on cards
+    document.addEventListener('click', (event) => {
+        const navBtn = event.target.closest('.image-nav');
+        if (!navBtn) return;
+        const pid = navBtn.dataset.pid;
+        if (!pid) return;
+        event.stopPropagation();
+        event.preventDefault();
+        const dir = parseInt(navBtn.dataset.dir || '0', 10);
+        if (dir) changeProductImage(pid, dir);
+    }, true);
+
+    // Modal image navigation
+    const detailPrev = document.getElementById('detailPrev');
+    const detailNext = document.getElementById('detailNext');
+    if (detailPrev) {
+        detailPrev.addEventListener('click', (event) => {
+            event.stopPropagation();
+            changeModalImage(-1);
+        });
+    }
+    if (detailNext) {
+        detailNext.addEventListener('click', (event) => {
+            event.stopPropagation();
+            changeModalImage(1);
+        });
     }
 
     // CRM dan qaytganda yoki tab qayta aktiv bo'lganda yangilash
@@ -476,13 +508,29 @@ function createProductCard(product) {
 
     const rating = product.rating || "4.9";
 
+    const state = ensureProductImageState(product);
+    const fallback = getProductFallbackImage(product);
+    const initialImage = (state.images[state.index] || state.images[0] || product.imageUrl || product.image || fallback);
+    const showNav = state.images.length > 1;
+
     card.innerHTML = `
 
         <div class="product-click-area" onclick="openProductDetailModal('${product.id}')">
 
             <div class="product-image">
 
-                <img src="${product.imageUrl || product.image}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/300x300-text=${product.name}'">
+                <img src="${initialImage}" alt="${product.name}" data-fallback="${fallback}" onerror="this.src='${fallback}'">
+
+                <button class="image-nav prev" data-pid="${product.id}" data-dir="-1" aria-label="Oldingi rasm" style="display:${showNav ? 'flex' : 'none'}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+                <button class="image-nav next" data-pid="${product.id}" data-dir="1" aria-label="Keyingi rasm" style="display:${showNav ? 'flex' : 'none'}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </button>
 
                 <button class="favorite-btn" onclick="event.stopPropagation()">
 
@@ -636,6 +684,116 @@ function formatPrice(price) {
 
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 
+}
+
+function getProductFallbackImage(product) {
+    const name = product && product.name ? encodeURIComponent(product.name) : 'No+Image';
+    return `https://via.placeholder.com/300x300?text=${name}`;
+}
+
+function getProductImages(product) {
+    if (!product) return [];
+    const list = [];
+    if (Array.isArray(product.imageUrls)) {
+        product.imageUrls.forEach(url => {
+            if (typeof url === 'string' && url.trim()) list.push(url.trim());
+        });
+    }
+    if (typeof product.imageUrl === 'string' && product.imageUrl.trim()) list.push(product.imageUrl.trim());
+    if (typeof product.image === 'string' && product.image.trim()) list.push(product.image.trim());
+    return [...new Set(list)];
+}
+
+function ensureProductImageState(product) {
+    const id = product.id.toString();
+    const images = getProductImages(product);
+    const prev = productImageState.get(id);
+    const same = prev && JSON.stringify(prev.images) === JSON.stringify(images);
+    const index = same ? Math.min(prev.index || 0, Math.max(images.length - 1, 0)) : 0;
+    const state = { images, index };
+    productImageState.set(id, state);
+    return state;
+}
+
+function setProductCardImage(productId) {
+    const id = productId.toString();
+    const card = document.getElementById(`product-card-${id}`);
+    if (!card) return;
+    const img = card.querySelector('.product-image img');
+    const prevBtn = card.querySelector('.image-nav.prev');
+    const nextBtn = card.querySelector('.image-nav.next');
+    const state = productImageState.get(id);
+    if (!img || !state) return;
+
+    const images = state.images || [];
+    const fallback = img.dataset.fallback || '';
+    const src = images[state.index] || images[0] || fallback;
+    if (src) img.src = src;
+
+    const showNav = images.length > 1;
+    if (prevBtn) prevBtn.style.display = showNav ? 'flex' : 'none';
+    if (nextBtn) nextBtn.style.display = showNav ? 'flex' : 'none';
+}
+
+function changeProductImage(productId, dir) {
+    const id = productId.toString();
+    const state = productImageState.get(id);
+    if (!state || !state.images || state.images.length < 2) return;
+    const len = state.images.length;
+    state.index = (state.index + dir + len) % len;
+    setProductCardImage(id);
+
+    if (modalImageState && modalImageState.productId.toString() === id) {
+        modalImageState.index = state.index;
+        updateDetailImage();
+    }
+}
+
+function setModalImages(product) {
+    const images = getProductImages(product);
+    const state = ensureProductImageState(product);
+    modalImageState = {
+        productId: product.id,
+        images: images,
+        index: state.index || 0,
+        fallback: getProductFallbackImage(product)
+    };
+    updateDetailImage();
+}
+
+function updateDetailImage() {
+    if (!modalImageState) return;
+    const img = document.getElementById('detailImage');
+    const prevBtn = document.getElementById('detailPrev');
+    const nextBtn = document.getElementById('detailNext');
+    if (!img) return;
+
+    const images = modalImageState.images || [];
+    const src = images[modalImageState.index] || images[0] || modalImageState.fallback || '';
+    if (src) img.src = src;
+    img.onerror = function () {
+        if (modalImageState && modalImageState.fallback) {
+            img.src = modalImageState.fallback;
+        }
+    };
+
+    const showNav = images.length > 1;
+    if (prevBtn) prevBtn.style.display = showNav ? 'flex' : 'none';
+    if (nextBtn) nextBtn.style.display = showNav ? 'flex' : 'none';
+}
+
+function changeModalImage(dir) {
+    if (!modalImageState || !modalImageState.images || modalImageState.images.length < 2) return;
+    const len = modalImageState.images.length;
+    modalImageState.index = (modalImageState.index + dir + len) % len;
+    updateDetailImage();
+
+    const id = modalImageState.productId.toString();
+    const state = productImageState.get(id);
+    if (state) {
+        state.index = modalImageState.index;
+        setProductCardImage(id);
+    }
 }
 
 // ================================
@@ -1689,7 +1847,9 @@ function openProductDetailModal(productId) {
 
     if (!product) return;
 
-    document.getElementById('detailImage').src = product.imageUrl || product.image;
+    setModalImages(product);
+
+    document.getElementById('detailImage').alt = product.name || '';
 
     document.getElementById('detailName').textContent = product.name;
 
@@ -1716,6 +1876,8 @@ function closeProductDetailModal() {
     modal.classList.remove('active');
 
     document.body.style.overflow = ''; // Restore scrolling
+
+    modalImageState = null;
 
 }
 

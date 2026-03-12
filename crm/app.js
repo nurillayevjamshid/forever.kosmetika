@@ -1,4 +1,4 @@
-/**
+﻿/**
  * CosmeticaCRM - Men Kosmetika Biznesi uchun CRM Tizimi
  * App.js - Firebase Compat Version (Updated)
  */
@@ -54,6 +54,25 @@ function formatMoney(amount) {
 
 function formatPlainMoney(amount) {
     return new Intl.NumberFormat('uz-UZ').format(amount || 0);
+}
+
+function getProductImagesList(product) {
+    if (!product) return [];
+    var images = [];
+    if (Array.isArray(product.imageUrls)) {
+        product.imageUrls.forEach(function (url) {
+            if (typeof url === 'string' && url.trim()) images.push(url.trim());
+        });
+    }
+    if (typeof product.imageUrl === 'string' && product.imageUrl.trim()) images.push(product.imageUrl.trim());
+    if (typeof product.image === 'string' && product.image.trim()) images.push(product.image.trim());
+    // Unique
+    return images.filter(function (url, idx, arr) { return arr.indexOf(url) === idx; });
+}
+
+function getProductMainImage(product) {
+    var list = getProductImagesList(product);
+    return list.length ? list[0] : '';
 }
 
 function formatDate(dateStr) {
@@ -586,8 +605,9 @@ function renderProducts(searchTerm) {
         var status = p.status || 'active';
         var statusClass = status === 'inactive' ? 'inactive' : 'active';
         var statusText = status === 'inactive' ? 'Inactive' : 'Active';
-        var imageHtml = p.imageUrl
-            ? '<div class="product-list-thumb"><img src="' + p.imageUrl + '" alt="' + escapeHtml(p.name) + '"></div>'
+        var mainImage = getProductMainImage(p);
+        var imageHtml = mainImage
+            ? '<div class="product-list-thumb"><img src="' + mainImage + '" alt="' + escapeHtml(p.name) + '"></div>'
             : '<div class="product-list-thumb"><div class="product-list-thumb-placeholder">' + (escapeHtml(p.name || 'M')[0] || 'M') + '</div></div>';
         return '' +
             '<tr>' +
@@ -607,8 +627,9 @@ function renderProducts(searchTerm) {
 
     if (mobileList) {
         mobileList.innerHTML = filtered.map(function (p) {
-            var imageHtml = p.imageUrl
-                ? '<div class="product-mobile-image"><img src="' + p.imageUrl + '" alt="' + escapeHtml(p.name) + '"></div>'
+            var mainImage = getProductMainImage(p);
+            var imageHtml = mainImage
+                ? '<div class="product-mobile-image"><img src="' + mainImage + '" alt="' + escapeHtml(p.name) + '"></div>'
                 : '<div class="product-mobile-image placeholder"><span>' + (escapeHtml(p.name || 'M')[0] || 'M') + '</span></div>';
             return '' +
                 '<button class="product-mobile-card" data-id="' + p.id + '">' +
@@ -632,13 +653,9 @@ function editProduct(id) {
     setSelectValue('productCategoryPicker', p.category, p.category);
     setSelectValue('productStatusPicker', p.status || 'active', (p.status || 'active') === 'active' ? 'Active' : 'Inactive');
     document.getElementById('productModalTitle').innerHTML = '<i class="fas fa-box-open"></i> Mahsulotni tahrirlash';
-    // Mavjud rasmni ko'rsatish
+    // Mavjud rasmlarni ko'rsatish
     resetImageUpload();
-    if (p.imageUrl) {
-        document.getElementById('imagePreview').src = p.imageUrl;
-        document.getElementById('imagePreviewContainer').style.display = 'block';
-        document.getElementById('imageUploadPlaceholder').style.display = 'none';
-    }
+    setProductFormImages(getProductImagesList(p));
     openModal('productModal');
 }
 
@@ -671,9 +688,10 @@ function openProductDetailModal(p) {
     var statusClass = status === 'inactive' ? 'inactive' : 'active';
     var statusText = status === 'inactive' ? 'Inactive' : 'Active';
 
-    var imageHtml = p.imageUrl
+    var mainImage = getProductMainImage(p);
+    var imageHtml = mainImage
         ? '<div style="width:100%; border-radius:16px; overflow:hidden; margin-bottom:20px; border:1px solid var(--border);">' +
-          '<img src="' + p.imageUrl + '" style="width:100%; height:auto; display:block;"></div>'
+          '<img src="' + mainImage + '" style="width:100%; height:auto; display:block;"></div>'
         : '<div style="width:100%; height:150px; background:var(--bg-secondary); border-radius:16px; display:flex; align-items:center; justify-content:center; margin-bottom:20px; color:var(--text-muted); font-size:3rem; border:1px solid var(--border);"><i class="fas fa-box"></i></div>';
 
     body.innerHTML = 
@@ -716,8 +734,6 @@ initSelectPicker('newUserRolePicker');
 document.getElementById('productForm').addEventListener('submit', async function (e) {
     e.preventDefault();
     var id = document.getElementById('productId').value;
-    var fileInput = document.getElementById('productImage');
-    var file = fileInput.files && fileInput.files[0];
 
     var btn = document.getElementById('saveProductBtn');
     var originalBtnText = btn.innerHTML;
@@ -735,18 +751,28 @@ document.getElementById('productForm').addEventListener('submit', async function
     };
 
     try {
-        // Rasm mavjud bo'lsa, uni Base64 ko'rinishida saqlaymiz (CORS muammosini oldini olish uchun)
-        if (file) {
-            // Preview'dan Base64 string'ni olamiz
-            var base64Image = document.getElementById('imagePreview').src;
-            data.imageUrl = base64Image;
-            data.imageStoragePath = ''; // Firestore'da saqlangan rasm uchun storage path kerak emas
+        // Rasmlar (ko'p rasm qo'llab-quvvatlash)
+        if (productFormImages.length) {
+            data.imageUrls = productFormImages.slice();
+            data.imageUrl = productFormImages[0];
+            if (!productImagesTouched && id) {
+                const existingProduct = productsArr.find(p => p.id === id);
+                data.imageStoragePath = existingProduct ? (existingProduct.imageStoragePath || '') : '';
+            } else {
+                data.imageStoragePath = ''; // Base64 uchun storage path kerak emas
+            }
         } else {
-            // Agar yangi rasm tanlanmagan bo'lsa, mavjud ma'lumotni saqlab qolamiz
+            // Agar rasm tanlanmagan bo'lsa, mavjud ma'lumotni saqlab qolamiz
             const existingProduct = productsArr.find(p => p.id === id);
-            if (existingProduct) {
-                data.imageUrl = existingProduct.imageUrl || '';
+            if (existingProduct && !productImagesTouched) {
+                var existingImages = getProductImagesList(existingProduct);
+                data.imageUrls = existingImages;
+                data.imageUrl = existingImages[0] || '';
                 data.imageStoragePath = existingProduct.imageStoragePath || '';
+            } else {
+                data.imageUrls = [];
+                data.imageUrl = '';
+                data.imageStoragePath = '';
             }
         }
 
@@ -789,8 +815,9 @@ function getSaleProductLabel(productId) {
 }
 
 function buildSaleProductThumb(product) {
-    if (product && product.imageUrl) {
-        return '<img src="' + escapeHtml(product.imageUrl) + '" alt="' + escapeHtml(product.name || 'Mahsulot') + '">';
+    var mainImage = getProductMainImage(product);
+    if (mainImage) {
+        return '<img src="' + escapeHtml(mainImage) + '" alt="' + escapeHtml(product.name || 'Mahsulot') + '">';
     }
     var firstLetter = ((product && product.name) ? product.name : 'M').charAt(0).toUpperCase();
     return '<span class="product-option-fallback">' + escapeHtml(firstLetter) + '</span>';
@@ -1146,9 +1173,10 @@ document.addEventListener('click', function (e) {
 
         var imagesHtml = saleForImages.items.map(function (it) {
             var p = productsArr.find(function (px) { return px.id === it.productId; });
-            if (p && p.imageUrl) {
+            var mainImage = getProductMainImage(p);
+            if (mainImage) {
                 return '<div class="gallery-item">' +
-                    '<img src="' + p.imageUrl + '" alt="' + escapeHtml(p.name) + '">' +
+                    '<img src="' + mainImage + '" alt="' + escapeHtml(p.name) + '">' +
                     '<div class="gallery-item-info">' + escapeHtml(p.name) + ' (x' + it.quantity + ')</div>' +
                     '</div>';
             }
@@ -1403,9 +1431,10 @@ document.addEventListener('click', function (e) {
 
             var imagesHtml = sale.items.map(function (it) {
                 var p = productsArr.find(function (px) { return px.id === it.productId; });
-                if (p && p.imageUrl) {
+                var mainImage = getProductMainImage(p);
+                if (mainImage) {
                     return '<div class="gallery-item">' +
-                        '<img src="' + p.imageUrl + '" alt="' + escapeHtml(p.name) + '">' +
+                        '<img src="' + mainImage + '" alt="' + escapeHtml(p.name) + '">' +
                         '<div class="gallery-item-info">' + escapeHtml(p.name) + ' (x' + it.quantity + ')</div>' +
                         '</div>';
                 }
@@ -1910,8 +1939,9 @@ function refreshDashboard() {
                 var product = productsArr.find(function (p) { return p.id === pid; });
                 var name = product ? product.name : "Noma'lum";
                 var qty = prodStats[pid];
-                var imgHtml = (product && product.imageUrl)
-                    ? '<img src="' + escapeHtml(product.imageUrl) + '" class="top-img" alt="' + escapeHtml(name) + '">'
+                var mainImage = getProductMainImage(product);
+                var imgHtml = mainImage
+                    ? '<img src="' + escapeHtml(mainImage) + '" class="top-img" alt="' + escapeHtml(name) + '">'
                     : '<div class="top-img-placeholder">' + (name.charAt(0).toUpperCase() || 'M') + '</div>';
                 var priceText = product ? formatMoney(product.price) : "Narx yo'q";
 
@@ -2553,50 +2583,115 @@ function saveProductData(id, data) {
 }
 
 // Rasm input ni reset qilish yordamchi funksiyasi
+var productFormImages = [];
+var productImagesTouched = false;
+
+function setProductFormImages(images, markTouched) {
+    var list = Array.isArray(images) ? images : [];
+    productFormImages = list.filter(function (url) { return typeof url === 'string' && url.trim(); });
+    if (markTouched === true) productImagesTouched = true;
+    if (markTouched === false) productImagesTouched = false;
+    renderProductImagePreviews();
+}
+
+function renderProductImagePreviews() {
+    var container = document.getElementById('imagePreviewContainer');
+    var list = document.getElementById('imagePreviewList');
+    var placeholder = document.getElementById('imageUploadPlaceholder');
+    if (!container || !list || !placeholder) return;
+
+    if (!productFormImages.length) {
+        list.innerHTML = '';
+        container.style.display = 'none';
+        placeholder.style.display = 'flex';
+        return;
+    }
+
+    container.style.display = 'block';
+    placeholder.style.display = 'none';
+    list.innerHTML = productFormImages.map(function (src, idx) {
+        return '' +
+            '<div class="image-preview-item">' +
+            '<img src="' + src + '" alt="Rasm ' + (idx + 1) + '">' +
+            '<button type="button" class="image-preview-remove" data-index="' + idx + '" title="Rasmni o\'chirish">' +
+            '<i class="fas fa-times"></i>' +
+            '</button>' +
+            '</div>';
+    }).join('');
+}
+
 function resetImageUpload() {
     document.getElementById('productImage').value = '';
-    document.getElementById('imagePreview').src = '';
-    document.getElementById('imagePreviewContainer').style.display = 'none';
-    document.getElementById('imageUploadPlaceholder').style.display = 'flex';
+    setProductFormImages([], false);
     document.getElementById('uploadProgress').style.display = 'none';
     document.getElementById('progressFill').style.width = '0%';
     document.getElementById('progressText').textContent = '0%';
 }
 
-// Rasm yuklash maydoni вЂ” click bilan fayl tanlash
+function handleImageFiles(files, append) {
+    var list = Array.prototype.slice.call(files || []);
+    if (!list.length) return;
+
+    var validFiles = list.filter(function (file) { return file && file.type && file.type.startsWith('image/'); });
+    if (!validFiles.length) {
+        showToast('Faqat rasm fayllarini yuklang!', 'error');
+        return;
+    }
+
+    if (validFiles.some(function (file) { return file.size > 5 * 1024 * 1024; })) {
+        showToast('Rasm hajmi 5MB dan oshmasligi kerak!', 'error');
+        return;
+    }
+
+    Promise.all(validFiles.map(function (file) {
+        return new Promise(function (resolve, reject) {
+            var reader = new FileReader();
+            reader.onload = function (ev) { resolve(ev.target.result); };
+            reader.onerror = function () { reject(); };
+            reader.readAsDataURL(file);
+        });
+    })).then(function (results) {
+        productFormImages = append ? productFormImages.concat(results) : results;
+        productImagesTouched = true;
+        renderProductImagePreviews();
+    }).catch(function () {
+        showToast('Rasmni o\'qishda xatolik yuz berdi!', 'error');
+    });
+}
+
+// Rasm yuklash maydoni - click bilan fayl tanlash
 var imageUploadArea = document.getElementById('imageUploadArea');
 var productImageInput = document.getElementById('productImage');
 
 imageUploadArea.addEventListener('click', function (e) {
-    if (e.target.closest('#removeImageBtn')) return;
+    if (e.target.closest('#removeImageBtn') || e.target.closest('.image-preview-remove')) return;
     productImageInput.click();
 });
 
 // Rasm tanlanganda preview ko'rsatish
 productImageInput.addEventListener('change', function () {
-    var file = this.files[0];
-    if (!file) return;
-
-    // Hajm tekshirish (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-        showToast('Rasm hajmi 5MB dan oshmasligi kerak!', 'error');
-        this.value = '';
-        return;
-    }
-
-    var reader = new FileReader();
-    reader.onload = function (ev) {
-        document.getElementById('imagePreview').src = ev.target.result;
-        document.getElementById('imagePreviewContainer').style.display = 'block';
-        document.getElementById('imageUploadPlaceholder').style.display = 'none';
-    };
-    reader.readAsDataURL(file);
+    if (!this.files || !this.files.length) return;
+    handleImageFiles(this.files, true);
+    this.value = '';
 });
 
-// Rasmni o'chirish (faqat previewdan, Storage dan emas)
+// Rasmni o'chirish (faqat previewdan, Storage dan emas) - barchasini tozalash
 document.getElementById('removeImageBtn').addEventListener('click', function (e) {
     e.stopPropagation();
     resetImageUpload();
+    productImagesTouched = true;
+});
+
+// Bitta rasmni o'chirish
+document.getElementById('imagePreviewList').addEventListener('click', function (e) {
+    var btn = e.target.closest('.image-preview-remove');
+    if (!btn) return;
+    e.stopPropagation();
+    var idx = parseInt(btn.dataset.index, 10);
+    if (isNaN(idx)) return;
+    productFormImages.splice(idx, 1);
+    productImagesTouched = true;
+    renderProductImagePreviews();
 });
 
 // Drag & drop qo'llab-quvvatlash
@@ -2615,22 +2710,8 @@ imageUploadArea.addEventListener('drop', function (e) {
     e.preventDefault();
     this.style.borderColor = '';
     this.style.background = '';
-    var file = e.dataTransfer.files[0];
-    if (!file || !file.type.startsWith('image/')) {
-        showToast('Faqat rasm fayllarini yuklang!', 'error');
-        return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-        showToast('Rasm hajmi 5MB dan oshmasligi kerak!', 'error');
-        return;
-    }
-    // Faylni input ga o'rnatish
-    var dt = new DataTransfer();
-    dt.items.add(file);
-    productImageInput.files = dt.files;
-    productImageInput.dispatchEvent(new Event('change'));
+    handleImageFiles(e.dataTransfer.files, true);
 });
-
 
 // ==========================================
 // === CUSTOMERS MANAGEMENT ===
@@ -3013,6 +3094,7 @@ document.addEventListener('click', function (e) {
         });
     }
 });
+
 
 
 

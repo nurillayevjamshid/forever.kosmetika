@@ -1056,17 +1056,17 @@
                 <div class="form-group">
                     <label for="productImage"><i class="fas fa-image"></i> Mahsulot rasmi</label>
                     <div class="image-upload-area" id="imageUploadArea">
-                        <input type="file" id="productImage" accept="image/*" style="display:none;">
+                        <input type="file" id="productImage" accept="image/*" multiple style="display:none;">
                         <div class="image-preview-container" id="imagePreviewContainer" style="display:none;">
-                            <img id="imagePreview" src="" alt="Rasm oldindan ko'rish">
-                            <button type="button" class="image-remove-btn" id="removeImageBtn" title="Rasmni o'chirish">
-                                <i class="fas fa-times"></i>
+                            <div class="image-preview-list" id="imagePreviewList"></div>
+                            <button type="button" class="image-remove-btn" id="removeImageBtn" title="Rasmlarni tozalash">
+                                <i class="fas fa-trash"></i>
                             </button>
                         </div>
                         <div class="image-upload-placeholder" id="imageUploadPlaceholder">
                             <i class="fas fa-cloud-upload-alt"></i>
                             <p>Rasm yuklash uchun bosing</p>
-                            <span>JPG, PNG, WEBP (max 5MB)</span>
+                            <span>JPG, PNG, WEBP (max 5MB) - Bir nechta rasm tanlash mumkin</span>
                         </div>
                     </div>
                     <div class="upload-progress" id="uploadProgress" style="display:none;">
