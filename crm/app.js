@@ -1,4 +1,4 @@
-Ôªø/**
+/**
  * CosmeticaCRM - Men Kosmetika Biznesi uchun CRM Tizimi
  * App.js - Firebase Compat Version (Updated)
  */
@@ -568,7 +568,7 @@ function renderProducts(searchTerm) {
             '<td data-label="#">' + (i + 1) + '</td>' +
             '<td data-label="Mahsulot"><div class="product-list-info">' + imageHtml +
             '<div class="product-list-meta"><span class="product-list-name">' + escapeHtml(p.name) + '</span></div></div></td>' +
-            '<td data-label="Kategoriya">' + escapeHtml(p.category || '–≤–Ç‚Äù') + '</td>' +
+            '<td data-label="Kategoriya">' + escapeHtml(p.category || '‚Äî') + '</td>' +
             '<td data-label="Narx">' + formatMoney(p.price) + '</td>' +
             '<td data-label="Tannarx">' + (p.cost ? formatMoney(p.cost) : '\u2014') + '</td>' +
             '<td data-label="Status"><span class="status-badge ' + statusClass + '">' + statusText + '</span></td>' +
@@ -646,7 +646,7 @@ function openProductDetailModal(p) {
         '</div>' +
         '<div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); padding:12px; border-radius:14px;">' +
         '<span style="font-size:11px; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Tannarxi</span>' +
-        '<div style="font-size:1.2rem; font-weight:800; color:var(--text); margin-top:4px;">' + (p.cost ? formatMoney(p.cost) : "‚Äî") + '</div>' +
+        '<div style="font-size:1.2rem; font-weight:800; color:var(--text); margin-top:4px;">' + (p.cost ? formatMoney(p.cost) : "ó") + '</div>' +
         '</div>' +
         '</div>' +
         '<div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); padding:15px; border-radius:14px;">' +
@@ -966,6 +966,7 @@ if (addSaleItemBtn) {
 function renderSales(searchTerm) {
     searchTerm = searchTerm || '';
     var tbody = document.getElementById('salesBody');
+    var mobileList = document.getElementById('salesMobileList');
     var empty = document.getElementById('salesEmpty');
     var filtered = salesArr.slice().sort(function (a, b) { return new Date(b.date) - new Date(a.date); });
     if (searchTerm) {
@@ -980,13 +981,25 @@ function renderSales(searchTerm) {
     if (salesFilter.region !== 'all') {
         filtered = filtered.filter(function (s) { return (s.region || '') === salesFilter.region; });
     }
-    if (filtered.length === 0) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
+    if (filtered.length === 0) {
+        tbody.innerHTML = '';
+        if (mobileList) mobileList.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+    }
     empty.style.display = 'none';
-    tbody.innerHTML = filtered.map(function (s, i) {
+    var rowsHtml = [];
+    var cardsHtml = [];
+
+    filtered.forEach(function (s, i) {
         var items = s.items || [];
+        var status = normalizeSaleStatus(s.status);
+        var subtotal = (typeof s.subtotalAmount === 'number') ? s.subtotalAmount : computeSaleSubtotal(items);
+        var deliveryAmount = (typeof s.deliveryAmount === 'number') ? s.deliveryAmount : calculateDeliveryPrice(subtotal, getRegionType(s.region));
+        var totalAmount = (typeof s.totalAmount === 'number') ? s.totalAmount : (subtotal + deliveryAmount);
         var tagsHtml = items.map(function (it) {
             var p = productsArr.find(function (px) { return px.id === it.productId; });
-            var pname = p ? escapeHtml(p.name) : '‚Äî';
+            var pname = p ? escapeHtml(p.name) : 'ó';
             return '<span class="sale-row-item-tag">' + pname + ' <span class="qty">x' + it.quantity + '</span></span>';
         }).join('');
 
@@ -1000,7 +1013,7 @@ function renderSales(searchTerm) {
 
         var fullItemsText = items.map(function (it) {
             var p = productsArr.find(function (px) { return px.id === it.productId; });
-            return (p ? p.name : '‚Äî') + ' (x' + it.quantity + ')';
+            return (p ? p.name : 'ó') + ' (x' + it.quantity + ')';
         }).join(', ');
 
         var totalCost = (s.items || []).reduce(function(sum, it) {
@@ -1008,12 +1021,7 @@ function renderSales(searchTerm) {
             return sum + ((p ? p.costPrice || 0 : 0) * it.quantity);
         }, 0);
 
-        var deliveryVal = s.deliveryAmount || 0;
-        var deliveryHtml = deliveryVal > 0 ? formatMoney(deliveryVal) : '<span class="status-badge active" style="background:var(--success-glow); color:var(--success);">Tekin</span>';
-
-        var status = s.status || 'kutilmoqda';
-        var statusClass = status === 'sotildi' ? 'active' : (status === 'atkaz' ? 'danger' : 'warning');
-        var statusLabel = status === 'sotildi' ? 'Sotildi' : (status === 'atkaz' ? 'Atkaz' : 'Kutilmoqda');
+        var deliveryHtml = deliveryAmount > 0 ? formatMoney(deliveryAmount) : '<span class="status-badge active" style="background:var(--success-glow); color:var(--success);">Tekin</span>';
 
         var statusSelect = '<select class="status-select-inline" data-id="' + s.id + '" style="padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-secondary); font-size: 0.8rem; cursor: pointer;">' +
             '<option value="kutilmoqda" ' + (status === 'kutilmoqda' ? 'selected' : '') + '>Kutilmoqda</option>' +
@@ -1021,21 +1029,52 @@ function renderSales(searchTerm) {
             '<option value="atkaz" ' + (status === 'atkaz' ? 'selected' : '') + '>Atkaz</option>' +
             '</select>';
 
-        return '' +
+        rowsHtml.push(
             '<tr class="sale-data-row">' +
             '<td data-label="#">' + (i + 1) + '</td>' +
             '<td data-label="Sana"><div class="sale-date-cell"><i class="far fa-calendar-alt"></i> ' + formatDate(s.date) + '</div></td>' +
-            '<td data-label="Nomi"><span class="sale-user-name">' + escapeHtml(s.name || '‚Äî') + '</span></td>' +
-            '<td data-label="Viloyat"><div class="sale-region-badge"><i class="fas fa-location-dot"></i> ' + escapeHtml(s.region || '‚Äî') + '</div></td>' +
+            '<td data-label="Nomi"><span class="sale-user-name">' + escapeHtml(s.name || 'ó') + '</span></td>' +
+            '<td data-label="Viloyat"><div class="sale-region-badge"><i class="fas fa-location-dot"></i> ' + escapeHtml(s.region || 'ó') + '</div></td>' +
             '<td data-label="Mahsulotlar" title="' + fullItemsText + '"><div class="sale-items-wrap">' + itemsHtml + '</div></td>' +
-            '<td data-label="Jami summa" class="amount-highlight">' + formatMoney(s.totalAmount) + '</td>' +
+            '<td data-label="Jami summa" class="amount-highlight">' + formatMoney(totalAmount) + '</td>' +
             '<td data-label="Tannarx">' + formatMoney(totalCost) + '</td>' +
             '<td data-label="Dostavka">' + deliveryHtml + '</td>' +
             '<td data-label="Status">' + statusSelect + '</td>' +
             '<td data-label="Amallar"><div class="sale-actions-wrap"><button class="btn-icon edit sale-edit-btn" data-id="' + s.id + '" title="Tahrirlash"><i class="fas fa-pen"></i></button>' +
             '<button class="btn-icon delete sale-delete-btn" data-id="' + s.id + '" title="O\'chirish"><i class="fas fa-trash"></i></button></div></td>' +
-            '</tr>';
-    }).join('');
+            '</tr>'
+        );
+
+        if (mobileList) {
+            var statusLabel = (status === 'sotildi') ? 'Sotildi' : (status === 'atkaz' ? 'Atkaz' : 'Kutilmoqda');
+            var itemCount = items.length;
+            var itemSummary = itemCount === 0
+                ? 'Mahsulot kiritilmagan'
+                : (itemCount === 1 ? '1 ta mahsulot' : (itemCount + ' ta mahsulot'));
+
+            cardsHtml.push(
+                '<button class="sale-mobile-card status-' + status + '" data-sale-id="' + s.id + '">' +
+                '<div class="sale-mobile-top-row">' +
+                '<span class="sale-mobile-time"><i class="far fa-calendar-alt"></i> ' + formatDate(s.date) + '</span>' +
+                '<span class="sale-mobile-status-badge">' + statusLabel + '</span>' +
+                '</div>' +
+                '<div class="sale-mobile-main">' +
+                '<h3 class="sale-mobile-title">' + escapeHtml(s.name || 'ó') + '</h3>' +
+                '<span class="sale-mobile-amount">' + formatMoney(totalAmount) + '</span>' +
+                '</div>' +
+                '<div class="sale-mobile-bottom-row">' +
+                '<span class="sale-mobile-region"><i class="fas fa-location-dot"></i> ' + escapeHtml(s.region || 'ó') + '</span>' +
+                '<span class="sale-mobile-items">' + itemSummary + '</span>' +
+                '</div>' +
+                '</button>'
+            );
+        }
+    });
+
+    tbody.innerHTML = rowsHtml.join('');
+    if (mobileList) {
+        mobileList.innerHTML = cardsHtml.join('');
+    }
     updateUIVisibility('sales');
 }
 
@@ -1078,7 +1117,7 @@ document.addEventListener('click', function (e) {
             }
             return '<div class="gallery-item no-img">' +
                 '<div class="placeholder"><i class="fas fa-image"></i></div>' +
-                '<div class="gallery-item-info">' + (p ? escapeHtml(p.name) : '‚Äî') + ' (x' + it.quantity + ')</div>' +
+                '<div class="gallery-item-info">' + (p ? escapeHtml(p.name) : 'ó') + ' (x' + it.quantity + ')</div>' +
                 '</div>';
         }).join('');
 
@@ -1109,10 +1148,10 @@ function openSaleDetailModal(sale) {
         if (!dateEl) return; // modal yo'q bo'lsa jim chiqamiz
 
         dateEl.textContent = formatDate(sale.date);
-        nameEl.textContent = sale.name || '‚Äî';
+        nameEl.textContent = sale.name || 'ó';
         totalEl.textContent = formatMoney(totalAmount);
-        regionEl.textContent = sale.region || '‚Äî';
-        costEl.textContent = costTotal ? formatMoney(costTotal) : '‚Äî';
+        regionEl.textContent = sale.region || 'ó';
+        costEl.textContent = costTotal ? formatMoney(costTotal) : 'ó';
         deliveryEl.textContent = deliveryAmount === 0 ? 'Tekin' : formatMoney(deliveryAmount);
 
         if (statusWrapEl) {
@@ -1157,14 +1196,14 @@ function openSaleDetailModal(sale) {
 function buildSaleStatusSelectHtml(status, saleId) {
     status = normalizeSaleStatus(status);
     var icon = (status === 'sotildi') ? 'fa-circle-check' : (status === 'atkaz' ? 'fa-circle-xmark' : 'fa-clock');
-    var label = (status === 'sotildi') ? 'Sotildi' : (status === 'atkaz' ? 'Atk√°z' : 'Kutilmoqda');
+    var label = (status === 'sotildi') ? 'Sotildi' : (status === 'atkaz' ? 'Atkaz' : 'Kutilmoqda');
     return '' +
         '<div class="status-select-wrap status-' + status + '" title="Status: ' + label + '">' +
         '<span class="status-dot" aria-hidden="true"></span>' +
         '<i class="fas ' + icon + ' status-ico" aria-hidden="true"></i>' +
         '<select class="status-select" data-id="' + saleId + '" data-prev="' + status + '">' +
         '<option value="kutilmoqda"' + (status === 'kutilmoqda' ? ' selected' : '') + '>Kutilmoqda</option>' +
-        '<option value="atkaz"' + (status === 'atkaz' ? ' selected' : '') + '>Atk√°z</option>' +
+        '<option value="atkaz"' + (status === 'atkaz' ? ' selected' : '') + '>Atkaz</option>' +
         '<option value="sotildi"' + (status === 'sotildi' ? ' selected' : '') + '>Sotildi</option>' +
         '</select>' +
         '<i class="fas fa-chevron-down status-caret" aria-hidden="true"></i>' +
@@ -1284,7 +1323,7 @@ async function ensureFinanceEntriesForSoldSale(sale) {
     if (deliveryAmount > 0 && !hasDeliveryExpense) {
         var isTashkent = getRegionType(sale.region) === 'tashkent';
         var category = isTashkent ? 'Yandex' : 'Pochta';
-        var deliveryDesc = (isTashkent ? 'Yandex dostavka' : 'Pochta dostavka') + ' ‚Äî ' + (sale.name || 'Sotuv') + ' (mijoz tomonidan to\'landi)';
+        var deliveryDesc = (isTashkent ? 'Yandex dostavka' : 'Pochta dostavka') + ' ó ' + (sale.name || 'Sotuv') + ' (mijoz tomonidan to\'landi)';
         await db.collection('finances').add({
             date: sale.date,
             type: 'expense',
@@ -1336,7 +1375,7 @@ document.addEventListener('click', function (e) {
                 }
                 return '<div class="gallery-item no-img">' +
                     '<div class="placeholder"><i class="fas fa-image"></i></div>' +
-                    '<div class="gallery-item-info">' + (p ? escapeHtml(p.name) : '‚Äî') + ' (x' + it.quantity + ')</div>' +
+                    '<div class="gallery-item-info">' + (p ? escapeHtml(p.name) : 'ó') + ' (x' + it.quantity + ')</div>' +
                     '</div>';
             }).join('');
 
@@ -1458,6 +1497,7 @@ function populateFinanceCategories(type) {
 function renderFinance(searchTerm) {
     searchTerm = searchTerm || '';
     var tbody = document.getElementById('financeBody');
+    var mobileList = document.getElementById('financeMobileList');
     var empty = document.getElementById('financeEmpty');
     var filtered = financesArr.slice().sort(function (a, b) { return new Date(b.date) - new Date(a.date); });
     if (searchTerm) {
@@ -1477,24 +1517,53 @@ function renderFinance(searchTerm) {
     document.getElementById('financeIncome').textContent = formatMoney(totalIncome);
     document.getElementById('financeExpense').textContent = formatMoney(totalExpense);
     document.getElementById('financeBalance').textContent = formatMoney(totalIncome - totalExpense);
-    if (filtered.length === 0) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
+    if (filtered.length === 0) {
+        tbody.innerHTML = '';
+        if (mobileList) mobileList.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+    }
     empty.style.display = 'none';
-    tbody.innerHTML = filtered.map(function (f, i) {
+
+    var rowsHtml = [];
+    var cardsHtml = [];
+
+    filtered.forEach(function (f, i) {
         var isInc = f.type === 'income';
-        return '' +
+
+        rowsHtml.push(
             '<tr>' +
             '<td data-label="#">' + (i + 1) + '</td>' +
             '<td data-label="Sana">' + formatDate(f.date) + '</td>' +
             '<td data-label="Turi"><span class="type-badge ' + f.type + '"><i class="fas fa-' + (isInc ? 'arrow-down' : 'arrow-up') + '"></i> ' + (isInc ? 'Kirim' : 'Chiqim') + '</span></td>' +
             '<td data-label="Kategoriya">' + escapeHtml(f.category) + '</td>' +
-            '<td data-label="Tavsif">' + escapeHtml(f.description || '–≤–Ç‚Äù') + '</td>' +
+            '<td data-label="Tavsif">' + escapeHtml(f.description || 'ó') + '</td>' +
             '<td data-label="Summa" class="' + (isInc ? 'amount-positive' : 'amount-negative') + '">' + (isInc ? '+' : '-') + formatMoney(f.amount) + '</td>' +
             '<td data-label="Amallar">' +
             '<button class="btn-icon edit finance-edit-btn" data-id="' + f.id + '" title="Tahrirlash"><i class="fas fa-pen"></i></button>' +
             '<button class="btn-icon delete finance-delete-btn" data-id="' + f.id + '" title="O\'chirish"><i class="fas fa-trash"></i></button>' +
             '</td>' +
-            '</tr>';
-    }).join('');
+            '</tr>'
+        );
+
+        if (mobileList) {
+            cardsHtml.push(
+                '<button class="finance-mobile-card type-' + f.type + '" data-id="' + f.id + '">' +
+                '<div class="finance-mobile-top-row">' +
+                '<span class="finance-mobile-category">' + escapeHtml(f.category) + '</span>' +
+                '<span class="finance-mobile-amount">' + (isInc ? '+' : '-') + formatMoney(f.amount) + '</span>' +
+                '</div>' +
+                '<div class="finance-mobile-bottom-row">' +
+                '<span class="finance-mobile-date"><i class="far fa-calendar-alt"></i> ' + formatDate(f.date) + '</span>' +
+                '<span class="finance-mobile-desc">' + escapeHtml(f.description || '') + '</span>' +
+                '</div>' +
+                '</button>'
+            );
+        }
+    });
+
+    tbody.innerHTML = rowsHtml.join('');
+    if (mobileList) mobileList.innerHTML = cardsHtml.join('');
 }
 
 function editFinance(id) {
@@ -1819,7 +1888,7 @@ function refreshDashboard() {
                     '<div class="top-img-wrap">' + imgHtml + '</div>' +
                     '<div class="top-info">' +
                     '<span class="top-name">' + escapeHtml(name) + '</span>' +
-                    '<span class="top-meta">' + priceText + ' ‚Äî ' + qty + ' dona</span>' +
+                    '<span class="top-meta">' + priceText + ' ó ' + qty + ' dona</span>' +
                     '</div>' +
                     '</li>';
             }).join('');
@@ -1856,7 +1925,7 @@ function refreshDashboard() {
                 return '<div class="expense-row">' +
                     '<div class="expense-icon-wrap ' + typeClass + '"><i class="fas ' + icon + '"></i></div>' +
                     '<div class="expense-details">' +
-                    '<span class="expense-title">' + escapeHtml(f.description || '‚Äî') + '</span>' +
+                    '<span class="expense-title">' + escapeHtml(f.description || 'ó') + '</span>' +
                     '<span class="expense-date">' + formatDate(f.date) + '</span>' +
                     '</div>' +
                     '<div class="expense-value-wrap">' +
@@ -2060,7 +2129,7 @@ function renderUsers(searchTerm) {
         var pwdToShow = hasPassword ? realPassword : "Parol topilmadi";
 
         var passwordHtml = '<div class="password-cell-inner' + (hasPassword ? '' : ' no-password') + '">' +
-            '<span class="password-text" data-original="' + escapeHtml(pwdToShow) + '" data-has-pwd="' + hasPassword + '">‚Ä¢‚Ä¢‚Ä¢‚Ä¢‚Ä¢‚Ä¢‚Ä¢‚Ä¢</span>' +
+            '<span class="password-text" data-original="' + escapeHtml(pwdToShow) + '" data-has-pwd="' + hasPassword + '">ïïïïïïïï</span>' +
             '<button type="button" class="password-eye-btn" data-visible="false" title="Ko\'rsatish/Yashirish"><i class="fas fa-eye"></i></button>' +
             '</div>';
 
@@ -2112,7 +2181,7 @@ document.addEventListener('click', function (e) {
             eyeBtn.classList.add('active');
             eyeBtn.setAttribute('data-visible', 'true');
         } else {
-            txt.textContent = '‚Ä¢‚Ä¢‚Ä¢‚Ä¢‚Ä¢‚Ä¢‚Ä¢‚Ä¢';
+            txt.textContent = 'ïïïïïïïï';
             icon.classList.replace('fa-eye-slash', 'fa-eye');
             eyeBtn.classList.remove('active');
             eyeBtn.setAttribute('data-visible', 'false');
@@ -2445,7 +2514,7 @@ navigateTo('dashboard');
 // === FILTER INIT ===
 // ==========================================
 
-// Sales ‚Äì region filter selectni to‚Äòldirish
+// Sales ñ region filter selectni toëldirish
 (function initSalesFilter() {
     var sel = document.getElementById('salesRegionFilter');
     if (!sel) return;
@@ -2461,7 +2530,7 @@ navigateTo('dashboard');
     });
 })();
 
-// Finance ‚Äì kategoriya filter
+// Finance ñ kategoriya filter
 (function initFinanceCategoryFilter() {
     var sel = document.getElementById('financeCategoryFilter');
     if (!sel) return;
@@ -2482,7 +2551,7 @@ navigateTo('dashboard');
     });
 })();
 
-// Products ‚Äì kategoriya va status filtrlar
+// Products ñ kategoriya va status filtrlar
 (function initProductsFilters() {
     var catSel = document.getElementById('productsCategoryFilter');
     var statusSel = document.getElementById('productsStatusFilter');
@@ -2663,6 +2732,7 @@ imageUploadArea.addEventListener('drop', function (e) {
 // Mijozlar ro'yxatini yuklash va ko'rsatish
 function renderCustomers(searchQuery) {
     var customersBody = document.getElementById('customersBody');
+    var mobileList = document.getElementById('customersMobileList');
     var customersEmpty = document.getElementById('customersEmpty');
     if (!customersBody) return;
 
@@ -2680,43 +2750,90 @@ function renderCustomers(searchQuery) {
 
         if (customers.length === 0) {
             customersBody.innerHTML = '';
+            if (mobileList) mobileList.innerHTML = '';
             customersEmpty.style.display = 'block';
-        } else {
-            customersEmpty.style.display = 'none';
-            customersBody.innerHTML = customers.map(function (c, i) {
-                var totalSpent = c.totalSpent || 0;
-                var vipBadge = totalSpent > 5000000 ? '<span class="status-badge active" style="background: linear-gradient(45deg, #ffd700, #ffa500); color: #000; border: none;"><i class="fas fa-crown"></i> VIP</span>' :
-                    totalSpent > 1000000 ? '<span class="status-badge info">Doimiy</span>' :
-                        '<span class="status-badge">Yangi</span>';
+            return;
+        }
 
-                var phoneDisplay = '<div>' + escapeHtml(c.phone) + '</div>';
-                if (c.telegram) {
-                    var tgLink = c.telegram.startsWith('@') ? c.telegram.substring(1) : c.telegram;
-                    phoneDisplay += '<a href="https://t.me/' + tgLink + '" target="_blank" style="color: #0088cc; font-size: 0.85rem;"><i class="fab fa-telegram"></i> ' + escapeHtml(c.telegram) + '</a>';
+        customersEmpty.style.display = 'none';
+
+        var rowsHtml = [];
+        var cardsHtml = [];
+
+        customers.forEach(function (c, i) {
+            var totalSpent = c.totalSpent || 0;
+            var vipBadge = totalSpent > 5000000 ? '<span class="status-badge active" style="background: linear-gradient(45deg, #ffd700, #ffa500); color: #000; border: none;"><i class="fas fa-crown"></i> VIP</span>' :
+                totalSpent > 1000000 ? '<span class="status-badge info">Doimiy</span>' :
+                    '<span class="status-badge">Yangi</span>';
+
+            var phoneDisplay = '<div>' + escapeHtml(c.phone) + '</div>';
+            if (c.telegram) {
+                var tgLink = c.telegram.startsWith('@') ? c.telegram.substring(1) : c.telegram;
+                phoneDisplay += '<a href="https://t.me/' + tgLink + '" target="_blank" style="color: #0088cc; font-size: 0.85rem;"><i class="fab fa-telegram"></i> ' + escapeHtml(c.telegram) + '</a>';
+            }
+
+            var debt = c.debt || 0;
+            var debtClass = debt > 0 ? 'amount-negative' : '';
+
+            rowsHtml.push(
+                '<tr>' +
+                '<td data-label="#">' + (i + 1) + '</td>' +
+                '<td data-label="Mijoz ismi"><div style="font-weight:600">' + escapeHtml(c.name) + '</div>' + (c.birthday ? '<div style="font-size:0.75rem; color:var(--text-muted)"><i class="fas fa-birthday-cake"></i> ' + c.birthday + '</div>' : '') + '</td>' +
+                '<td data-label="Telefon / Telegram">' + phoneDisplay + '</td>' +
+                '<td data-label="Viloyat">' + escapeHtml(c.region || '-') + '</td>' +
+                '<td data-label="Sotuvlar soni">' + (c.salesCount || 0) + '</td>' +
+                '<td data-label="Umumiy savdo">' + formatMoney(totalSpent) + '</td>' +
+                '<td data-label="Qarz" class="' + debtClass + '">' + formatMoney(debt) + '</td>' +
+                '<td data-label="Status">' + vipBadge + '</td>' +
+                '<td data-label="Amallar">' +
+                '<button class="btn-icon info customer-history-btn" data-id="' + c.id + '" data-name="' + escapeHtml(c.name) + '" title="Xaridlar tarixi"><i class="fas fa-history"></i></button>' +
+                '<button class="btn-icon edit customer-edit-btn" data-id="' + c.id + '" title="Tahrirlash"><i class="fas fa-pen"></i></button>' +
+                '<button class="btn-icon delete customer-delete-btn" data-id="' + c.id + '" data-name="' + escapeHtml(c.name) + '" title="O\'chirish"><i class="fas fa-trash"></i></button>' +
+                '</td>' +
+                '</tr>'
+            );
+
+            if (mobileList) {
+                var regionValue = c.viloyat || c.region || '';
+                var districtValue = c.tuman || '';
+
+                var normalizedRegion = regionValue;
+                var normalizedDistrict = districtValue;
+                if (normalizedRegion === '-' || normalizedRegion === 'ó' || normalizedRegion === 'ñ') normalizedRegion = '';
+                if (normalizedDistrict === '-' || normalizedDistrict === 'ó' || normalizedDistrict === 'ñ') normalizedDistrict = '';
+
+                var addressValue = (c.address || c.customerAddress || '').toString().trim();
+                if (addressValue) {
+                    if (addressValue.indexOf(',') !== -1) {
+                        var addressParts = addressValue.split(',');
+                        if (!normalizedRegion) normalizedRegion = (addressParts[0] || '').trim();
+                        if (!normalizedDistrict) normalizedDistrict = addressParts.slice(1).join(',').trim();
+                    } else if (!normalizedRegion) {
+                        normalizedRegion = addressValue.trim();
+                    }
                 }
 
-                var debt = c.debt || 0;
-                var debtClass = debt > 0 ? 'amount-negative' : '';
+                regionValue = normalizedRegion || '-';
+                districtValue = normalizedDistrict || 'ó';
+                var districtDisplay = districtValue !== 'ó' && districtValue !== '-' ? ', ' + districtValue : '';
 
-                return '' +
-                    '<tr>' +
-                    '<td data-label="#">' + (i + 1) + '</td>' +
-                    '<td data-label="Mijoz ismi"><div style="font-weight:600">' + escapeHtml(c.name) + '</div>' + (c.birthday ? '<div style="font-size:0.75rem; color:var(--text-muted)"><i class="fas fa-birthday-cake"></i> ' + c.birthday + '</div>' : '') + '</td>' +
-                    '<td data-label="Telefon / Telegram">' + phoneDisplay + '</td>' +
-                    '<td data-label="Viloyat">' + escapeHtml(c.region || '-') + '</td>' +
-                    '<td data-label="Sotuvlar soni">' + (c.salesCount || 0) + '</td>' +
-                    '<td data-label="Umumiy savdo">' + formatMoney(totalSpent) + '</td>' +
-                    '<td data-label="Qarz" class="' + debtClass + '">' + formatMoney(debt) + '</td>' +
-                    '<td data-label="Status">' + vipBadge + '</td>' +
-                    '<td data-label="Amallar">' +
-                    '<button class="btn-icon info customer-history-btn" data-id="' + c.id + '" data-name="' + escapeHtml(c.name) + '" title="Xaridlar tarixi"><i class="fas fa-history"></i></button>' +
-                    '<button class="btn-icon edit customer-edit-btn" data-id="' + c.id + '" title="Tahrirlash"><i class="fas fa-pen"></i></button>' +
-                    '<button class="btn-icon delete customer-delete-btn" data-id="' + c.id + '" data-name="' + escapeHtml(c.name) + '" title="O\'chirish"><i class="fas fa-trash"></i></button>' +
-                    '</td>' +
-                    '</tr>';
-            }).join('');
-            updateUIVisibility('customers');
-        }
+                cardsHtml.push(
+                    '<button class="customer-mobile-card" data-id="' + c.id + '">' +
+                    '<div class="customer-mobile-top-row">' +
+                    '<span class="customer-mobile-name">' + escapeHtml(c.name) + '</span>' +
+                    '</div>' +
+                    '<div class="customer-mobile-bottom-row">' +
+                    '<span class="customer-mobile-region"><i class="fas fa-location-dot"></i> ' + escapeHtml(regionValue) + escapeHtml(districtDisplay) + '</span>' +
+                    '<span class="customer-mobile-phone"><i class="fas fa-phone"></i> ' + escapeHtml(c.phone) + '</span>' +
+                    '</div>' +
+                    '</button>'
+                );
+            }
+        });
+
+        customersBody.innerHTML = rowsHtml.join('');
+        if (mobileList) mobileList.innerHTML = cardsHtml.join('');
+        updateUIVisibility('customers');
     });
 }
 
@@ -2822,7 +2939,7 @@ function showCustomerHistory(customerId, customerName) {
                 var itemsStr = s.items ? s.items.map(function (it) {
                     var p = productsArr.find(function (px) { return px.id === it.productId; });
                     return (p ? p.name : 'Mahsulot') + ' (x' + it.quantity + ')';
-                }).join(', ') : '‚Äî';
+                }).join(', ') : 'ó';
 
                 html += '<tr>' +
                     '<td>' + formatDate(s.date) + '</td>' +
@@ -2862,6 +2979,8 @@ document.addEventListener('click', function (e) {
         });
     }
 });
+
+
 
 
 
