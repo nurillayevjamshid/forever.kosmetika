@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=20260311_1">
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -24,7 +24,8 @@
                     <i class="fas fa-gem"></i>
                 </div>
                 <span class="logo-text">Cosmetica<span class="logo-accent">CRM</span></span>
-            </div> <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+            </div>
+            <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
                 <i class="fas fa-bars"></i>
             </button>
         </div>
@@ -76,11 +77,6 @@
         </ul>
 
         <div class="sidebar-footer">
-            <a class="sidebar-back" href="../" title="Online shopga qaytish">
-                <i class="fas fa-store"></i>
-                <span>Online shop</span>
-            </a>
-
             <a href="#" class="user-info-link" id="nav-profile">
                 <div class="user-info">
                     <div class="user-avatar">
@@ -145,25 +141,6 @@
                         </div>
                         <div class="stat-decoration"></div>
                     </div>
-                    <!-- Card 2: Tannarx ro'yxati -->
-                    <div class="stat-card stat-total-cost">
-                        <div class="stat-card-inner">
-                            <div class="stat-card-header">
-                                <span class="stat-label">Tannarx ro'yxati</span>
-                                <div class="stat-card-icon">
-                                    <i class="fas fa-receipt"></i>
-                                </div>
-                            </div>
-                            <div class="stat-card-body">
-                                <span class="stat-value" id="totalCost">0</span>
-                                <div class="stat-trend">
-                                    <i class="fas fa-boxes-stacked"></i>
-                                    <span>Sotildi bo'lganda yoziladi</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="stat-decoration"></div>
-                    </div>
                     <!-- Card 2: Sof Foyda -->
                     <div class="stat-card stat-net-profit">
                         <div class="stat-card-inner">
@@ -204,34 +181,9 @@
                     </div>
                 </div>
 
-                <!-- Top Section: Tannarx + Xarajatlar (col-6 / col-6) -->
-                <div class="dashboard-top-section dashboard-split-grid">
-                    <div class="card cost-card">
-                        <div class="card-header">
-                            <h2><i class="fas fa-receipt"></i> Tannarxlar jadvali</h2>
-                            <div class="header-actions">
-                                <span class="muted-chip"><i class="fas fa-circle-info"></i> Faqat "Sotildi"</span>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="cost-table-wrap">
-                                <div class="cost-table-list" id="dashCostList"></div>
-                                <div class="cost-table-details" id="dashCostDetails">
-                                    <div class="empty-state" style="padding: 40px 20px;">
-                                        <i class="fas fa-hand-pointer"></i>
-                                        <p>Tannarx yozuvini tanlang</p>
-                                        <span style="font-size: 13px; color: var(--text-muted);">Tanlangan sotuv
-                                            ma'lumotlari shu yerda chiqadi.</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="empty-state" id="dashEmptyCost" style="display:none;">
-                                <i class="fas fa-receipt"></i>
-                                <p>Hali tannarxlar mavjud emas</p>
-                            </div>
-                        </div>
-                    </div>
-
+                <!-- Top Section: Split Layout (Expenses & Cost Prices) -->
+                <div class="dashboard-top-section" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
+                    <!-- Column 1: Xarajatlar -->
                     <div class="card expense-card">
                         <div class="card-header">
                             <h2><i class="fas fa-wallet"></i> Xarajatlar bo'limi</h2>
@@ -241,13 +193,29 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body" style="max-height: 400px; overflow-y: auto;">
                             <div class="expense-feed-container" id="dashExpenseList">
                                 <!-- Dynamic Expense Items will be injected here -->
                             </div>
                             <div class="empty-state" id="dashEmptyExpense" style="display:none;">
                                 <i class="fas fa-receipt"></i>
                                 <p>Hali xarajatlar mavjud emas</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Column 2: Tannarxlar ro'yxati -->
+                    <div class="card cost-card">
+                        <div class="card-header">
+                            <h2><i class="fas fa-tags"></i> Tannarxlar ro'yxati</h2>
+                        </div>
+                        <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                            <div class="expense-feed-container" id="dashCostList">
+                                <!-- Dynamic Cost Items will be injected here -->
+                            </div>
+                            <div class="empty-state" id="dashEmptyCost" style="display:block;">
+                                <i class="fas fa-calculator"></i>
+                                <p>Hali tannarx ma'lumotlari yo'q</p>
                             </div>
                         </div>
                     </div>
@@ -285,24 +253,9 @@
                     <button class="btn btn-primary" id="addSaleBtn">
                         <i class="fas fa-plus"></i> Yangi Sotuv
                     </button>
-                    <div class="select-picker" id="salesRegionFilterPicker">
-                        <input type="hidden" id="salesRegionFilter" value="all">
-                        <button type="button" class="select-trigger">
-                            <span class="select-trigger-label">Barcha viloyatlar</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="select-dropdown"></div>
-                    </div>
-                    <div class="date-filter-group">
-                        <div class="date-filter">
-                            <i class="fas fa-calendar-day"></i>
-                            <input type="date" id="salesDateFrom" placeholder="dan">
-                        </div>
-                        <div class="date-filter">
-                            <i class="fas fa-calendar"></i>
-                            <input type="date" id="salesDateTo" placeholder="gacha">
-                        </div>
-                    </div>
+                    <select id="salesRegionFilter" class="filter-select">
+                        <option value="all">Barcha viloyatlar</option>
+                    </select>
                     <div class="search-box">
                         <i class="fas fa-search"></i>
                         <input type="text" id="salesSearch" placeholder="Qidirish...">
@@ -317,7 +270,7 @@
                                         <th>#</th>
                                         <th>Sana</th>
                                         <th>Nomi</th>
-                                        <th>Viloyat / Tuman</th>
+                                        <th>Viloyat</th>
                                         <th>Mahsulotlar</th>
                                         <th>Jami summa</th>
                                         <th>Tannarx</th>
@@ -330,10 +283,6 @@
                                     <!-- Dynamic content -->
                                 </tbody>
                             </table>
-                        </div>
-                        <!-- Mobile friendly sales list (cards) -->
-                        <div class="sales-mobile-list" id="salesMobileList">
-                            <!-- Dynamic mobile cards -->
                         </div>
                         <div class="empty-state" id="salesEmpty" style="display:none;">
                             <i class="fas fa-shopping-cart"></i>
@@ -362,11 +311,11 @@
                                     <tr>
                                         <th>#</th>
                                         <th>Mijoz ismi</th>
-                                        <th>Telefon</th>
+                                        <th>Telefon / Telegram</th>
                                         <th>Viloyat</th>
                                         <th>Sotuvlar soni</th>
                                         <th>Umumiy savdo</th>
-                                        <th>Telegram / Instagram</th>
+                                        <th>Qarz</th>
                                         <th>Status</th>
                                         <th>Amallar</th>
                                     </tr>
@@ -375,10 +324,6 @@
                                     <!-- Dynamic content -->
                                 </tbody>
                             </table>
-                        </div>
-                        <!-- Mobile friendly customers list (cards) -->
-                        <div class="customers-mobile-list" id="customersMobileList">
-                            <!-- Dynamic mobile cards -->
                         </div>
                         <div class="empty-state" id="customersEmpty" style="display:none;">
                             <i class="fas fa-address-book"></i>
@@ -397,32 +342,14 @@
                     <button class="btn btn-danger" id="addExpenseBtn">
                         <i class="fas fa-minus"></i> Chiqim qo'shish
                     </button>
-                    <div class="select-picker" id="financeTypeFilterPicker">
-                        <input type="hidden" id="financeTypeFilter" value="all">
-                        <button type="button" class="select-trigger">
-                            <span class="select-trigger-label">Barchasi</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="select-dropdown"></div>
-                    </div>
-                    <div class="select-picker" id="financeCategoryFilterPicker">
-                        <input type="hidden" id="financeCategoryFilter" value="all">
-                        <button type="button" class="select-trigger">
-                            <span class="select-trigger-label">Barcha kategoriyalar</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="select-dropdown"></div>
-                    </div>
-                    <div class="date-filter-group">
-                        <div class="date-filter">
-                            <i class="fas fa-calendar-day"></i>
-                            <input type="date" id="financeDateFrom" placeholder="dan">
-                        </div>
-                        <div class="date-filter">
-                            <i class="fas fa-calendar"></i>
-                            <input type="date" id="financeDateTo" placeholder="gacha">
-                        </div>
-                    </div>
+                    <select id="financeTypeFilter" class="filter-select">
+                        <option value="all">Barchasi</option>
+                        <option value="income">Faqat kirim</option>
+                        <option value="expense">Faqat chiqim</option>
+                    </select>
+                    <select id="financeCategoryFilter" class="filter-select">
+                        <option value="all">Barcha kategoriyalar</option>
+                    </select>
                     <div class="search-box">
                         <i class="fas fa-search"></i>
                         <input type="text" id="financeSearch" placeholder="Qidirish...">
@@ -497,10 +424,6 @@
                                 </tbody>
                             </table>
                         </div>
-                        <!-- Mobile friendly finance list (cards) -->
-                        <div class="finance-mobile-list" id="financeMobileList">
-                            <!-- Dynamic mobile cards -->
-                        </div>
                         <div class="empty-state" id="financeEmpty" style="display:none;">
                             <i class="fas fa-wallet"></i>
                             <p>Hali kirim-chiqimlar yo'q.</p>
@@ -515,24 +438,14 @@
                     <button class="btn btn-primary" id="addProductBtn">
                         <i class="fas fa-plus"></i> Yangi Mahsulot
                     </button>
-                    <div class="select-picker" id="productsCategoryFilterPicker">
-                        <input type="hidden" id="productsCategoryFilter" value="all">
-                        <button type="button" class="select-trigger">
-                            <span class="select-trigger-label">Barcha kategoriyalar</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="select-dropdown"></div>
-                    </div>
-                    <div class="select-picker" id="productsStatusFilterPicker">
-                        <input type="hidden" id="productsStatusFilter" value="all">
-                        <button type="button" class="select-trigger">
-                            <span class="select-trigger-label">Barcha statuslar</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="select-dropdown">
-                            <!-- Static options will be initialized from JS -->
-                        </div>
-                    </div>
+                    <select id="productsCategoryFilter" class="filter-select">
+                        <option value="all">Barcha kategoriyalar</option>
+                    </select>
+                    <select id="productsStatusFilter" class="filter-select">
+                        <option value="all">Barcha statuslar</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
                     <div class="search-box">
                         <i class="fas fa-search"></i>
                         <input type="text" id="productsSearch" placeholder="Qidirish...">
@@ -557,9 +470,6 @@
                                     <!-- Dynamic content -->
                                 </tbody>
                             </table>
-                        </div>
-                        <div class="products-mobile-list" id="productsMobileList">
-                            <!-- Dynamic mobile cards -->
                         </div>
                         <div class="empty-state" id="productsEmpty" style="display:none;">
                             <i class="fas fa-box-open"></i>
@@ -738,79 +648,52 @@
                             <div class="card-body">
                                 <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 15px;">
                                     Ushbu xodim uchun tizimdagi bo'limlarni yoqish yoki o'chirish.</p>
-                                <div class="permissions-container"
-                                    style="display: flex; flex-direction: column; gap: 20px; margin-bottom: 20px;">
+                                <div class="permissions-container" style="display: flex; flex-direction: column; gap: 20px; margin-bottom: 20px;">
                                     <!-- Bo'limlar Ruxsati -->
                                     <div class="perm-group">
-                                        <label
-                                            style="font-weight: 600; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Asosiy
-                                            bo'limlar</label>
-                                        <div class="permissions-grid"
-                                            style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                            <label class="perm-item"
-                                                style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: var(--bg-secondary); border-radius: 6px; border: 1px solid var(--border); font-size: 0.9rem;">
+                                        <label style="font-weight: 600; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Asosiy bo'limlar</label>
+                                        <div class="permissions-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                            <label class="perm-item" style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: var(--bg-secondary); border-radius: 6px; border: 1px solid var(--border); font-size: 0.9rem;">
                                                 <input type="checkbox" id="profile_perm_sales"> <span>Sotuvlar</span>
                                             </label>
-                                            <label class="perm-item"
-                                                style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: var(--bg-secondary); border-radius: 6px; border: 1px solid var(--border); font-size: 0.9rem;">
-                                                <input type="checkbox" id="profile_perm_customers">
-                                                <span>Mijozlar</span>
+                                            <label class="perm-item" style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: var(--bg-secondary); border-radius: 6px; border: 1px solid var(--border); font-size: 0.9rem;">
+                                                <input type="checkbox" id="profile_perm_customers"> <span>Mijozlar</span>
                                             </label>
-                                            <label class="perm-item"
-                                                style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: var(--bg-secondary); border-radius: 6px; border: 1px solid var(--border); font-size: 0.9rem;">
-                                                <input type="checkbox" id="profile_perm_finance">
-                                                <span>Kirim/Chiqim</span>
+                                            <label class="perm-item" style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: var(--bg-secondary); border-radius: 6px; border: 1px solid var(--border); font-size: 0.9rem;">
+                                                <input type="checkbox" id="profile_perm_finance"> <span>Kirim/Chiqim</span>
                                             </label>
-                                            <label class="perm-item"
-                                                style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: var(--bg-secondary); border-radius: 6px; border: 1px solid var(--border); font-size: 0.9rem;">
-                                                <input type="checkbox" id="profile_perm_products">
-                                                <span>Mahsulotlar</span>
+                                            <label class="perm-item" style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: var(--bg-secondary); border-radius: 6px; border: 1px solid var(--border); font-size: 0.9rem;">
+                                                <input type="checkbox" id="profile_perm_products"> <span>Mahsulotlar</span>
                                             </label>
                                         </div>
                                     </div>
 
                                     <!-- Amallar va Detallar Ruxsati -->
                                     <div class="perm-group">
-                                        <label
-                                            style="font-weight: 600; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Amallar
-                                            va Detallar</label>
-                                        <div class="permissions-grid"
-                                            style="display: grid; grid-template-columns: 1fr; gap: 8px;">
-                                            <label class="perm-item"
-                                                style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: var(--bg-secondary); border-radius: 6px; border: 1px solid var(--border); font-size: 0.9rem;">
-                                                <input type="checkbox" id="profile_perm_show_profit"> <span>Sof foyda va
-                                                    moliyani ko'rish</span>
+                                        <label style="font-weight: 600; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Amallar va Detallar</label>
+                                        <div class="permissions-grid" style="display: grid; grid-template-columns: 1fr; gap: 8px;">
+                                            <label class="perm-item" style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: var(--bg-secondary); border-radius: 6px; border: 1px solid var(--border); font-size: 0.9rem;">
+                                                <input type="checkbox" id="profile_perm_show_profit"> <span>Sof foyda va moliyani ko'rish</span>
                                             </label>
-                                            <label class="perm-item"
-                                                style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: var(--bg-secondary); border-radius: 6px; border: 1px solid var(--border); font-size: 0.9rem;">
-                                                <input type="checkbox" id="profile_perm_add_expense"> <span>Chiqim
-                                                    qo'shish huquqi</span>
+                                            <label class="perm-item" style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: var(--bg-secondary); border-radius: 6px; border: 1px solid var(--border); font-size: 0.9rem;">
+                                                <input type="checkbox" id="profile_perm_add_expense"> <span>Chiqim qo'shish huquqi</span>
                                             </label>
-                                            <label class="perm-item"
-                                                style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: var(--bg-secondary); border-radius: 6px; border: 1px solid var(--border); font-size: 0.9rem;">
-                                                <input type="checkbox" id="profile_perm_edit_sale"> <span>Sotuvlarni
-                                                    tahrirlash/o'chirish</span>
+                                            <label class="perm-item" style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: var(--bg-secondary); border-radius: 6px; border: 1px solid var(--border); font-size: 0.9rem;">
+                                                <input type="checkbox" id="profile_perm_edit_sale"> <span>Sotuvlarni tahrirlash/o'chirish</span>
                                             </label>
-                                            <label class="perm-item"
-                                                style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: var(--bg-secondary); border-radius: 6px; border: 1px solid var(--border); font-size: 0.9rem;">
-                                                <input type="checkbox" id="profile_perm_delete_customer">
-                                                <span>Mijozlarni o'chirish huquqi</span>
+                                            <label class="perm-item" style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: var(--bg-secondary); border-radius: 6px; border: 1px solid var(--border); font-size: 0.9rem;">
+                                                <input type="checkbox" id="profile_perm_delete_customer"> <span>Mijozlarni o'chirish huquqi</span>
                                             </label>
-                                            <label class="perm-item"
-                                                style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: var(--bg-secondary); border-radius: 6px; border: 1px solid var(--border); font-size: 0.9rem;">
-                                                <input type="checkbox" id="profile_perm_staff"> <span>Xodimlar bo'limi
-                                                    (Admin)</span>
+                                            <label class="perm-item" style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: var(--bg-secondary); border-radius: 6px; border: 1px solid var(--border); font-size: 0.9rem;">
+                                                <input type="checkbox" id="profile_perm_staff"> <span>Xodimlar bo'limi (Admin)</span>
                                             </label>
-                                            <label class="perm-item"
-                                                style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: var(--bg-secondary); border-radius: 6px; border: 1px solid var(--border); font-size: 0.9rem;">
-                                                <input type="checkbox" id="profile_perm_settings"> <span>Sozlamalar
-                                                    bo'limi</span>
+                                            <label class="perm-item" style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: var(--bg-secondary); border-radius: 6px; border: 1px solid var(--border); font-size: 0.9rem;">
+                                                <input type="checkbox" id="profile_perm_settings"> <span>Sozlamalar bo'limi</span>
                                             </label>
                                         </div>
                                     </div>
                                 </div>
-                                <button id="saveProfilePermissionsBtn" class="btn btn-primary"
-                                    style="width: 100%; justify-content: center;">
+                                <button id="saveProfilePermissionsBtn" class="btn btn-primary" style="width: 100%; justify-content: center;">
                                     <i class="fas fa-save"></i> O'zgarishlarni saqlash
                                 </button>
                             </div>
@@ -841,51 +724,6 @@
 
     </main>
 
-    <!-- ============== SALE DETAIL MODAL (MOBILE) ============== -->
-    <div class="modal-overlay" id="saleDetailModal">
-        <div class="modal modal-sale-detail">
-            <div class="modal-header">
-                <h2><i class="fas fa-receipt"></i> Sotuv tafsilotlari</h2>
-                <button class="modal-close" data-modal="saleDetailModal"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="modal-body sale-detail-body">
-                <div class="sale-detail-top">
-                    <div class="sale-detail-main">
-                        <span class="sale-detail-date" id="saleDetailDate">--.--.--</span>
-                        <h3 class="sale-detail-title" id="saleDetailName">Sotuv nomi</h3>
-                    </div>
-                    <div class="sale-detail-status-wrap" id="saleDetailStatusWrap"></div>
-                </div>
-                <div class="sale-detail-amount-block">
-                    <span class="label">Jami summa</span>
-                    <span class="value" id="saleDetailTotal">0 so'm</span>
-                </div>
-                <div class="sale-detail-grid">
-                    <div class="sale-detail-item">
-                        <span class="label">Viloyat / Tuman</span>
-                        <span class="value" id="saleDetailRegion">---</span>
-                    </div>
-                    <div class="sale-detail-item">
-                        <span class="label">Tannarx</span>
-                        <span class="value" id="saleDetailCost">—</span>
-                    </div>
-                    <div class="sale-detail-item">
-                        <span class="label">Dostavka</span>
-                        <span class="value" id="saleDetailDelivery">—</span>
-                    </div>
-                </div>
-                <div class="sale-detail-products">
-                    <h4>Mahsulotlar</h4>
-                    <ul id="saleDetailProductsList"></ul>
-                </div>
-                <div class="sale-detail-note" id="saleDetailNoteWrap" style="display:none;">
-                    <h4>Izoh</h4>
-                    <p id="saleDetailNote"></p>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- ============== MODALS ============== -->
     <!-- Sale Modal (updated: name instead of customer select, no quantity) -->
     <div class="modal-overlay" id="saleModal">
@@ -904,17 +742,23 @@
                     <label for="saleName"><i class="fas fa-tag"></i> Nomi (eslatma)</label>
                     <input type="text" id="saleName" placeholder="Masalan: Abdulloh - Krem" required>
                 </div>
-                <div class="form-group">
-                    <label for="saleRegion"><i class="fas fa-map-marker-alt"></i> Viloyat</label>
-                    <div class="select-picker" id="saleRegionPicker">
-                        <input type="hidden" id="saleRegion" required>
-                        <button type="button" class="select-trigger">
-                            <span class="select-trigger-label">Tanlang...</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="select-dropdown">
-                            <!-- Dynamic -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label for="saleRegion"><i class="fas fa-map-marker-alt"></i> Viloyat</label>
+                        <div class="select-picker" id="saleRegionPicker">
+                            <input type="hidden" id="saleRegion" required>
+                            <button type="button" class="select-trigger">
+                                <span class="select-trigger-label">Tanlang...</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="select-dropdown">
+                                <!-- Dynamic -->
+                            </div>
                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="saleDelivery"><i class="fas fa-truck"></i> Dostavka (so'm)</label>
+                        <input type="number" id="saleDelivery" placeholder="0 (tekin bo'lsa)" min="0" step="500">
                     </div>
                 </div>
                 <div class="form-group"
@@ -1127,34 +971,26 @@
                     <label for="newUserPassword"><i class="fas fa-lock"></i> Parol</label>
                     <input type="password" id="newUserPassword" placeholder="Kamida 6 ta belgi" required minlength="6">
                 </div>
-
-                <div class="permissions-section"
-                    style="margin-top: 20px; padding: 15px; background: var(--bg-secondary); border-radius: 12px; border: 1px solid var(--border);">
-                    <label style="font-weight: 600; color: var(--accent); margin-bottom: 12px; display: block;"><i
-                            class="fas fa-user-lock"></i> Bo'limlarga kirish huquqlari</label>
+                
+                <div class="permissions-section" style="margin-top: 20px; padding: 15px; background: var(--bg-secondary); border-radius: 12px; border: 1px solid var(--border);">
+                    <label style="font-weight: 600; color: var(--accent); margin-bottom: 12px; display: block;"><i class="fas fa-user-lock"></i> Bo'limlarga kirish huquqlari</label>
                     <div class="permissions-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <label class="perm-item"
-                            style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.9rem;">
+                        <label class="perm-item" style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.9rem;">
                             <input type="checkbox" id="perm_sales" checked> <span>Sotuvlar</span>
                         </label>
-                        <label class="perm-item"
-                            style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.9rem;">
+                        <label class="perm-item" style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.9rem;">
                             <input type="checkbox" id="perm_customers" checked> <span>Mijozlar</span>
                         </label>
-                        <label class="perm-item"
-                            style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.9rem;">
+                        <label class="perm-item" style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.9rem;">
                             <input type="checkbox" id="perm_finance" checked> <span>Kirim / Chiqim</span>
                         </label>
-                        <label class="perm-item"
-                            style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.9rem;">
+                        <label class="perm-item" style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.9rem;">
                             <input type="checkbox" id="perm_products" checked> <span>Mahsulotlar</span>
                         </label>
-                        <label class="perm-item"
-                            style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.9rem;">
+                        <label class="perm-item" style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.9rem;">
                             <input type="checkbox" id="perm_staff"> <span>Xodimlar</span>
                         </label>
-                        <label class="perm-item"
-                            style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.9rem;">
+                        <label class="perm-item" style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.9rem;">
                             <input type="checkbox" id="perm_settings"> <span>Sozlamalar</span>
                         </label>
                     </div>
@@ -1185,15 +1021,9 @@
                         <label for="customerPhone"><i class="fas fa-phone"></i> Telefon raqami</label>
                         <input type="tel" id="customerPhone" placeholder="+998 90 123 45 67" required>
                     </div>
-                </div>
-                <div class="form-row">
                     <div class="form-group">
                         <label for="customerTelegram"><i class="fab fa-telegram"></i> Telegram (@username)</label>
                         <input type="text" id="customerTelegram" placeholder="@foydalanuvchi">
-                    </div>
-                    <div class="form-group">
-                        <label for="customerInstagram"><i class="fab fa-instagram"></i> Instagram (@username)</label>
-                        <input type="text" id="customerInstagram" placeholder="@foydalanuvchi">
                     </div>
                 </div>
                 <div class="form-row">
@@ -1318,64 +1148,6 @@
         </div>
     </div>
 
-    <!-- Customer Details Modal -->
-    <div class="modal-overlay" id="customerDetailsModal">
-        <div class="modal" style="max-width: 500px;">
-            <div class="modal-header">
-                <h2><i class="fas fa-user-circle"></i> Mijoz ma'lumotlari</h2>
-                <button class="modal-close" data-modal="customerDetailsModal"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="modal-body" id="customerDetailsBody">
-                <!-- Dynamic details -->
-            </div>
-            <div class="modal-footer" style="display:flex; gap:10px; flex-wrap:wrap">
-                <button type="button" class="btn btn-secondary" data-modal="customerDetailsModal">Yopish</button>
-                <div style="margin-left:auto; display:flex; gap:10px;">
-                    <button class="btn btn-info" id="detailHistoryBtn"><i class="fas fa-history"></i> Tarix</button>
-                    <button class="btn btn-primary" id="detailEditBtn"><i class="fas fa-pen"></i> Tahrirlash</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Finance Details Modal -->
-    <div class="modal-overlay" id="financeDetailsModal">
-        <div class="modal" style="max-width: 500px;">
-            <div class="modal-header">
-                <h2><i class="fas fa-file-invoice-dollar"></i> Amaliyot tafsilotlari</h2>
-                <button class="modal-close" data-modal="financeDetailsModal"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="modal-body" id="financeDetailsBody">
-                <!-- Dynamic details -->
-            </div>
-            <div class="modal-footer" style="display:flex; gap:10px; flex-wrap:wrap">
-                <button type="button" class="btn btn-secondary" data-modal="financeDetailsModal">Yopish</button>
-                <div style="margin-left:auto; display:flex; gap:10px;">
-                    <button class="btn btn-primary" id="financeDetailEditBtn"><i class="fas fa-pen"></i> Tahrirlash</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Product Details Modal -->
-    <div class="modal-overlay" id="productDetailsModal">
-        <div class="modal" style="max-width: 500px;">
-            <div class="modal-header">
-                <h2><i class="fas fa-box-open"></i> Mahsulot ma'lumotlari</h2>
-                <button class="modal-close" data-modal="productDetailsModal"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="modal-body" id="productDetailsBody">
-                <!-- Dynamic details -->
-            </div>
-            <div class="modal-footer" style="display:flex; gap:10px; flex-wrap:wrap">
-                <button type="button" class="btn btn-secondary" data-modal="productDetailsModal">Yopish</button>
-                <div style="margin-left:auto; display:flex; gap:10px;">
-                    <button class="btn btn-primary" id="productDetailEditBtn"><i class="fas fa-pen"></i> Tahrirlash</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Toast Notification -->
     <div class="toast-container" id="toastContainer"></div>
 
@@ -1404,7 +1176,7 @@
         const storage = firebase.storage();
     </script>
 
-    <script src="app.js?v=20260311_1"></script>
+    <script src="app.js"></script>
 </body>
 
 </html>
