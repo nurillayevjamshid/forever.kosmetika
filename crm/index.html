@@ -558,6 +558,9 @@
                                 </tbody>
                             </table>
                         </div>
+                        <div class="products-mobile-list" id="productsMobileList">
+                            <!-- Dynamic mobile cards -->
+                        </div>
                         <div class="empty-state" id="productsEmpty" style="display:none;">
                             <i class="fas fa-box-open"></i>
                             <p>Hali mahsulotlar yo'q. "Yangi Mahsulot" tugmasini bosing.</p>
@@ -1349,6 +1352,25 @@
                 <button type="button" class="btn btn-secondary" data-modal="financeDetailsModal">Yopish</button>
                 <div style="margin-left:auto; display:flex; gap:10px;">
                     <button class="btn btn-primary" id="financeDetailEditBtn"><i class="fas fa-pen"></i> Tahrirlash</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Details Modal -->
+    <div class="modal-overlay" id="productDetailsModal">
+        <div class="modal" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-box-open"></i> Mahsulot ma'lumotlari</h2>
+                <button class="modal-close" data-modal="productDetailsModal"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="productDetailsBody">
+                <!-- Dynamic details -->
+            </div>
+            <div class="modal-footer" style="display:flex; gap:10px; flex-wrap:wrap">
+                <button type="button" class="btn btn-secondary" data-modal="productDetailsModal">Yopish</button>
+                <div style="margin-left:auto; display:flex; gap:10px;">
+                    <button class="btn btn-primary" id="productDetailEditBtn"><i class="fas fa-pen"></i> Tahrirlash</button>
                 </div>
             </div>
         </div>

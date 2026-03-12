@@ -556,6 +556,7 @@ db.collection("finances").onSnapshot(function (snapshot) {
 function renderProducts(searchTerm) {
     searchTerm = searchTerm || '';
     var tbody = document.getElementById('productsBody');
+    var mobileList = document.getElementById('productsMobileList');
     var empty = document.getElementById('productsEmpty');
     var filtered = productsArr.slice();
     if (searchTerm) {
@@ -574,7 +575,12 @@ function renderProducts(searchTerm) {
     if (productsFilter.status !== 'all') {
         filtered = filtered.filter(function (p) { return (p.status || 'active') === productsFilter.status; });
     }
-    if (filtered.length === 0) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
+    if (filtered.length === 0) { 
+        tbody.innerHTML = ''; 
+        if (mobileList) mobileList.innerHTML = '';
+        empty.style.display = 'block'; 
+        return; 
+    }
     empty.style.display = 'none';
     tbody.innerHTML = filtered.map(function (p, i) {
         var status = p.status || 'active';
@@ -598,6 +604,20 @@ function renderProducts(searchTerm) {
             '</td>' +
             '</tr>';
     }).join('');
+
+    if (mobileList) {
+        mobileList.innerHTML = filtered.map(function (p) {
+            var imageHtml = p.imageUrl
+                ? '<div class="product-mobile-image"><img src="' + p.imageUrl + '" alt="' + escapeHtml(p.name) + '"></div>'
+                : '<div class="product-mobile-image placeholder"><span>' + (escapeHtml(p.name || 'M')[0] || 'M') + '</span></div>';
+            return '' +
+                '<button class="product-mobile-card" data-id="' + p.id + '">' +
+                imageHtml +
+                '<div class="product-mobile-name">' + escapeHtml(p.name || 'Noma\'lum') + '</div>' +
+                '<div class="product-mobile-price">' + formatMoney(p.price) + '</div>' +
+                '</button>';
+        }).join('');
+    }
 }
 
 function editProduct(id) {
@@ -629,6 +649,61 @@ document.getElementById('addProductBtn').addEventListener('click', function () {
     resetImageUpload();
     openModal('productModal');
 });
+
+// Mobile card click
+document.addEventListener('click', function (e) {
+    var card = e.target.closest('.product-mobile-card');
+    if (card) {
+        var id = card.dataset.id;
+        var p = productsArr.find(function (x) { return x.id === id; });
+        if (p) openProductDetailModal(p);
+    }
+});
+
+function openProductDetailModal(p) {
+    var body = document.getElementById('productDetailsBody');
+    if (!body) return;
+
+    var status = p.status || 'active';
+    var statusClass = status === 'inactive' ? 'inactive' : 'active';
+    var statusText = status === 'inactive' ? 'Inactive' : 'Active';
+
+    var imageHtml = p.imageUrl
+        ? '<div style="width:100%; border-radius:16px; overflow:hidden; margin-bottom:20px; border:1px solid var(--border);">' +
+          '<img src="' + p.imageUrl + '" style="width:100%; height:auto; display:block;"></div>'
+        : '<div style="width:100%; height:150px; background:var(--bg-secondary); border-radius:16px; display:flex; align-items:center; justify-content:center; margin-bottom:20px; color:var(--text-muted); font-size:3rem; border:1px solid var(--border);"><i class="fas fa-box"></i></div>';
+
+    body.innerHTML = 
+        imageHtml +
+        '<div style="margin-bottom:20px;">' +
+        '<h2 style="font-size:1.5rem; font-weight:800; margin-bottom:8px;">' + escapeHtml(p.name) + '</h2>' +
+        '<div style="display:flex; gap:10px; align-items:center;">' +
+        '<span class="status-badge info">' + escapeHtml(p.category || "Kategoriyasiz") + '</span>' +
+        '<span class="status-badge ' + statusClass + '">' + statusText + '</span>' +
+        '</div>' +
+        '</div>' +
+        '<div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px;">' +
+        '<div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); padding:12px; border-radius:14px;">' +
+        '<span style="font-size:11px; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Sotuv narxi</span>' +
+        '<div style="font-size:1.2rem; font-weight:800; color:var(--text); margin-top:4px;">' + formatMoney(p.price) + '</div>' +
+        '</div>' +
+        '<div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); padding:12px; border-radius:14px;">' +
+        '<span style="font-size:11px; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Tannarxi</span>' +
+        '<div style="font-size:1.2rem; font-weight:800; color:var(--text); margin-top:4px;">' + (p.cost ? formatMoney(p.cost) : "—") + '</div>' +
+        '</div>' +
+        '</div>' +
+        '<div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); padding:15px; border-radius:14px;">' +
+        '<span style="font-size:11px; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Tavsif</span>' +
+        '<div style="margin-top:8px; font-size:14px; line-height:1.5; color:var(--text-secondary);">' + (escapeHtml(p.description) || "Tavsif mavjud emas") + '</div>' +
+        '</div>';
+
+    document.getElementById('productDetailEditBtn').onclick = function() {
+        closeModal('productDetailsModal');
+        editProduct(p.id);
+    };
+
+    openModal('productDetailsModal');
+}
 
 // Generic Status Picker
 initSelectPicker('productStatusPicker');
