@@ -117,6 +117,13 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     }
 
+    // CRM dan qaytganda yoki tab qayta aktiv bo'lganda yangilash
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            loadProducts();
+        }
+    });
+
 });
 
 // ================================
@@ -256,6 +263,9 @@ function syncCustomSelectState(selectEl) {
 
 async function loadProducts() {
 
+    const activeFilter = document.querySelector('.filter-btn.active');
+    const currentFilter = activeFilter ? activeFilter.getAttribute('data-filter') : 'all';
+
     if (isFirebaseReady && typeof firebaseGetProducts === 'function') {
 
         try {
@@ -288,7 +298,7 @@ async function loadProducts() {
 
     // Mahsulotlarni ko'rsatish
 
-    displayProducts('all');
+    displayProducts(currentFilter);
 
 }
 

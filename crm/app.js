@@ -625,6 +625,9 @@ function editProduct(id) {
     if (!p) return;
     document.getElementById('productId').value = p.id;
     document.getElementById('productName').value = p.name;
+    document.getElementById('productPrice').value = (p.price != null ? p.price : '');
+    document.getElementById('productCost').value = (p.cost || '');
+    document.getElementById('productDescription').value = (p.description || '');
     initSelectPicker('productCategoryPicker', allProductCategories);
     setSelectValue('productCategoryPicker', p.category, p.category);
     setSelectValue('productStatusPicker', p.status || 'active', (p.status || 'active') === 'active' ? 'Active' : 'Inactive');
