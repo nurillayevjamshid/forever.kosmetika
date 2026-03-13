@@ -954,6 +954,15 @@ function updateSaleTotal() {
     document.getElementById('saleTotalDisplay').textContent = formatMoney(total);
 }
 
+function normalizeSaleStatus(status) {
+    status = (status || '').toString().trim().toLowerCase();
+    // Common typos/variants
+    if (status === 'sotildi' || status === 'sold') return 'sotildi';
+    if (status === 'atkaz' || status === 'otkaz' || status === 'atk·z' || status === 'atkaz ') return 'atkaz';
+    if (status === 'kutilmoqda' || status === 'kutilyapti' || status === 'pending') return 'kutilmoqda';
+    return 'kutilmoqda';
+}
+
 var addSaleItemBtn = document.getElementById('addSaleItemBtn');
 if (addSaleItemBtn) {
     addSaleItemBtn.addEventListener('click', function () {
@@ -1197,14 +1206,14 @@ function openSaleDetailModal(sale) {
 function buildSaleStatusSelectHtml(status, saleId) {
     status = normalizeSaleStatus(status);
     var icon = (status === 'sotildi') ? 'fa-circle-check' : (status === 'atkaz' ? 'fa-circle-xmark' : 'fa-clock');
-    var label = (status === 'sotildi') ? 'Sotildi' : (status === 'atkaz' ? 'Atkùz' : 'Kutilmoqda');
+    var label = (status === 'sotildi') ? 'Sotildi' : (status === 'atkaz' ? 'Atkaz' : 'Kutilmoqda');
     return '' +
         '<div class="status-select-wrap status-' + status + '" title="Status: ' + label + '">' +
         '<span class="status-dot" aria-hidden="true"></span>' +
         '<i class="fas ' + icon + ' status-ico" aria-hidden="true"></i>' +
         '<select class="status-select" data-id="' + saleId + '" data-prev="' + status + '">' +
         '<option value="kutilmoqda"' + (status === 'kutilmoqda' ? ' selected' : '') + '>Kutilmoqda</option>' +
-        '<option value="atkaz"' + (status === 'atkaz' ? ' selected' : '') + '>Atkùz</option>' +
+        '<option value="atkaz"' + (status === 'atkaz' ? ' selected' : '') + '>Atkaz</option>' +
         '<option value="sotildi"' + (status === 'sotildi' ? ' selected' : '') + '>Sotildi</option>' +
         '</select>' +
         '<i class="fas fa-chevron-down status-caret" aria-hidden="true"></i>' +
