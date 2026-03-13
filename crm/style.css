@@ -1644,6 +1644,245 @@ html[data-theme="light"] .form-group select option {
     }
 }
 
+/* ===========================
+   Sales – Mobile cards + detail modal (restored from 570e3e5)
+   =========================== */
+
+/* Hide sales mobile list on desktop */
+#salesMobileList {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    /* Prefer dedicated mobile cards for sales */
+    #salesTable {
+        display: none;
+    }
+
+    #salesMobileList {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding-top: 8px;
+    }
+
+    .sale-mobile-card {
+        width: 100%;
+        border: 1px solid var(--border);
+        outline: none;
+        text-align: left;
+        border-radius: 14px;
+        padding: 12px 12px;
+        background: rgba(255, 255, 255, 0.03);
+        box-shadow: var(--shadow-md);
+        transition: var(--transition-fast);
+        color: var(--text);
+    }
+
+    .sale-mobile-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
+    }
+
+    .sale-mobile-top-row,
+    .sale-mobile-bottom-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 12px;
+        gap: 10px;
+    }
+
+    .sale-mobile-time {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--text-secondary);
+    }
+
+    .sale-mobile-time i {
+        font-size: 13px;
+    }
+
+    .sale-mobile-status-badge {
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text);
+        flex-shrink: 0;
+    }
+
+    .sale-mobile-main {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin: 8px 0 10px;
+    }
+
+    .sale-mobile-title {
+        font-size: 14px;
+        font-weight: 800;
+        color: var(--text);
+        margin: 0;
+    }
+
+    .sale-mobile-amount {
+        font-size: 14px;
+        font-weight: 900;
+        color: var(--accent);
+        white-space: nowrap;
+    }
+
+    .sale-mobile-region {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--text-secondary);
+        min-width: 0;
+    }
+
+    .sale-mobile-region i {
+        font-size: 12px;
+        flex-shrink: 0;
+    }
+
+    .sale-mobile-items {
+        font-weight: 600;
+        color: var(--text-muted);
+        white-space: nowrap;
+    }
+
+    /* Status-based background accents */
+    .sale-mobile-card.status-kutilmoqda {
+        background: linear-gradient(135deg, rgba(41, 182, 246, 0.10), rgba(255, 255, 255, 0.02));
+    }
+
+    .sale-mobile-card.status-sotildi {
+        background: linear-gradient(135deg, rgba(0, 200, 83, 0.10), rgba(255, 255, 255, 0.02));
+    }
+
+    .sale-mobile-card.status-atkaz {
+        background: linear-gradient(135deg, rgba(255, 61, 87, 0.10), rgba(255, 255, 255, 0.02));
+    }
+
+    .sale-mobile-card.status-sotildi .sale-mobile-status-badge {
+        background: var(--success-bg);
+        color: var(--success);
+        border-color: rgba(0, 200, 83, 0.25);
+    }
+
+    .sale-mobile-card.status-atkaz .sale-mobile-status-badge {
+        background: var(--danger-bg);
+        color: var(--danger);
+        border-color: rgba(255, 61, 87, 0.25);
+    }
+
+    .sale-mobile-card.status-kutilmoqda .sale-mobile-status-badge {
+        background: var(--info-bg);
+        color: var(--info);
+        border-color: rgba(41, 182, 246, 0.25);
+    }
+}
+
+/* Sale detail modal (mostly mobile) */
+.modal-sale-detail {
+    max-width: 480px;
+}
+
+.sale-detail-body {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.sale-detail-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.sale-detail-date {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.sale-detail-title {
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.sale-detail-amount-block {
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.04);
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: baseline;
+}
+
+.sale-detail-amount-block .label {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.sale-detail-amount-block .value {
+    font-size: 16px;
+    font-weight: 900;
+    color: var(--accent);
+}
+
+.sale-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 8px;
+}
+
+.sale-detail-item {
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border);
+}
+
+.sale-detail-item .label {
+    display: block;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+}
+
+.sale-detail-item .value {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.sale-detail-products h4,
+.sale-detail-note h4 {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--text-secondary);
+}
+
+.sale-detail-products ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 0;
+    margin: 0;
+}
+
+.sale-detail-products li {
+    font-size: 12px;
+}
+
 @media (max-width: 480px) {
     /* Global spacing */
     .pages-container {

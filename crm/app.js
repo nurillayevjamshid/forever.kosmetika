@@ -966,6 +966,7 @@ if (addSaleItemBtn) {
 function renderSales(searchTerm) {
     searchTerm = searchTerm || '';
     var tbody = document.getElementById('salesBody');
+    var mobileList = document.getElementById('salesMobileList');
     var empty = document.getElementById('salesEmpty');
     var filtered = salesArr.slice().sort(function (a, b) { return new Date(b.date) - new Date(a.date); });
     if (searchTerm) {
@@ -980,10 +981,23 @@ function renderSales(searchTerm) {
     if (salesFilter.region !== 'all') {
         filtered = filtered.filter(function (s) { return (s.region || '') === salesFilter.region; });
     }
-    if (filtered.length === 0) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
+    if (filtered.length === 0) {
+        tbody.innerHTML = '';
+        if (mobileList) mobileList.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+    }
     empty.style.display = 'none';
-    tbody.innerHTML = filtered.map(function (s, i) {
+    var rowsHtml = [];
+    var cardsHtml = [];
+
+    filtered.forEach(function (s, i) {
         var items = s.items || [];
+        var status = normalizeSaleStatus(s.status);
+        var subtotal = (typeof s.subtotalAmount === 'number') ? s.subtotalAmount : computeSaleSubtotal(items);
+        var deliveryAmount = (typeof s.deliveryAmount === 'number') ? s.deliveryAmount : calculateDeliveryPrice(subtotal, getRegionType(s.region));
+        var totalAmount = (typeof s.totalAmount === 'number') ? s.totalAmount : (subtotal + deliveryAmount);
+
         var tagsHtml = items.map(function (it) {
             var p = productsArr.find(function (px) { return px.id === it.productId; });
             var pname = p ? escapeHtml(p.name) : 'ù';
@@ -1008,12 +1022,7 @@ function renderSales(searchTerm) {
             return sum + ((p ? p.costPrice || 0 : 0) * it.quantity);
         }, 0);
 
-        var deliveryVal = s.deliveryAmount || 0;
-        var deliveryHtml = deliveryVal > 0 ? formatMoney(deliveryVal) : '<span class="status-badge active" style="background:var(--success-glow); color:var(--success);">Tekin</span>';
-
-        var status = s.status || 'kutilmoqda';
-        var statusClass = status === 'sotildi' ? 'active' : (status === 'atkaz' ? 'danger' : 'warning');
-        var statusLabel = status === 'sotildi' ? 'Sotildi' : (status === 'atkaz' ? 'Atkaz' : 'Kutilmoqda');
+        var deliveryHtml = deliveryAmount > 0 ? formatMoney(deliveryAmount) : '<span class="status-badge active" style="background:var(--success-glow); color:var(--success);">Tekin</span>';
 
         var statusSelect = '<select class="status-select-inline" data-id="' + s.id + '" style="padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-secondary); font-size: 0.8rem; cursor: pointer;">' +
             '<option value="kutilmoqda" ' + (status === 'kutilmoqda' ? 'selected' : '') + '>Kutilmoqda</option>' +
@@ -1021,21 +1030,52 @@ function renderSales(searchTerm) {
             '<option value="atkaz" ' + (status === 'atkaz' ? 'selected' : '') + '>Atkaz</option>' +
             '</select>';
 
-        return '' +
+        rowsHtml.push(
             '<tr class="sale-data-row">' +
             '<td data-label="#">' + (i + 1) + '</td>' +
             '<td data-label="Sana"><div class="sale-date-cell"><i class="far fa-calendar-alt"></i> ' + formatDate(s.date) + '</div></td>' +
             '<td data-label="Nomi"><span class="sale-user-name">' + escapeHtml(s.name || 'ù') + '</span></td>' +
             '<td data-label="Viloyat"><div class="sale-region-badge"><i class="fas fa-location-dot"></i> ' + escapeHtml(s.region || 'ù') + '</div></td>' +
             '<td data-label="Mahsulotlar" title="' + fullItemsText + '"><div class="sale-items-wrap">' + itemsHtml + '</div></td>' +
-            '<td data-label="Jami summa" class="amount-highlight">' + formatMoney(s.totalAmount) + '</td>' +
+            '<td data-label="Jami summa" class="amount-highlight">' + formatMoney(totalAmount) + '</td>' +
             '<td data-label="Tannarx">' + formatMoney(totalCost) + '</td>' +
             '<td data-label="Dostavka">' + deliveryHtml + '</td>' +
             '<td data-label="Status">' + statusSelect + '</td>' +
             '<td data-label="Amallar"><div class="sale-actions-wrap"><button class="btn-icon edit sale-edit-btn" data-id="' + s.id + '" title="Tahrirlash"><i class="fas fa-pen"></i></button>' +
             '<button class="btn-icon delete sale-delete-btn" data-id="' + s.id + '" title="O\'chirish"><i class="fas fa-trash"></i></button></div></td>' +
-            '</tr>';
-    }).join('');
+            '</tr>'
+        );
+
+        if (mobileList) {
+            var statusLabel = (status === 'sotildi') ? 'Sotildi' : (status === 'atkaz' ? 'Atkaz' : 'Kutilmoqda');
+            var itemCount = items.length;
+            var itemSummary = itemCount === 0
+                ? 'Mahsulot kiritilmagan'
+                : (itemCount === 1 ? '1 ta mahsulot' : (itemCount + ' ta mahsulot'));
+
+            cardsHtml.push(
+                '<button class="sale-mobile-card status-' + status + '" data-sale-id="' + s.id + '">' +
+                '<div class="sale-mobile-top-row">' +
+                '<span class="sale-mobile-time"><i class="far fa-calendar-alt"></i> ' + formatDate(s.date) + '</span>' +
+                '<span class="sale-mobile-status-badge">' + statusLabel + '</span>' +
+                '</div>' +
+                '<div class="sale-mobile-main">' +
+                '<h3 class="sale-mobile-title">' + escapeHtml(s.name || 'ù') + '</h3>' +
+                '<span class="sale-mobile-amount">' + formatMoney(totalAmount) + '</span>' +
+                '</div>' +
+                '<div class="sale-mobile-bottom-row">' +
+                '<span class="sale-mobile-region"><i class="fas fa-location-dot"></i> ' + escapeHtml(s.region || 'ù') + '</span>' +
+                '<span class="sale-mobile-items">' + itemSummary + '</span>' +
+                '</div>' +
+                '</button>'
+            );
+        }
+    });
+
+    tbody.innerHTML = rowsHtml.join('');
+    if (mobileList) {
+        mobileList.innerHTML = cardsHtml.join('');
+    }
     updateUIVisibility('sales');
 }
 
@@ -1078,7 +1118,7 @@ document.addEventListener('click', function (e) {
             }
             return '<div class="gallery-item no-img">' +
                 '<div class="placeholder"><i class="fas fa-image"></i></div>' +
-                '<div class="gallery-item-info">' + (p ? escapeHtml(p.name) : 'ù') + ' (x' + it.quantity + ')</div>' +
+                '<div class="gallery-item-info">' + (p ? escapeHtml(p.name) : 'ó') + ' (x' + it.quantity + ')</div>' +
                 '</div>';
         }).join('');
 
@@ -1109,10 +1149,10 @@ function openSaleDetailModal(sale) {
         if (!dateEl) return; // modal yo'q bo'lsa jim chiqamiz
 
         dateEl.textContent = formatDate(sale.date);
-        nameEl.textContent = sale.name || 'ù';
+        nameEl.textContent = sale.name || 'ó';
         totalEl.textContent = formatMoney(totalAmount);
-        regionEl.textContent = sale.region || 'ù';
-        costEl.textContent = costTotal ? formatMoney(costTotal) : 'ù';
+        regionEl.textContent = sale.region || 'ó';
+        costEl.textContent = costTotal ? formatMoney(costTotal) : 'ó';
         deliveryEl.textContent = deliveryAmount === 0 ? 'Tekin' : formatMoney(deliveryAmount);
 
         if (statusWrapEl) {

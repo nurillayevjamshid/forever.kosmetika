@@ -290,6 +290,10 @@
                                 </tbody>
                             </table>
                         </div>
+                        <!-- Mobile friendly sales list (cards) -->
+                        <div class="sales-mobile-list" id="salesMobileList">
+                            <!-- Dynamic mobile cards -->
+                        </div>
                         <div class="empty-state" id="salesEmpty" style="display:none;">
                             <i class="fas fa-shopping-cart"></i>
                             <p>Hali sotuvlar yo'q. "Yangi Sotuv" tugmasini bosing.</p>
@@ -766,6 +770,51 @@
         </div>
 
     </main>
+
+    <!-- ============== SALE DETAIL MODAL (MOBILE) ============== -->
+    <div class="modal-overlay" id="saleDetailModal">
+        <div class="modal modal-sale-detail">
+            <div class="modal-header">
+                <h2><i class="fas fa-receipt"></i> Sotuv tafsilotlari</h2>
+                <button class="modal-close" data-modal="saleDetailModal"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body sale-detail-body">
+                <div class="sale-detail-top">
+                    <div class="sale-detail-main">
+                        <span class="sale-detail-date" id="saleDetailDate">--.--.--</span>
+                        <h3 class="sale-detail-title" id="saleDetailName">Sotuv nomi</h3>
+                    </div>
+                    <div class="sale-detail-status-wrap" id="saleDetailStatusWrap"></div>
+                </div>
+                <div class="sale-detail-amount-block">
+                    <span class="label">Jami summa</span>
+                    <span class="value" id="saleDetailTotal">0 so'm</span>
+                </div>
+                <div class="sale-detail-grid">
+                    <div class="sale-detail-item">
+                        <span class="label">Viloyat / Tuman</span>
+                        <span class="value" id="saleDetailRegion">---</span>
+                    </div>
+                    <div class="sale-detail-item">
+                        <span class="label">Tannarx</span>
+                        <span class="value" id="saleDetailCost">—</span>
+                    </div>
+                    <div class="sale-detail-item">
+                        <span class="label">Dostavka</span>
+                        <span class="value" id="saleDetailDelivery">—</span>
+                    </div>
+                </div>
+                <div class="sale-detail-products">
+                    <h4>Mahsulotlar</h4>
+                    <ul id="saleDetailProductsList"></ul>
+                </div>
+                <div class="sale-detail-note" id="saleDetailNoteWrap" style="display:none;">
+                    <h4>Izoh</h4>
+                    <p id="saleDetailNote"></p>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- ============== MODALS ============== -->
     <!-- Sale Modal (updated: name instead of customer select, no quantity) -->
