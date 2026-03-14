@@ -536,10 +536,27 @@ body {
 /* ===========================
    Dashboard Grid
    =========================== */
+.dashboard-top-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.dashboard-main-grid,
 .dashboard-grid {
     display: grid;
     grid-template-columns: 1.5fr 1fr;
-    gap: 20px;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+@media (max-width: 992px) {
+    .dashboard-top-section,
+    .dashboard-main-grid,
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* ===========================
