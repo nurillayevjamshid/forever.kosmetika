@@ -5594,15 +5594,21 @@ input[type="checkbox"] {
 
 .status-bubble-options {
     position: absolute;
-    bottom: calc(100% + 12px);
+    top: calc(100% + 8px); /* Appear below the button */
     left: 0;
+    width: 200px; /* Specific width for card style */
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 4px; /* Tighter gap inside the card */
+    padding: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border-light);
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.5);
     opacity: 0;
     pointer-events: none;
-    transform: translateY(15px) scale(0.9);
-    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform: translateY(-10px) scale(0.95);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 100;
 }
 
@@ -5612,32 +5618,37 @@ input[type="checkbox"] {
     transform: translateY(0) scale(1);
 }
 
+.status-bubbles-picker.open .status-caret {
+    transform: rotate(180deg);
+}
+
 .bubble-opt {
-    background: var(--surface-light);
-    border: 1px solid var(--border-light);
-    padding: 12px 20px;
-    border-radius: 40px; /* Bubble shape */
+    background: transparent;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     gap: 12px;
     white-space: nowrap;
     cursor: pointer;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-    font-size: 14px;
-    font-weight: 700;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    backdrop-filter: blur(15px);
-    border-left-width: 5px; /* Visual accent */
+    font-size: 13.5px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
 }
 
 .bubble-opt:hover {
-    transform: translateX(8px) scale(1.05);
-    background: var(--surface-hover);
+    background: var(--surface-light);
+    transform: translateX(4px);
 }
 
-.bubble-opt.kutilmoqda { border-left-color: #f59e0b; color: #f59e0b; }
-.bubble-opt.sotildi { border-left-color: #10b981; color: #10b981; }
-.bubble-opt.atkaz { border-left-color: #ef4444; color: #ef4444; }
+.bubble-opt.kutilmoqda { color: #f59e0b; }
+.bubble-opt.kutilmoqda:hover { border-left-color: #f59e0b; }
+.bubble-opt.sotildi { color: #10b981; }
+.bubble-opt.sotildi:hover { border-left-color: #10b981; }
+.bubble-opt.atkaz { color: #ef4444; }
+.bubble-opt.atkaz:hover { border-left-color: #ef4444; }
 
 .bubble-opt i {
     width: 20px;
@@ -5651,11 +5662,10 @@ input[type="checkbox"] {
 }
 
 .status-caret {
-    position: absolute;
-    right: 12px;
     font-size: 10px;
     color: var(--text-muted);
     pointer-events: none;
+    transition: transform 0.3s ease;
 }
 
 /* Status Specific Colors */

@@ -1536,7 +1536,7 @@ function buildSaleStatusSelectHtml(status, saleId) {
         '<button type="button" class="status-trigger" title="Status: ' + label + '">' +
         '<i class="fas ' + iconClass + ' status-main-icon"></i>' +
         '<span>' + label + '</span>' +
-        '<i class="fas fa-chevron-up status-caret"></i>' +
+        '<i class="fas fa-chevron-down status-caret"></i>' +
         '</button>' +
         '<div class="status-bubble-options">' +
         '<div class="bubble-opt kutilmoqda" data-value="kutilmoqda"><i class="fas fa-spinner fa-spin"></i> Kutilmoqda</div>' +
