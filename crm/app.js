@@ -2992,3 +2992,11 @@ document.addEventListener('click', function (e) {
 
 
 
+
+function normalizeSaleStatus(status) {
+    status = (status || "").toString().trim().toLowerCase();
+    if (status === "sotildi" || status === "sold") return "sotildi";
+    if (status === "atkaz" || status === "otkaz" || status === "atkaz ") return "atkaz";
+    if (status === "kutilmoqda" || status === "kutilyapti" || status === "pending") return "kutilmoqda";
+    return "kutilmoqda";
+}
