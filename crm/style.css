@@ -1648,8 +1648,11 @@ html[data-theme="light"] .form-group select option {
    Sales – Mobile cards + detail modal (restored from 570e3e5)
    =========================== */
 
-/* Hide sales mobile list on desktop */
-#salesMobileList {
+/* Hide mobile lists on desktop */
+#salesMobileList,
+#customersMobileList,
+#financeMobileList,
+#productsMobileList {
     display: none;
 }
 
@@ -1785,6 +1788,187 @@ html[data-theme="light"] .form-group select option {
         background: var(--info-bg);
         color: var(--info);
         border-color: rgba(41, 182, 246, 0.25);
+    }
+
+    /* === Generic Mobile Card Styles (Reused by other sections) === */
+    .mobile-card {
+        width: 100%;
+        border: 1px solid var(--border);
+        outline: none;
+        text-align: left;
+        border-radius: 14px;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.03);
+        box-shadow: var(--shadow-md);
+        transition: var(--transition-fast);
+        color: var(--text);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .mobile-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .mobile-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .mobile-card-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text);
+        margin: 0;
+        line-height: 1.3;
+    }
+
+    .mobile-card-subtitle {
+        font-size: 12px;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .mobile-card-body {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 5px;
+    }
+
+    .mobile-card-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .mobile-card-label {
+        font-size: 10px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    .mobile-card-value {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-secondary);
+    }
+
+    .mobile-card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid var(--border);
+    }
+
+    .mobile-card-badge {
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+        background: rgba(255, 255, 255, 0.06);
+    }
+
+    /* === Customer Mobile Specifics === */
+    #customersTable { display: none; }
+    #customersMobileList { display: flex; flex-direction: column; gap: 12px; padding-top: 8px; }
+
+    .customer-mobile-card {
+        border-left: 4px solid var(--accent);
+    }
+
+    .customer-mobile-card.vip {
+        border-left-color: #ffd700;
+        background: linear-gradient(135deg, rgba(255, 215, 0, 0.05), rgba(255, 255, 255, 0.02));
+    }
+
+    .customer-mobile-card .amount-debt {
+        color: var(--danger);
+        font-weight: 800;
+    }
+
+    /* === Finance Mobile Specifics === */
+    #financeTable { display: none; }
+    #financeMobileList { display: flex; flex-direction: column; gap: 12px; padding-top: 8px; }
+
+    .finance-mobile-card.income {
+        border-left: 4px solid var(--success);
+        background: linear-gradient(135deg, rgba(0, 200, 83, 0.05), rgba(255, 255, 255, 0.02));
+    }
+
+    .finance-mobile-card.expense {
+        border-left: 4px solid var(--danger);
+        background: linear-gradient(135deg, rgba(255, 61, 87, 0.05), rgba(255, 255, 255, 0.02));
+    }
+
+    .finance-amount-large {
+        font-size: 1.1rem;
+        font-weight: 800;
+    }
+
+    /* === Product Mobile Specifics === */
+    #productsTable { display: none; }
+    #productsMobileList { display: flex; flex-direction: column; gap: 12px; padding-top: 8px; }
+
+    .product-mobile-card {
+        padding: 0;
+        flex-direction: row;
+        height: 110px;
+    }
+
+    .product-mobile-img {
+        width: 100px;
+        height: 100%;
+        object-fit: cover;
+        flex-shrink: 0;
+        border-right: 1px solid var(--border);
+    }
+
+    .product-mobile-placeholder {
+        width: 100px;
+        height: 100%;
+        background: var(--surface-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: var(--text-muted);
+        flex-shrink: 0;
+        border-right: 1px solid var(--border);
+    }
+
+    .product-mobile-content {
+        flex: 1;
+        padding: 12px 15px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-width: 0;
+    }
+
+    .product-mobile-info-top {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .product-mobile-price {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: var(--accent);
     }
 }
 
@@ -3996,11 +4180,11 @@ html[data-theme="light"] .profile-tab-btn.active {
         opacity: 0;
         transform: translateY(10px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
     }
+}
 
    /* ============================
    MOBILE LAYOUT FOR CRM
