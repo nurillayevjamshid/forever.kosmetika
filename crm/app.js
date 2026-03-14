@@ -1528,40 +1528,61 @@ function openSaleDetailModal(sale) {
 
 function buildSaleStatusSelectHtml(status, saleId) {
     status = normalizeSaleStatus(status);
-    var icon = (status === 'sotildi') ? 'fa-circle-check' : (status === 'atkaz' ? 'fa-circle-xmark' : 'fa-clock');
-    var label = (status === 'sotildi') ? 'Sotildi' : (status === 'atkaz' ? 'Atkaz' : 'Kutilmoqda');
+    var label = (status === 'sotildi') ? 'Sotildi' : (status === 'atkaz' ? 'Rad etildi' : 'Kutilmoqda');
+    var iconClass = (status === 'sotildi') ? 'fa-check' : (status === 'atkaz' ? 'fa-xmark' : 'fa-spinner fa-spin');
+    
     return '' +
-        '<div class="status-select-wrap status-' + status + '" title="Status: ' + label + '">' +
-        '<span class="status-dot" aria-hidden="true"></span>' +
-        '<select class="status-select" data-id="' + saleId + '" data-prev="' + status + '">' +
-        '<option value="kutilmoqda" class="opt-kutilmoqda"' + (status === 'kutilmoqda' ? ' selected' : '') + '>\uD83D\uDFE1 Kutilmoqda</option>' +
-        '<option value="atkaz" class="opt-atkaz"' + (status === 'atkaz' ? ' selected' : '') + '>\uD83D\uDD34 Atkaz</option>' +
-        '<option value="sotildi" class="opt-sotildi"' + (status === 'sotildi' ? ' selected' : '') + '>\uD83D\uDFE2 Sotildi</option>' +
-        '</select>' +
-        '<i class="fas fa-chevron-down status-caret" aria-hidden="true"></i>' +
+        '<div class="status-bubbles-picker status-' + status + '" data-id="' + saleId + '">' +
+        '<button type="button" class="status-trigger" title="Status: ' + label + '">' +
+        '<i class="fas ' + iconClass + ' status-main-icon"></i>' +
+        '<span>' + label + '</span>' +
+        '<i class="fas fa-chevron-up status-caret"></i>' +
+        '</button>' +
+        '<div class="status-bubble-options">' +
+        '<div class="bubble-opt kutilmoqda" data-value="kutilmoqda"><i class="fas fa-spinner fa-spin"></i> Kutilmoqda</div>' +
+        '<div class="bubble-opt atkaz" data-value="atkaz"><i class="fas fa-xmark"></i> Rad etildi</div>' +
+        '<div class="bubble-opt sotildi" data-value="sotildi"><i class="fas fa-check"></i> Sotildi</div>' +
+        '</div>' +
         '</div>';
 }
 
-// Status change handler (event delegation)
-document.addEventListener('change', function (e) {
-    var sel = e.target.closest('.status-select');
-    if (!sel) return;
-
-    var saleId = sel.getAttribute('data-id');
-    var prev = sel.getAttribute('data-prev') || 'kutilmoqda';
-    var next = normalizeSaleStatus(sel.value);
-    
-    // UI Instant Update: Update the wrapper class and icons
-    var wrap = sel.closest('.status-select-wrap');
-    if (wrap) {
-        wrap.className = 'status-select-wrap status-' + next;
+// Status change handler (event delegation for custom picker)
+document.addEventListener('click', function (e) {
+    var trigger = e.target.closest('.status-trigger');
+    if (trigger) {
+        var picker = trigger.closest('.status-bubbles-picker');
+        var wasOpen = picker.classList.contains('open');
+        document.querySelectorAll('.status-bubbles-picker.open').forEach(function(p) { p.classList.remove('open'); });
+        if (!wasOpen) picker.classList.add('open');
+        return;
     }
 
-    if (!saleId || prev === next) return;
-    updateSaleStatus(saleId, prev, next, sel);
+    var bubbleOpt = e.target.closest('.bubble-opt');
+    if (bubbleOpt) {
+        var picker = bubbleOpt.closest('.status-bubbles-picker');
+        var saleId = picker.getAttribute('data-id');
+        var next = normalizeSaleStatus(bubbleOpt.getAttribute('data-value'));
+        var prev = picker.className.split(' ').find(function(c) { return c.startsWith('status-') && c !== 'status-bubbles-picker'; }).replace('status-', '');
+        
+        if (saleId && prev !== next) {
+            // UI Instant Update
+            picker.className = 'status-bubbles-picker status-' + next;
+            var label = (next === 'sotildi') ? 'Sotildi' : (next === 'atkaz' ? 'Rad etildi' : 'Kutilmoqda');
+            var iconClass = (next === 'sotildi') ? 'fa-check' : (next === 'atkaz' ? 'fa-xmark' : 'fa-spinner fa-spin');
+            picker.querySelector('.status-trigger span').textContent = label;
+            picker.querySelector('.status-trigger .status-main-icon').className = 'fas ' + iconClass + ' status-main-icon';
+            
+            updateSaleStatus(saleId, prev, next);
+        }
+        picker.classList.remove('open');
+        return;
+    }
+
+    // Close on outside click
+    document.querySelectorAll('.status-bubbles-picker.open').forEach(function(p) { p.classList.remove('open'); });
 });
 
-async function updateSaleStatus(saleId, prevStatus, nextStatus, selectEl) {
+async function updateSaleStatus(saleId, prevStatus, nextStatus) {
     try {
         var sale = salesArr.find(function (x) { return x.id === saleId; });
         if (!sale) throw new Error('Sotuv topilmadi');
