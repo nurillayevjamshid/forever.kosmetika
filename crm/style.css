@@ -5566,6 +5566,17 @@ input[type="checkbox"] {
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     min-width: 140px;
+    border: 1.5px solid rgba(255, 255, 255, 0.08); /* Stronger border */
+}
+
+.status-trigger:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.02);
+}
+
+.status-bubbles-picker.open .status-trigger {
+    box-shadow: 0 0 0 3px var(--accent-glow);
+    background: rgba(255, 255, 255, 0.08);
 }
 
 .status-trigger i.status-main-icon {
@@ -5597,32 +5608,29 @@ input[type="checkbox"] {
 }
 
 .status-bubble-options {
-    position: absolute;
-    top: calc(100% + 8px); /* Appear below the button */
-    left: 0;
-    width: 200px; /* Specific width for card style */
-    display: flex;
+    display: none; /* Hidden by default */
+    margin-top: 12px;
+    width: 100%; /* Take full width of parent cell */
+    min-width: 160px;
     flex-direction: column;
-    gap: 4px; /* Tighter gap inside the card */
-    padding: 8px;
-    background: var(--surface);
-    border: 1px solid var(--border-light);
-    border-radius: 20px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+    gap: 6px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.03); /* Subtle inner card look */
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
     opacity: 0;
-    visibility: hidden; /* Prevent interaction and accidental rendering */
-    pointer-events: none;
-    transform: translateY(-10px) scale(0.95);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 100;
+    transform: translateY(-5px);
+    transition: all 0.3s ease;
 }
 
 .status-bubbles-picker.open .status-bubble-options {
+    display: flex;
     opacity: 1;
     visibility: visible;
     pointer-events: all;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
 }
+
 
 .status-bubbles-picker.open .status-caret {
     transform: rotate(180deg);
