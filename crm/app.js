@@ -1533,11 +1533,10 @@ function buildSaleStatusSelectHtml(status, saleId) {
     return '' +
         '<div class="status-select-wrap status-' + status + '" title="Status: ' + label + '">' +
         '<span class="status-dot" aria-hidden="true"></span>' +
-        '<i class="fas ' + icon + ' status-ico" aria-hidden="true"></i>' +
         '<select class="status-select" data-id="' + saleId + '" data-prev="' + status + '">' +
-        '<option value="kutilmoqda" class="opt-kutilmoqda"' + (status === 'kutilmoqda' ? ' selected' : '') + '>Kutilmoqda</option>' +
-        '<option value="atkaz" class="opt-atkaz"' + (status === 'atkaz' ? ' selected' : '') + '>Atkaz</option>' +
-        '<option value="sotildi" class="opt-sotildi"' + (status === 'sotildi' ? ' selected' : '') + '>Sotildi</option>' +
+        '<option value="kutilmoqda" class="opt-kutilmoqda"' + (status === 'kutilmoqda' ? ' selected' : '') + '>\uD83D\uDFE1 Kutilmoqda</option>' +
+        '<option value="atkaz" class="opt-atkaz"' + (status === 'atkaz' ? ' selected' : '') + '>\uD83D\uDD34 Atkaz</option>' +
+        '<option value="sotildi" class="opt-sotildi"' + (status === 'sotildi' ? ' selected' : '') + '>\uD83D\uDFE2 Sotildi</option>' +
         '</select>' +
         '<i class="fas fa-chevron-down status-caret" aria-hidden="true"></i>' +
         '</div>';
@@ -1556,11 +1555,6 @@ document.addEventListener('change', function (e) {
     var wrap = sel.closest('.status-select-wrap');
     if (wrap) {
         wrap.className = 'status-select-wrap status-' + next;
-        var iconEl = wrap.querySelector('.status-ico');
-        if (iconEl) {
-            var iconClass = (next === 'sotildi') ? 'fa-circle-check' : (next === 'atkaz' ? 'fa-circle-xmark' : 'fa-clock');
-            iconEl.className = 'fas ' + iconClass + ' status-ico';
-        }
     }
 
     if (!saleId || prev === next) return;

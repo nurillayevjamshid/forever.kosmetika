@@ -1224,7 +1224,7 @@ html[data-theme="light"] input[readonly] {
 }
 
 .status-badge {
-    padding: 3px 10px; /* More compact */
+    padding: 6px 14px; /* Increased padding */
     border-radius: 99px;
     font-size: 11px;
     font-weight: 700;
@@ -5545,8 +5545,8 @@ input[type="checkbox"] {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 4px 12px;
-    border-radius: 12px;
+    padding: 8px 16px; /* Increased padding */
+    border-radius: 14px; /* Slightly more rounded */
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     position: relative;
@@ -5576,6 +5576,7 @@ input[type="checkbox"] {
 }
 
 .status-ico {
+    display: none; /* User requested to remove this icon */
     font-size: 12px;
     flex-shrink: 0;
 }
@@ -5639,9 +5640,9 @@ html[data-theme="light"] .status-select option {
 
 /* Inline Table Wrap */
 .sale-status-inline-wrap .status-select-wrap {
-    min-width: 120px;
-    padding: 2px 10px;
-    border-radius: 8px;
+    min-width: 130px;
+    padding: 6px 12px;
+    border-radius: 10px;
 }
 .sale-status-inline-wrap .status-select {
     font-size: 11px;
