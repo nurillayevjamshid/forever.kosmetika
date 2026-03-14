@@ -1573,7 +1573,7 @@ function renderFinance(searchTerm) {
             '<td data-label="Sana">' + formatDate(f.date) + '</td>' +
             '<td data-label="Turi"><span class="type-badge ' + f.type + '"><i class="fas fa-' + (isInc ? 'arrow-down' : 'arrow-up') + '"></i> ' + (isInc ? 'Kirim' : 'Chiqim') + '</span></td>' +
             '<td data-label="Kategoriya">' + escapeHtml(f.category) + '</td>' +
-            '<td data-label="Tavsif">' + escapeHtml(f.description || '??') + '</td>' +
+            '<td data-label="Tavsif">' + escapeHtml(f.description || '???') + '</td>' +
             '<td data-label="Summa" class="' + (isInc ? 'amount-positive' : 'amount-negative') + '">' + (isInc ? '+' : '-') + formatMoney(f.amount) + '</td>' +
             '<td data-label="Amallar">' +
             '<button class="btn-icon edit finance-edit-btn" data-id="' + f.id + '" title="Tahrirlash"><i class="fas fa-pen"></i></button>' +
@@ -1583,20 +1583,16 @@ function renderFinance(searchTerm) {
     }).join('');
 
     if (mobileList) {
-        cardsHtml = filtered.map(function (p) {
-            var status = p.status || 'active';
-            var statusClass = status === 'inactive' ? 'inactive' : 'active';
-            var mainImage = getProductMainImage(p);
-            var imageHtml = mainImage
-                ? '<img src="' + mainImage + '" alt="' + escapeHtml(p.name) + '">'
-                : '<div class="placeholder"><i class="fas fa-box"></i></div>';
-            
-            return '<button class="product-mobile-card ' + statusClass + '" data-id="' + p.id + '">' +
-                '<div class="product-mobile-image">' + imageHtml + '</div>' +
-                '<div class="product-mobile-info">' +
-                '<h3 class="product-mobile-name">' + escapeHtml(p.name) + '</h3>' +
-                '<span class="product-mobile-category">' + escapeHtml(p.category || '???') + '</span>' +
-                '<span class="product-mobile-price">' + formatMoney(p.price) + '</span>' +
+        cardsHtml = filtered.map(function (f) {
+            var isInc = f.type === 'income';
+            return '<button class="finance-mobile-card ' + f.type + '" data-id="' + f.id + '">' +
+                '<div class="finance-mobile-top">' +
+                '<span class="finance-mobile-date">' + formatDate(f.date) + '</span>' +
+                '<span class="finance-mobile-category">' + escapeHtml(f.category) + '</span>' +
+                '</div>' +
+                '<div class="finance-mobile-main">' +
+                '<span class="finance-mobile-desc">' + escapeHtml(f.description || '...') + '</span>' +
+                '<span class="finance-mobile-amount">' + (isInc ? '+' : '-') + formatMoney(f.amount) + '</span>' +
                 '</div>' +
                 '</button>';
         }).join('');
@@ -2183,27 +2179,7 @@ function renderUsers(searchTerm) {
             '<button class="btn-icon delete user-delete-btn" data-id="' + u.id + '" data-name="' + escapeHtml(u.name) + '" title="O\'chirish"><i class="fas fa-trash"></i></button></td>' +
             '</tr>';
     }).join('');
-
-    if (mobileList) {
-        cardsHtml = filtered.map(function (p) {
-            var status = p.status || 'active';
-            var statusClass = status === 'inactive' ? 'inactive' : 'active';
-            var mainImage = getProductMainImage(p);
-            var imageHtml = mainImage
-                ? '<img src="' + mainImage + '" alt="' + escapeHtml(p.name) + '">'
-                : '<div class="placeholder"><i class="fas fa-box"></i></div>';
-            
-            return '<button class="product-mobile-card ' + statusClass + '" data-id="' + p.id + '">' +
-                '<div class="product-mobile-image">' + imageHtml + '</div>' +
-                '<div class="product-mobile-info">' +
-                '<h3 class="product-mobile-name">' + escapeHtml(p.name) + '</h3>' +
-                '<span class="product-mobile-category">' + escapeHtml(p.category || '???') + '</span>' +
-                '<span class="product-mobile-price">' + formatMoney(p.price) + '</span>' +
-                '</div>' +
-                '</button>';
-        }).join('');
-        mobileList.innerHTML = cardsHtml;
-    }
+    updateUIVisibility('staff');
 }
 
 // User edit/delete delegatsiya
@@ -2843,6 +2819,10 @@ function renderCustomers(searchQuery) {
 
             customers.forEach(function (c, i) {
                 var totalSpent = c.totalSpent || 0;
+                var debt = c.debt || 0;
+                var statusLabel = totalSpent > 5000000 ? 'VIP' : (totalSpent > 1000000 ? 'Doimiy' : 'Yangi');
+                var statusClass = totalSpent > 5000000 ? 'vip' : (totalSpent > 1000000 ? 'regular' : 'new');
+
                 var vipBadge = totalSpent > 5000000 ? '<span class="status-badge active" style="background: linear-gradient(45deg, #ffd700, #ffa500); color: #000; border: none;"><i class="fas fa-crown"></i> VIP</span>' :
                     totalSpent > 1000000 ? '<span class="status-badge info">Doimiy</span>' :
                         '<span class="status-badge">Yangi</span>';
@@ -2853,10 +2833,9 @@ function renderCustomers(searchQuery) {
                     phoneDisplay += '<a href="https://t.me/' + tgLink + '" target="_blank" style="color: #0088cc; font-size: 0.85rem;"><i class="fab fa-telegram"></i> ' + escapeHtml(c.telegram) + '</a>';
                 }
 
-                var debt = c.debt || 0;
                 var debtClass = debt > 0 ? 'amount-negative' : '';
 
-                return '' +
+                rowsHtml.push(
                     '<tr>' +
                     '<td data-label="#">' + (i + 1) + '</td>' +
                     '<td data-label="Mijoz ismi"><div style="font-weight:600">' + escapeHtml(c.name) + '</div>' + (c.birthday ? '<div style="font-size:0.75rem; color:var(--text-muted)"><i class="fas fa-birthday-cake"></i> ' + c.birthday + '</div>' : '') + '</td>' +
@@ -2871,8 +2850,33 @@ function renderCustomers(searchQuery) {
                     '<button class="btn-icon edit customer-edit-btn" data-id="' + c.id + '" title="Tahrirlash"><i class="fas fa-pen"></i></button>' +
                     '<button class="btn-icon delete customer-delete-btn" data-id="' + c.id + '" data-name="' + escapeHtml(c.name) + '" title="O\'chirish"><i class="fas fa-trash"></i></button>' +
                     '</td>' +
-                    '</tr>';
-            }).join('');
+                    '</tr>'
+                );
+
+                if (mobileList) {
+                    cardsHtml.push(
+                        '<button class="customer-mobile-card ' + statusClass + '" data-customer-id="' + c.id + '">' +
+                        '<div class="customer-mobile-top-row">' +
+                        '<span class="customer-mobile-status">' + statusLabel + '</span>' +
+                        '<span class="customer-mobile-region"><i class="fas fa-location-dot"></i> ' + escapeHtml(c.region || '-') + '</span>' +
+                        '</div>' +
+                        '<div class="customer-mobile-main">' +
+                        '<h3 class="customer-mobile-title">' + escapeHtml(c.name) + '</h3>' +
+                        '<span class="customer-mobile-amount">' + formatMoney(totalSpent) + '</span>' +
+                        '</div>' +
+                        '<div class="customer-mobile-bottom-row">' +
+                        '<span class="customer-mobile-phone"><i class="fas fa-phone"></i> ' + escapeHtml(c.phone) + '</span>' +
+                        '<span class="customer-mobile-debt ' + (debt > 0 ? 'has-debt' : '') + '">Qarz: ' + formatMoney(debt) + '</span>' +
+                        '</div>' +
+                        '</button>'
+                    );
+                }
+            });
+
+            customersBody.innerHTML = rowsHtml.join('');
+            if (mobileList) {
+                mobileList.innerHTML = cardsHtml.join('');
+            }
             updateUIVisibility('customers');
         }
     });
