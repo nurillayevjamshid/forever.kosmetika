@@ -146,6 +146,26 @@ document.addEventListener('keydown', function (e) {
 });
 
 // ==========================================
+// THEME MANAGEMENT
+// ==========================================
+(function() {
+    var themeToggle = document.getElementById('themeToggle');
+    var currentTheme = localStorage.getItem('crm-theme') || 'dark';
+    
+    // Apply theme on load
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    
+    if (themeToggle) {
+        themeToggle.addEventListener('click', function() {
+            var newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('crm-theme', newTheme);
+            showToast(newTheme === 'dark' ? "Tungi rejim yoqildi" : "Kunduzgi rejim yoqildi", "info");
+        });
+    }
+})();
+
+// ==========================================
 // CORE RENDERING FUNCTIONS (Moved up)
 // ==========================================
 

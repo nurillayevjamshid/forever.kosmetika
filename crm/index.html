@@ -13,6 +13,12 @@
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <script>
+        (function() {
+            var theme = localStorage.getItem('crm-theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
 </head>
 
 <body>
@@ -115,6 +121,10 @@
                 </div>
             </div>
             <div class="topbar-right">
+                <button class="theme-toggle" id="themeToggle" title="Mavzuni o'zgartirish">
+                    <i class="fas fa-sun toggle-sun"></i>
+                    <i class="fas fa-moon toggle-moon"></i>
+                </button>
                 <div class="date-display">
                     <i class="fas fa-calendar-alt"></i>
                     <span id="currentDate"></span>
