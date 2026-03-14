@@ -350,11 +350,11 @@ function renderProducts(searchTerm) {
                 : '<div class="pm-img-placeholder"><i class="fas fa-box"></i></div>';
             
             return '<button class="product-mobile-card" data-id="' + p.id + '">' +
+                '<div class="pm-img-wrap">' + imgHtml + '</div>' +
                 '<div class="pm-name-wrap">' +
                 '<span class="pm-name">' + escapeHtml(p.name) + '</span>' +
                 '<span class="pm-category">' + escapeHtml(p.category || 'Boshqa') + '</span>' +
                 '</div>' +
-                '<div class="pm-img-wrap">' + imgHtml + '</div>' +
                 '<div class="pm-price">' + formatMoney(p.price) + '</div>' +
                 '</button>';
         }).join('');
