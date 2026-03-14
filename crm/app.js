@@ -1360,11 +1360,7 @@ function renderSales(searchTerm) {
 
         var deliveryHtml = deliveryAmount > 0 ? formatMoney(deliveryAmount) : '<span class="status-badge active" style="background:var(--success-glow); color:var(--success);">Tekin</span>';
 
-        var statusSelect = '<select class="status-select-inline" data-id="' + s.id + '" style="padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-secondary); font-size: 0.8rem; cursor: pointer;">' +
-            '<option value="kutilmoqda" ' + (status === 'kutilmoqda' ? 'selected' : '') + '>Kutilmoqda</option>' +
-            '<option value="sotildi" ' + (status === 'sotildi' ? 'selected' : '') + '>Sotildi</option>' +
-            '<option value="atkaz" ' + (status === 'atkaz' ? 'selected' : '') + '>Atkaz</option>' +
-            '</select>';
+        var statusSelectHtml = buildSaleStatusSelectHtml(status, s.id);
 
         rowsHtml.push(
             '<tr class="sale-data-row">' +
@@ -1376,7 +1372,7 @@ function renderSales(searchTerm) {
             '<td data-label="Jami summa" class="amount-highlight">' + formatMoney(totalAmount) + '</td>' +
             '<td data-label="Tannarx">' + formatMoney(totalCost) + '</td>' +
             '<td data-label="Dostavka">' + deliveryHtml + '</td>' +
-            '<td data-label="Status">' + statusSelect + '</td>' +
+            '<td data-label="Status"><div class="sale-status-inline-wrap">' + statusSelectHtml + '</div></td>' +
             '<td data-label="Amallar"><div class="sale-actions-wrap"><button class="btn-icon edit sale-edit-btn" data-id="' + s.id + '" title="Tahrirlash"><i class="fas fa-pen"></i></button>' +
             '<button class="btn-icon delete sale-delete-btn" data-id="' + s.id + '" title="O\'chirish"><i class="fas fa-trash"></i></button></div></td>' +
             '</tr>'
@@ -1539,9 +1535,9 @@ function buildSaleStatusSelectHtml(status, saleId) {
         '<span class="status-dot" aria-hidden="true"></span>' +
         '<i class="fas ' + icon + ' status-ico" aria-hidden="true"></i>' +
         '<select class="status-select" data-id="' + saleId + '" data-prev="' + status + '">' +
-        '<option value="kutilmoqda"' + (status === 'kutilmoqda' ? ' selected' : '') + '>Kutilmoqda</option>' +
-        '<option value="atkaz"' + (status === 'atkaz' ? ' selected' : '') + '>Atkaz</option>' +
-        '<option value="sotildi"' + (status === 'sotildi' ? ' selected' : '') + '>Sotildi</option>' +
+        '<option value="kutilmoqda" class="opt-kutilmoqda"' + (status === 'kutilmoqda' ? ' selected' : '') + '>Kutilmoqda</option>' +
+        '<option value="atkaz" class="opt-atkaz"' + (status === 'atkaz' ? ' selected' : '') + '>Atkaz</option>' +
+        '<option value="sotildi" class="opt-sotildi"' + (status === 'sotildi' ? ' selected' : '') + '>Sotildi</option>' +
         '</select>' +
         '<i class="fas fa-chevron-down status-caret" aria-hidden="true"></i>' +
         '</div>';
@@ -1551,10 +1547,22 @@ function buildSaleStatusSelectHtml(status, saleId) {
 document.addEventListener('change', function (e) {
     var sel = e.target.closest('.status-select');
     if (!sel) return;
+
     var saleId = sel.getAttribute('data-id');
     var prev = sel.getAttribute('data-prev') || 'kutilmoqda';
     var next = normalizeSaleStatus(sel.value);
-    sel.value = next;
+    
+    // UI Instant Update: Update the wrapper class and icons
+    var wrap = sel.closest('.status-select-wrap');
+    if (wrap) {
+        wrap.className = 'status-select-wrap status-' + next;
+        var iconEl = wrap.querySelector('.status-ico');
+        if (iconEl) {
+            var iconClass = (next === 'sotildi') ? 'fa-circle-check' : (next === 'atkaz' ? 'fa-circle-xmark' : 'fa-clock');
+            iconEl.className = 'fas ' + iconClass + ' status-ico';
+        }
+    }
+
     if (!saleId || prev === next) return;
     updateSaleStatus(saleId, prev, next, sel);
 });
