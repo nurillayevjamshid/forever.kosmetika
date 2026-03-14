@@ -826,11 +826,16 @@ function editProduct(id) {
     if (!p) return;
     document.getElementById('productId').value = p.id;
     document.getElementById('productName').value = p.name;
+    document.getElementById('productPrice').value = p.price || 0;
+    document.getElementById('productCost').value = p.cost || p.costPrice || 0;
+    document.getElementById('productCost').readOnly = true;
+    document.getElementById('productDescription').value = p.description || '';
+    
     initSelectPicker('productCategoryPicker', allProductCategories);
     setSelectValue('productCategoryPicker', p.category, p.category);
     setSelectValue('productStatusPicker', p.status || 'active', (p.status || 'active') === 'active' ? 'Active' : 'Inactive');
     document.getElementById('productModalTitle').innerHTML = '<i class="fas fa-box-open"></i> Mahsulotni tahrirlash';
-    // Mavjud rasmlarni ko'rsatish
+    // Mavjud rasmlarni ko\'rsatish
     resetImageUpload();
     setProductFormImages(getProductImagesList(p));
     openModal('productModal');
@@ -839,6 +844,7 @@ function editProduct(id) {
 document.getElementById('addProductBtn').addEventListener('click', function () {
     document.getElementById('productForm').reset();
     document.getElementById('productId').value = '';
+    document.getElementById('productCost').readOnly = false;
     initSelectPicker('productCategoryPicker', allProductCategories);
     setSelectValue('productCategoryPicker', '', 'Tanlang...');
     setSelectValue('productStatusPicker', 'active', 'Active');

@@ -739,6 +739,19 @@ html[data-theme="light"] .filter-select {
     color: var(--text-muted);
 }
 
+/* Form Styles Extension */
+input[readonly] {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    cursor: not-allowed;
+    opacity: 0.7;
+    border-style: dotted;
+}
+
+html[data-theme="light"] input[readonly] {
+    background-color: #f1f5f9 !important;
+    border-color: #e2e8f0;
+}
+
 /* ===========================
    Buttons
    =========================== */
