@@ -325,18 +325,28 @@ function renderProducts(searchTerm) {
 
     var rows = filtered.map(function (p, i) {
         var mainImg = getProductMainImage(p);
-        var imgHtml = mainImg ? '<img src="' + mainImg + '" class="table-img">' : '<div class="table-img-placeholder"><i class="fas fa-image"></i></div>';
+        var imgHtml = mainImg 
+            ? '<img src="' + mainImg + '" class="product-avatar">' 
+            : '<div class="product-avatar-placeholder">' + (p.name.charAt(0).toUpperCase()) + '</div>';
+        
         return '<tr>' +
             '<td>' + (i + 1) + '</td>' +
-            '<td><div class="product-cell">' + imgHtml + '<span>' + escapeHtml(p.name) + '</span></div></td>' +
-            '<td>' + escapeHtml(p.category || 'Boshqa') + '</td>' +
-            '<td>' + formatMoney(p.price) + '</td>' +
-            '<td>' + (p.cost ? formatMoney(p.cost) : '\u2014') + '</td>' +
-            '<td><span class="status-badge ' + ((p.status || 'active') === 'active' ? 'active' : '') + '">' + (p.status === 'active' ? 'Faol' : 'Nofaol') + '</span></td>' +
+            '<td class="product-main-col">' +
+                '<div class="product-info-wrap">' +
+                    imgHtml +
+                    '<div class="product-detail-text">' +
+                        '<div class="product-name">' + escapeHtml(p.name) + '</div>' +
+                        '<div class="product-category">' + escapeHtml(p.category || 'Boshqa') + '</div>' +
+                    '</div>' +
+                '</div>' +
+            '</td>' +
+            '<td><div class="product-price">' + formatMoney(p.price) + '</div><div class="product-label">Sotish narxi</div></td>' +
+            '<td><div class="product-cost">' + (p.cost ? formatMoney(p.cost) : '\u2014') + '</div><div class="product-label">Tannarxi</div></td>' +
+            '<td><span class="status-badge ' + ((p.status || 'active') === 'active' ? 'active' : 'inactive') + '">' + (p.status === 'active' ? 'Active' : 'Nofaol') + '</span></td>' +
             '<td><div class="sale-actions-wrap">' +
-            '<button class="btn-icon info product-view-btn" data-id="' + p.id + '"><i class="fas fa-eye"></i></button>' +
-            '<button class="btn-icon edit product-edit-btn" data-id="' + p.id + '"><i class="fas fa-pen"></i></button>' +
-            '<button class="btn-icon delete product-delete-btn" data-id="' + p.id + '" data-name="' + escapeHtml(p.name) + '" data-storage-path="' + (p.storagePath || '') + '"><i class="fas fa-trash"></i></button>' +
+            '<button class="btn-icon info product-view-btn" data-id="' + p.id + '" title="Ko\'rish"><i class="fas fa-eye"></i></button>' +
+            '<button class="btn-icon edit product-edit-btn" data-id="' + p.id + '" title="Tahrirlash"><i class="fas fa-pen"></i></button>' +
+            '<button class="btn-icon delete product-delete-btn" data-id="' + p.id + '" data-name="' + escapeHtml(p.name) + '" data-storage-path="' + (p.storagePath || '') + '" title="O\'chirish"><i class="fas fa-trash"></i></button>' +
             '</div></td>' +
             '</tr>';
     });
