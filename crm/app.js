@@ -1129,55 +1129,55 @@ function openSaleDetailModal(sale) {
     try {
         var status = normalizeSaleStatus(sale.status);
         var items = sale.items || [];
-        var subtotal = (typeof sale.subtotalAmount === 'number') ? sale.subtotalAmount : computeSaleSubtotal(items);
-        var deliveryAmount = (typeof sale.deliveryAmount === 'number') ? sale.deliveryAmount : calculateDeliveryPrice(subtotal, getRegionType(sale.region));
-        var totalAmount = (typeof sale.totalAmount === 'number') ? sale.totalAmount : (subtotal + deliveryAmount);
-        var costTotal = (typeof sale.costTotal === 'number') ? sale.costTotal : computeSaleCostTotal(items);
-
-        var dateEl = document.getElementById('saleDetailDate');
-        var nameEl = document.getElementById('saleDetailName');
-        var statusWrapEl = document.getElementById('saleDetailStatusWrap');
-        var totalEl = document.getElementById('saleDetailTotal');
-        var regionEl = document.getElementById('saleDetailRegion');
-        var costEl = document.getElementById('saleDetailCost');
-        var deliveryEl = document.getElementById('saleDetailDelivery');
-        var productsListEl = document.getElementById('saleDetailProductsList');
-        var noteWrapEl = document.getElementById('saleDetailNoteWrap');
-        var noteEl = document.getElementById('saleDetailNote');
-
-        if (!dateEl) return; // modal yo'q bo'lsa jim chiqamiz
-
+        var subtotal = (typeof sale.subtotalAmount === "number") ? sale.subtotalAmount : computeSaleSubtotal(items);
+        var deliveryAmount = (typeof sale.deliveryAmount === "number") ? sale.deliveryAmount : calculateDeliveryPrice(subtotal, getRegionType(sale.region));
+        var totalAmount = (typeof sale.totalAmount === "number") ? sale.totalAmount : (subtotal + deliveryAmount);
+        var costTotal = (typeof sale.costTotal === "number") ? sale.costTotal : computeSaleCostTotal(items);
+        
+        var dateEl = document.getElementById("saleDetailDate");
+        var nameEl = document.getElementById("saleDetailName");
+        var statusWrapEl = document.getElementById("saleDetailStatusWrap");
+        var totalEl = document.getElementById("saleDetailTotal");
+        var regionEl = document.getElementById("saleDetailRegion");
+        var costEl = document.getElementById("saleDetailCost");
+        var deliveryEl = document.getElementById("saleDetailDelivery");
+        var productsListEl = document.getElementById("saleDetailProductsList");
+        var noteWrapEl = document.getElementById("saleDetailNoteWrap");
+        var noteEl = document.getElementById("saleDetailNote");
+        
+        if (!dateEl) return;
+        
         dateEl.textContent = formatDate(sale.date);
-        nameEl.textContent = sale.name || '—';
+        nameEl.textContent = sale.name || "Sotuv";
         totalEl.textContent = formatMoney(totalAmount);
-        regionEl.textContent = sale.region || '—';
-        costEl.textContent = costTotal ? formatMoney(costTotal) : '—';
-        deliveryEl.textContent = deliveryAmount === 0 ? 'Tekin' : formatMoney(deliveryAmount);
-
+        regionEl.textContent = sale.region || "NomaÊ¼lum";
+        costEl.textContent = costTotal ? formatMoney(costTotal) : "â€”";
+        deliveryEl.textContent = deliveryAmount === 0 ? "Tekin" : formatMoney(deliveryAmount);
+        
         if (statusWrapEl) {
             statusWrapEl.innerHTML = buildSaleStatusSelectHtml(status, sale.id);
         }
-
-        // Products list
+        
         if (productsListEl) {
             productsListEl.innerHTML = items.map(function (it) {
                 var p = productsArr.find(function (px) { return px.id === it.productId; });
-                var pname = p ? p.name : 'Mahsulot';
-                var countLabel = it.quantity + ' ta';
-                return '' +
-                    '<li>' +
-                    '<button type="button" class="sale-detail-product-row btn-product-full" data-sale-id="' + sale.id + '" data-product-id="' + (it.productId || '') + '">' +
-                    '<span class="p-name">' + escapeHtml(pname) + '</span>' +
-                    '<span class="p-qty">' + countLabel + '</span>' +
-                    '<span class="p-price">' + (it.price ? formatMoney(it.price * it.quantity) : '') + '</span>' +
-                    '</button>' +
-                    '</li>';
-            }).join('');
+                var pname = p ? p.name : "Mahsulot";
+                var countLabel = it.quantity + " ta";
+                return "" +
+                    "<li>" +
+                    "<button type=\"button\" class=\"premium-product-item-btn\" data-sale-id=\"" + sale.id + "\" data-product-id=\"" + (it.productId || "") + "\">" +
+                    "<div style=\"display:flex; align-items:center;\">" +
+                    "<span class=\"p-name\">" + escapeHtml(pname) + "</span>" +
+                    "<span class=\"p-qty\">" + countLabel + "</span>" +
+                    "</div>" +
+                    "<span class=\"p-price\">" + (it.price ? formatMoney(it.price * it.quantity) : "") + "</span>" +
+                    "</button>" +
+                    "</li>";
+            }).join("");
         }
-
-        // Note
+        
         if (noteWrapEl && noteEl) {
-            var note = (sale.note || '').trim();
+            var note = (sale.note || "").trim();
             if (note) {
                 noteEl.textContent = note;
                 noteWrapEl.style.display = 'block';

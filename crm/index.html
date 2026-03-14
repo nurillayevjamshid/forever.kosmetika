@@ -781,44 +781,79 @@
 
     <!-- ============== SALE DETAIL MODAL (MOBILE) ============== -->
     <div class="modal-overlay" id="saleDetailModal">
-        <div class="modal modal-sale-detail">
-            <div class="modal-header">
-                <h2><i class="fas fa-receipt"></i> Sotuv tafsilotlari</h2>
-                <button class="modal-close" data-modal="saleDetailModal"><i class="fas fa-times"></i></button>
+        <div class="modal modal-sale-detail premium-modal">
+            <div class="modal-header premium-header">
+                <div class="header-icon-wrap">
+                    <i class="fas fa-receipt"></i>
+                </div>
+                <div class="header-content">
+                    <h2>Sotuv tafsilotlari</h2>
+                    <span class="sale-detail-date" id="saleDetailDate">--.--.--</span>
+                </div>
+                <button class="modal-close premium-close" data-modal="saleDetailModal"><i class="fas fa-times"></i></button>
             </div>
-            <div class="modal-body sale-detail-body">
-                <div class="sale-detail-top">
-                    <div class="sale-detail-main">
-                        <span class="sale-detail-date" id="saleDetailDate">--.--.--</span>
-                        <h3 class="sale-detail-title" id="saleDetailName">Sotuv nomi</h3>
+            <div class="modal-body sale-detail-body premium-body">
+                <div class="premium-card main-info-card">
+                    <div class="sale-detail-top">
+                        <div class="sale-detail-main">
+                            <h3 class="sale-detail-title" id="saleDetailName">Sotuv nomi</h3>
+                        </div>
+                        <div class="sale-detail-status-wrap" id="saleDetailStatusWrap"></div>
                     </div>
-                    <div class="sale-detail-status-wrap" id="saleDetailStatusWrap"></div>
-                </div>
-                <div class="sale-detail-amount-block">
-                    <span class="label">Jami summa</span>
-                    <span class="value" id="saleDetailTotal">0 so'm</span>
-                </div>
-                <div class="sale-detail-grid">
-                    <div class="sale-detail-item">
-                        <span class="label">Viloyat / Tuman</span>
-                        <span class="value" id="saleDetailRegion">---</span>
-                    </div>
-                    <div class="sale-detail-item">
-                        <span class="label">Tannarx</span>
-                        <span class="value" id="saleDetailCost">—</span>
-                    </div>
-                    <div class="sale-detail-item">
-                        <span class="label">Dostavka</span>
-                        <span class="value" id="saleDetailDelivery">—</span>
+                    
+                    <div class="premium-divider"></div>
+                    
+                    <div class="sale-detail-amount-block premium-amount-card">
+                        <div class="amount-label-wrap">
+                            <i class="fas fa-wallet"></i>
+                            <span class="label">Jami summa</span>
+                        </div>
+                        <span class="value premium-value" id="saleDetailTotal">0 so'm</span>
                     </div>
                 </div>
-                <div class="sale-detail-products">
-                    <h4>Mahsulotlar</h4>
-                    <ul id="saleDetailProductsList"></ul>
+
+                <div class="sale-detail-grid premium-grid">
+                    <div class="sale-detail-item premium-info-box">
+                        <div class="box-icon"><i class="fas fa-map-marker-alt"></i></div>
+                        <div class="box-content">
+                            <span class="label">Viloyat / Tuman</span>
+                            <span class="value" id="saleDetailRegion">---</span>
+                        </div>
+                    </div>
+                    <div class="sale-detail-item premium-info-box">
+                        <div class="box-icon"><i class="fas fa-tag"></i></div>
+                        <div class="box-content">
+                            <span class="label">Tannarx</span>
+                            <span class="value" id="saleDetailCost">—</span>
+                        </div>
+                    </div>
+                    <div class="sale-detail-item premium-info-box">
+                        <div class="box-icon"><i class="fas fa-truck"></i></div>
+                        <div class="box-content">
+                            <span class="label">Dostavka</span>
+                            <span class="value" id="saleDetailDelivery">—</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="sale-detail-note" id="saleDetailNoteWrap" style="display:none;">
-                    <h4>Izoh</h4>
-                    <p id="saleDetailNote"></p>
+
+                <div class="sale-detail-section">
+                    <div class="section-header">
+                        <i class="fas fa-box-open"></i>
+                        <h4>Mahsulotlar</h4>
+                    </div>
+                    <div class="premium-list-container">
+                        <ul id="saleDetailProductsList" class="premium-product-list"></ul>
+                    </div>
+                </div>
+
+                <div class="sale-detail-section" id="saleDetailNoteWrap" style="display:none;">
+                    <div class="section-header">
+                        <i class="fas fa-comment-alt"></i>
+                        <h4>Izoh</h4>
+                    </div>
+                    <div class="premium-note-box">
+                        <p id="saleDetailNote"></p>
+                    </div>
                 </div>
             </div>
         </div>
