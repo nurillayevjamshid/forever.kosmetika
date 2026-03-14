@@ -103,43 +103,112 @@ html[data-theme="light"] {
     --shadow-lg: 0 10px 15px rgba(0,0,0,0.03);
 }
 
-/* Theme Toggle Styles */
-.theme-toggle {
-    background: var(--surface-light);
-    border: 1px solid var(--border);
-    color: var(--text-secondary);
-    width: 40px;
-    height: 40px;
-    border-radius: var(--radius-sm);
+/* Premium Theme Switch (Pill Shape) */
+.theme-switch {
+    width: 64px;
+    height: 32px;
+    background: #1a1a2e;
+    border-radius: 99px;
+    position: relative;
     cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    overflow: hidden;
+}
+
+/* Stars for Dark Mode */
+.theme-switch::before {
+    content: '★';
+    position: absolute;
+    font-size: 6px;
+    color: #fff;
+    top: 4px;
+    right: 16px;
+    opacity: 0.4;
+    text-shadow: -6px 8px 0 rgba(255,255,255,0.4), -12px 2px 0 rgba(255,255,255,0.4);
+    transition: all 0.4s ease;
+}
+
+html[data-theme="light"] .theme-switch::before {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+.switch-knob {
+    width: 24px;
+    height: 24px;
+    background: #fff;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: var(--transition-fast);
-    font-size: 16px;
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    transform: translateX(32px); /* Default Dark: Moon on right */
+    position: relative;
+    z-index: 2;
+}
+
+.switch-knob i {
+    font-size: 14px;
+    transition: all 0.4s ease;
+}
+
+/* Icons within knob */
+.toggle-sun {
+    color: #f59e0b;
+    display: none;
+}
+
+.toggle-moon {
+    color: #4a5568;
+    display: block;
+}
+
+/* Light Mode Switched State */
+html[data-theme="light"] .theme-switch {
+    background: #87ceeb; /* Sky blue for light mode */
+    border-color: #cbd5e1;
+}
+
+html[data-theme="light"] .switch-knob {
+    transform: translateX(0);
+    background: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+html[data-theme="light"] .toggle-sun {
+    display: block;
+}
+
+html[data-theme="light"] .toggle-moon {
+    display: none;
+}
+
+/* Date Display Style */
+.date-display {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface-light);
+    color: var(--text-secondary);
+    padding: 8px 18px;
+    border-radius: 14px;
+    font-size: 13.5px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    border: 1px solid var(--border);
+    transition: var(--transition);
     box-shadow: var(--shadow-sm);
 }
 
-.theme-toggle:hover {
+.date-display i {
     color: var(--accent);
-    background: var(--surface-hover);
-    transform: translateY(-1px);
+    font-size: 14px;
 }
-
-.theme-toggle i {
-    transition: transform 0.3s ease;
-}
-
-.theme-toggle:active i {
-    transform: scale(0.9);
-}
-
-/* Toggle visibility logic */
-.toggle-sun { display: none; }
-.toggle-moon { display: block; }
-
-html[data-theme="light"] .toggle-sun { display: block; color: #f59e0b; }
-html[data-theme="light"] .toggle-moon { display: none; }
 
 
 /* ===========================
@@ -5452,4 +5521,22 @@ input[type="checkbox"] {
 .sale-detail-status-wrap .status-select {
     font-weight: 600 !important;
     font-size: 13px !important;
+}
+
+/* Responsive Topbar */
+@media (max-width: 768px) {
+    .topbar {
+        padding: 0 16px !important;
+        gap: 8px !important;
+    }
+    .date-display {
+        font-size: 11px !important;
+        padding: 6px 10px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .date-display {
+        display: none !important; /* Hide clock on very small screens to fit title */
+    }
 }

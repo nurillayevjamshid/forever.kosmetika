@@ -146,13 +146,12 @@ document.addEventListener('keydown', function (e) {
 });
 
 // ==========================================
-// THEME MANAGEMENT
+// THEME & CLOCK MANAGEMENT
 // ==========================================
 (function() {
+    // Theme Toggle
     var themeToggle = document.getElementById('themeToggle');
     var currentTheme = localStorage.getItem('crm-theme') || 'dark';
-    
-    // Apply theme on load
     document.documentElement.setAttribute('data-theme', currentTheme);
     
     if (themeToggle) {
@@ -163,6 +162,24 @@ document.addEventListener('keydown', function (e) {
             showToast(newTheme === 'dark' ? "Tungi rejim yoqildi" : "Kunduzgi rejim yoqildi", "info");
         });
     }
+
+    // Real-time Clock
+    function updateClock() {
+        var now = new Date();
+        var day = String(now.getDate()).padStart(2, '0');
+        var month = String(now.getMonth() + 1).padStart(2, '0');
+        var year = now.getFullYear();
+        var hours = String(now.getHours()).padStart(2, '0');
+        var minutes = String(now.getMinutes()).padStart(2, '0');
+        var seconds = String(now.getSeconds()).padStart(2, '0');
+        
+        var displayStr = day + '.' + month + '.' + year + ' ' + hours + ':' + minutes + ':' + seconds + ' (Toshkent)';
+        var clockEl = document.getElementById('currentDateTime');
+        if (clockEl) clockEl.textContent = displayStr;
+    }
+    
+    setInterval(updateClock, 1000);
+    updateClock(); // Initial call
 })();
 
 // ==========================================
