@@ -553,8 +553,16 @@ function renderProducts(searchTerm) {
     if (productsFilter.status !== 'all') {
         filtered = filtered.filter(function (p) { return (p.status || 'active') === productsFilter.status; });
     }
-    if (filtered.length === 0) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
+    var mobileList = document.getElementById('productsMobileList');
+    if (filtered.length === 0) { 
+        tbody.innerHTML = ''; 
+        if (mobileList) mobileList.innerHTML = '';
+        empty.style.display = 'block'; 
+        return; 
+    }
     empty.style.display = 'none';
+    
+    var cardsHtml = [];
     tbody.innerHTML = filtered.map(function (p, i) {
         var status = p.status || 'active';
         var statusClass = status === 'inactive' ? 'inactive' : 'active';
@@ -568,7 +576,7 @@ function renderProducts(searchTerm) {
             '<td data-label="#">' + (i + 1) + '</td>' +
             '<td data-label="Mahsulot"><div class="product-list-info">' + imageHtml +
             '<div class="product-list-meta"><span class="product-list-name">' + escapeHtml(p.name) + '</span></div></div></td>' +
-            '<td data-label="Kategoriya">' + escapeHtml(p.category || '??ù') + '</td>' +
+            '<td data-label="Kategoriya">' + escapeHtml(p.category || '??') + '</td>' +
             '<td data-label="Narx">' + formatMoney(p.price) + '</td>' +
             '<td data-label="Tannarx">' + (p.cost ? formatMoney(p.cost) : '\u2014') + '</td>' +
             '<td data-label="Status"><span class="status-badge ' + statusClass + '">' + statusText + '</span></td>' +
@@ -578,6 +586,27 @@ function renderProducts(searchTerm) {
             '</td>' +
             '</tr>';
     }).join('');
+
+    if (mobileList) {
+        cardsHtml = filtered.map(function (p) {
+            var status = p.status || 'active';
+            var statusClass = status === 'inactive' ? 'inactive' : 'active';
+            var mainImage = getProductMainImage(p);
+            var imageHtml = mainImage
+                ? '<img src="' + mainImage + '" alt="' + escapeHtml(p.name) + '">'
+                : '<div class="placeholder"><i class="fas fa-box"></i></div>';
+            
+            return '<button class="product-mobile-card ' + statusClass + '" data-id="' + p.id + '">' +
+                '<div class="product-mobile-image">' + imageHtml + '</div>' +
+                '<div class="product-mobile-info">' +
+                '<h3 class="product-mobile-name">' + escapeHtml(p.name) + '</h3>' +
+                '<span class="product-mobile-category">' + escapeHtml(p.category || '???') + '</span>' +
+                '<span class="product-mobile-price">' + formatMoney(p.price) + '</span>' +
+                '</div>' +
+                '</button>';
+        }).join('');
+        mobileList.innerHTML = cardsHtml;
+    }
 }
 
 function editProduct(id) {
@@ -646,7 +675,7 @@ function openProductDetailModal(p) {
         '</div>' +
         '<div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); padding:12px; border-radius:14px;">' +
         '<span style="font-size:11px; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Tannarxi</span>' +
-        '<div style="font-size:1.2rem; font-weight:800; color:var(--text); margin-top:4px;">' + (p.cost ? formatMoney(p.cost) : "ù") + '</div>' +
+        '<div style="font-size:1.2rem; font-weight:800; color:var(--text); margin-top:4px;">' + (p.cost ? formatMoney(p.cost) : "") + '</div>' +
         '</div>' +
         '</div>' +
         '<div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); padding:15px; border-radius:14px;">' +
@@ -958,7 +987,7 @@ function normalizeSaleStatus(status) {
     status = (status || '').toString().trim().toLowerCase();
     // Common typos/variants
     if (status === 'sotildi' || status === 'sold') return 'sotildi';
-    if (status === 'atkaz' || status === 'otkaz' || status === 'atk·z' || status === 'atkaz ') return 'atkaz';
+    if (status === 'atkaz' || status === 'otkaz' || status === 'atkz' || status === 'atkaz ') return 'atkaz';
     if (status === 'kutilmoqda' || status === 'kutilyapti' || status === 'pending') return 'kutilmoqda';
     return 'kutilmoqda';
 }
@@ -1009,7 +1038,7 @@ function renderSales(searchTerm) {
 
         var tagsHtml = items.map(function (it) {
             var p = productsArr.find(function (px) { return px.id === it.productId; });
-            var pname = p ? escapeHtml(p.name) : 'ù';
+            var pname = p ? escapeHtml(p.name) : '';
             return '<span class="sale-row-item-tag">' + pname + ' <span class="qty">x' + it.quantity + '</span></span>';
         }).join('');
 
@@ -1023,7 +1052,7 @@ function renderSales(searchTerm) {
 
         var fullItemsText = items.map(function (it) {
             var p = productsArr.find(function (px) { return px.id === it.productId; });
-            return (p ? p.name : 'ù') + ' (x' + it.quantity + ')';
+            return (p ? p.name : '') + ' (x' + it.quantity + ')';
         }).join(', ');
 
         var totalCost = (s.items || []).reduce(function(sum, it) {
@@ -1043,8 +1072,8 @@ function renderSales(searchTerm) {
             '<tr class="sale-data-row">' +
             '<td data-label="#">' + (i + 1) + '</td>' +
             '<td data-label="Sana"><div class="sale-date-cell"><i class="far fa-calendar-alt"></i> ' + formatDate(s.date) + '</div></td>' +
-            '<td data-label="Nomi"><span class="sale-user-name">' + escapeHtml(s.name || 'ù') + '</span></td>' +
-            '<td data-label="Viloyat"><div class="sale-region-badge"><i class="fas fa-location-dot"></i> ' + escapeHtml(s.region || 'ù') + '</div></td>' +
+            '<td data-label="Nomi"><span class="sale-user-name">' + escapeHtml(s.name || '') + '</span></td>' +
+            '<td data-label="Viloyat"><div class="sale-region-badge"><i class="fas fa-location-dot"></i> ' + escapeHtml(s.region || '') + '</div></td>' +
             '<td data-label="Mahsulotlar" title="' + fullItemsText + '"><div class="sale-items-wrap">' + itemsHtml + '</div></td>' +
             '<td data-label="Jami summa" class="amount-highlight">' + formatMoney(totalAmount) + '</td>' +
             '<td data-label="Tannarx">' + formatMoney(totalCost) + '</td>' +
@@ -1069,11 +1098,11 @@ function renderSales(searchTerm) {
                 '<span class="sale-mobile-status-badge">' + statusLabel + '</span>' +
                 '</div>' +
                 '<div class="sale-mobile-main">' +
-                '<h3 class="sale-mobile-title">' + escapeHtml(s.name || 'ù') + '</h3>' +
+                '<h3 class="sale-mobile-title">' + escapeHtml(s.name || '') + '</h3>' +
                 '<span class="sale-mobile-amount">' + formatMoney(totalAmount) + '</span>' +
                 '</div>' +
                 '<div class="sale-mobile-bottom-row">' +
-                '<span class="sale-mobile-region"><i class="fas fa-location-dot"></i> ' + escapeHtml(s.region || 'ù') + '</span>' +
+                '<span class="sale-mobile-region"><i class="fas fa-location-dot"></i> ' + escapeHtml(s.region || '') + '</span>' +
                 '<span class="sale-mobile-items">' + itemSummary + '</span>' +
                 '</div>' +
                 '</button>'
@@ -1127,7 +1156,7 @@ document.addEventListener('click', function (e) {
             }
             return '<div class="gallery-item no-img">' +
                 '<div class="placeholder"><i class="fas fa-image"></i></div>' +
-                '<div class="gallery-item-info">' + (p ? escapeHtml(p.name) : 'ó') + ' (x' + it.quantity + ')</div>' +
+                '<div class="gallery-item-info">' + (p ? escapeHtml(p.name) : '') + ' (x' + it.quantity + ')</div>' +
                 '</div>';
         }).join('');
 
@@ -1158,10 +1187,10 @@ function openSaleDetailModal(sale) {
         if (!dateEl) return; // modal yo'q bo'lsa jim chiqamiz
 
         dateEl.textContent = formatDate(sale.date);
-        nameEl.textContent = sale.name || 'ó';
+        nameEl.textContent = sale.name || '';
         totalEl.textContent = formatMoney(totalAmount);
-        regionEl.textContent = sale.region || 'ó';
-        costEl.textContent = costTotal ? formatMoney(costTotal) : 'ó';
+        regionEl.textContent = sale.region || '';
+        costEl.textContent = costTotal ? formatMoney(costTotal) : '';
         deliveryEl.textContent = deliveryAmount === 0 ? 'Tekin' : formatMoney(deliveryAmount);
 
         if (statusWrapEl) {
@@ -1333,7 +1362,7 @@ async function ensureFinanceEntriesForSoldSale(sale) {
     if (deliveryAmount > 0 && !hasDeliveryExpense) {
         var isTashkent = getRegionType(sale.region) === 'tashkent';
         var category = isTashkent ? 'Yandex' : 'Pochta';
-        var deliveryDesc = (isTashkent ? 'Yandex dostavka' : 'Pochta dostavka') + ' ù ' + (sale.name || 'Sotuv') + ' (mijoz tomonidan to\'landi)';
+        var deliveryDesc = (isTashkent ? 'Yandex dostavka' : 'Pochta dostavka') + '  ' + (sale.name || 'Sotuv') + ' (mijoz tomonidan to\'landi)';
         await db.collection('finances').add({
             date: sale.date,
             type: 'expense',
@@ -1385,7 +1414,7 @@ document.addEventListener('click', function (e) {
                 }
                 return '<div class="gallery-item no-img">' +
                     '<div class="placeholder"><i class="fas fa-image"></i></div>' +
-                    '<div class="gallery-item-info">' + (p ? escapeHtml(p.name) : 'ù') + ' (x' + it.quantity + ')</div>' +
+                    '<div class="gallery-item-info">' + (p ? escapeHtml(p.name) : '') + ' (x' + it.quantity + ')</div>' +
                     '</div>';
             }).join('');
 
@@ -1526,8 +1555,16 @@ function renderFinance(searchTerm) {
     document.getElementById('financeIncome').textContent = formatMoney(totalIncome);
     document.getElementById('financeExpense').textContent = formatMoney(totalExpense);
     document.getElementById('financeBalance').textContent = formatMoney(totalIncome - totalExpense);
-    if (filtered.length === 0) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
+    var mobileList = document.getElementById('financeMobileList');
+    if (filtered.length === 0) { 
+        tbody.innerHTML = ''; 
+        if (mobileList) mobileList.innerHTML = '';
+        empty.style.display = 'block'; 
+        return; 
+    }
     empty.style.display = 'none';
+    
+    var cardsHtml = [];
     tbody.innerHTML = filtered.map(function (f, i) {
         var isInc = f.type === 'income';
         return '' +
@@ -1536,7 +1573,7 @@ function renderFinance(searchTerm) {
             '<td data-label="Sana">' + formatDate(f.date) + '</td>' +
             '<td data-label="Turi"><span class="type-badge ' + f.type + '"><i class="fas fa-' + (isInc ? 'arrow-down' : 'arrow-up') + '"></i> ' + (isInc ? 'Kirim' : 'Chiqim') + '</span></td>' +
             '<td data-label="Kategoriya">' + escapeHtml(f.category) + '</td>' +
-            '<td data-label="Tavsif">' + escapeHtml(f.description || '??ù') + '</td>' +
+            '<td data-label="Tavsif">' + escapeHtml(f.description || '??') + '</td>' +
             '<td data-label="Summa" class="' + (isInc ? 'amount-positive' : 'amount-negative') + '">' + (isInc ? '+' : '-') + formatMoney(f.amount) + '</td>' +
             '<td data-label="Amallar">' +
             '<button class="btn-icon edit finance-edit-btn" data-id="' + f.id + '" title="Tahrirlash"><i class="fas fa-pen"></i></button>' +
@@ -1544,6 +1581,27 @@ function renderFinance(searchTerm) {
             '</td>' +
             '</tr>';
     }).join('');
+
+    if (mobileList) {
+        cardsHtml = filtered.map(function (p) {
+            var status = p.status || 'active';
+            var statusClass = status === 'inactive' ? 'inactive' : 'active';
+            var mainImage = getProductMainImage(p);
+            var imageHtml = mainImage
+                ? '<img src="' + mainImage + '" alt="' + escapeHtml(p.name) + '">'
+                : '<div class="placeholder"><i class="fas fa-box"></i></div>';
+            
+            return '<button class="product-mobile-card ' + statusClass + '" data-id="' + p.id + '">' +
+                '<div class="product-mobile-image">' + imageHtml + '</div>' +
+                '<div class="product-mobile-info">' +
+                '<h3 class="product-mobile-name">' + escapeHtml(p.name) + '</h3>' +
+                '<span class="product-mobile-category">' + escapeHtml(p.category || '???') + '</span>' +
+                '<span class="product-mobile-price">' + formatMoney(p.price) + '</span>' +
+                '</div>' +
+                '</button>';
+        }).join('');
+        mobileList.innerHTML = cardsHtml;
+    }
 }
 
 function editFinance(id) {
@@ -1868,7 +1926,7 @@ function refreshDashboard() {
                     '<div class="top-img-wrap">' + imgHtml + '</div>' +
                     '<div class="top-info">' +
                     '<span class="top-name">' + escapeHtml(name) + '</span>' +
-                    '<span class="top-meta">' + priceText + ' ù ' + qty + ' dona</span>' +
+                    '<span class="top-meta">' + priceText + '  ' + qty + ' dona</span>' +
                     '</div>' +
                     '</li>';
             }).join('');
@@ -1905,7 +1963,7 @@ function refreshDashboard() {
                 return '<div class="expense-row">' +
                     '<div class="expense-icon-wrap ' + typeClass + '"><i class="fas ' + icon + '"></i></div>' +
                     '<div class="expense-details">' +
-                    '<span class="expense-title">' + escapeHtml(f.description || 'ù') + '</span>' +
+                    '<span class="expense-title">' + escapeHtml(f.description || '') + '</span>' +
                     '<span class="expense-date">' + formatDate(f.date) + '</span>' +
                     '</div>' +
                     '<div class="expense-value-wrap">' +
@@ -2109,7 +2167,7 @@ function renderUsers(searchTerm) {
         var pwdToShow = hasPassword ? realPassword : "Parol topilmadi";
 
         var passwordHtml = '<div class="password-cell-inner' + (hasPassword ? '' : ' no-password') + '">' +
-            '<span class="password-text" data-original="' + escapeHtml(pwdToShow) + '" data-has-pwd="' + hasPassword + '">ùùùùùùùù</span>' +
+            '<span class="password-text" data-original="' + escapeHtml(pwdToShow) + '" data-has-pwd="' + hasPassword + '"></span>' +
             '<button type="button" class="password-eye-btn" data-visible="false" title="Ko\'rsatish/Yashirish"><i class="fas fa-eye"></i></button>' +
             '</div>';
 
@@ -2125,6 +2183,27 @@ function renderUsers(searchTerm) {
             '<button class="btn-icon delete user-delete-btn" data-id="' + u.id + '" data-name="' + escapeHtml(u.name) + '" title="O\'chirish"><i class="fas fa-trash"></i></button></td>' +
             '</tr>';
     }).join('');
+
+    if (mobileList) {
+        cardsHtml = filtered.map(function (p) {
+            var status = p.status || 'active';
+            var statusClass = status === 'inactive' ? 'inactive' : 'active';
+            var mainImage = getProductMainImage(p);
+            var imageHtml = mainImage
+                ? '<img src="' + mainImage + '" alt="' + escapeHtml(p.name) + '">'
+                : '<div class="placeholder"><i class="fas fa-box"></i></div>';
+            
+            return '<button class="product-mobile-card ' + statusClass + '" data-id="' + p.id + '">' +
+                '<div class="product-mobile-image">' + imageHtml + '</div>' +
+                '<div class="product-mobile-info">' +
+                '<h3 class="product-mobile-name">' + escapeHtml(p.name) + '</h3>' +
+                '<span class="product-mobile-category">' + escapeHtml(p.category || '???') + '</span>' +
+                '<span class="product-mobile-price">' + formatMoney(p.price) + '</span>' +
+                '</div>' +
+                '</button>';
+        }).join('');
+        mobileList.innerHTML = cardsHtml;
+    }
 }
 
 // User edit/delete delegatsiya
@@ -2161,7 +2240,7 @@ document.addEventListener('click', function (e) {
             eyeBtn.classList.add('active');
             eyeBtn.setAttribute('data-visible', 'true');
         } else {
-            txt.textContent = 'ùùùùùùùù';
+            txt.textContent = '';
             icon.classList.replace('fa-eye-slash', 'fa-eye');
             eyeBtn.classList.remove('active');
             eyeBtn.setAttribute('data-visible', 'false');
@@ -2506,7 +2585,7 @@ navigateTo('dashboard');
 // === FILTER INIT ===
 // ==========================================
 
-// Sales ù region filter selectni toùldirish
+// Sales  region filter selectni toldirish
 (function initSalesFilter() {
     var sel = document.getElementById('salesRegionFilter');
     if (!sel) return;
@@ -2524,7 +2603,7 @@ navigateTo('dashboard');
     });
 })();
 
-// Finance ù kategoriya filter
+// Finance  kategoriya filter
 (function initFinanceCategoryFilter() {
     var sel = document.getElementById('financeCategoryFilter');
     if (!sel) return;
@@ -2552,7 +2631,7 @@ navigateTo('dashboard');
     });
 })();
 
-// Products ù kategoriya va status filtrlar
+// Products  kategoriya va status filtrlar
 (function initProductsFilters() {
     var catSel = document.getElementById('productsCategoryFilter');
     var statusSel = document.getElementById('productsStatusFilter');
@@ -2737,6 +2816,7 @@ imageUploadArea.addEventListener('drop', function (e) {
 // Mijozlar ro'yxatini yuklash va ko'rsatish
 function renderCustomers(searchQuery) {
     var customersBody = document.getElementById('customersBody');
+    var mobileList = document.getElementById('customersMobileList');
     var customersEmpty = document.getElementById('customersEmpty');
     if (!customersBody) return;
 
@@ -2754,10 +2834,14 @@ function renderCustomers(searchQuery) {
 
         if (customers.length === 0) {
             customersBody.innerHTML = '';
+            if (mobileList) mobileList.innerHTML = '';
             customersEmpty.style.display = 'block';
         } else {
             customersEmpty.style.display = 'none';
-            customersBody.innerHTML = customers.map(function (c, i) {
+            var rowsHtml = [];
+            var cardsHtml = [];
+
+            customers.forEach(function (c, i) {
                 var totalSpent = c.totalSpent || 0;
                 var vipBadge = totalSpent > 5000000 ? '<span class="status-badge active" style="background: linear-gradient(45deg, #ffd700, #ffa500); color: #000; border: none;"><i class="fas fa-crown"></i> VIP</span>' :
                     totalSpent > 1000000 ? '<span class="status-badge info">Doimiy</span>' :
@@ -2896,7 +2980,7 @@ function showCustomerHistory(customerId, customerName) {
                 var itemsStr = s.items ? s.items.map(function (it) {
                     var p = productsArr.find(function (px) { return px.id === it.productId; });
                     return (p ? p.name : 'Mahsulot') + ' (x' + it.quantity + ')';
-                }).join(', ') : 'ù';
+                }).join(', ') : '';
 
                 html += '<tr>' +
                     '<td>' + formatDate(s.date) + '</td>' +
@@ -2950,3 +3034,39 @@ document.addEventListener('click', function (e) {
 
 
 
+
+// Mobile customer card click
+document.addEventListener('click', function (e) {
+    var card = e.target.closest('.customer-mobile-card');
+    if (card) {
+        var id = card.getAttribute('data-customer-id');
+        // Trigger the edit logic for the customer with the given ID
+        db.collection('customers').doc(id).get().then(function (doc) {
+            if (doc.exists) {
+                var c = doc.data();
+                document.getElementById('customerId').value = doc.id;
+                document.getElementById('customerName').value = c.name;
+                document.getElementById('customerPhone').value = c.phone;
+                document.getElementById('customerTelegram').value = c.telegram || '';
+                document.getElementById('customerBirthday').value = c.birthday || '';
+                document.getElementById('customerAddress').value = c.address || '';
+                document.getElementById('customerNote').value = c.note || '';
+                
+                initSelectPicker('customerRegionPicker', allRegions);
+                setSelectValue('customerRegionPicker', c.region, c.region || 'Tanlang...');
+                
+                document.getElementById('customerModalTitle').innerHTML = '<i class="fas fa-user-edit"></i> Mijozni tahrirlash';
+                openModal('customerModal');
+            }
+        });
+    }
+});
+
+// Mobile finance card click
+document.addEventListener('click', function (e) {
+    var card = e.target.closest('.finance-mobile-card');
+    if (card) {
+        var id = card.getAttribute('data-id');
+        editFinance(id);
+    }
+});
