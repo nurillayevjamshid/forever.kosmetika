@@ -26,12 +26,14 @@ auth.onAuthStateChanged(function (user) {
                 }
             }
             renderProducts();
-            updateUIVisibility();
+            var savedPage = localStorage.getItem('crm-active-page') || 'dashboard';
+            navigateTo(savedPage);
         }).catch(function (error) {
             console.error("Error loading user role:", error);
             currentUserRole = 'admin';
             renderProducts();
-            updateUIVisibility();
+            var savedPage = localStorage.getItem('crm-active-page') || 'dashboard';
+            navigateTo(savedPage);
         });
     }
 });
@@ -490,6 +492,7 @@ var pageConfig = {
 };
 
 function navigateTo(pageName) {
+    localStorage.setItem('crm-active-page', pageName);
     document.querySelectorAll('.nav-item').forEach(function (item) {
         item.classList.toggle('active', item.dataset.page === pageName);
     });
