@@ -2098,12 +2098,99 @@ html[data-theme="light"] .customer-detail-item {
    Finance - Mobile Card View
    =========================== */
 
-.finance-mobile-list {
+.finance-mobile-list,
+.products-mobile-list,
+.customers-mobile-list {
     display: none;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
     margin-top: 10px;
 }
+
+.product-mobile-card {
+    display: grid;
+    grid-template-columns: 1fr 60px 120px;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 12px 16px;
+    text-align: left;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    text-decoration: none;
+    width: 100%;
+}
+
+.product-mobile-card:hover {
+    background: rgba(255, 255, 255, 0.06);
+    transform: translateY(-2px);
+    border-color: var(--accent-border-soft);
+}
+
+.pm-name-wrap {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.pm-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pm-category {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.pm-img-wrap {
+    width: 54px;
+    height: 54px;
+    border-radius: 12px;
+    background: var(--surface-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.pm-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.pm-img-placeholder {
+    font-size: 1.2rem;
+    color: var(--accent);
+    opacity: 0.5;
+}
+
+.pm-price {
+    font-weight: 800;
+    font-size: 0.95rem;
+    color: var(--accent);
+    text-align: right;
+    white-space: nowrap;
+}
+
+html[data-theme="light"] .product-mobile-card {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border-color: #bae6fd;
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.08);
+}
+
+html[data-theme="light"] .product-mobile-card:hover {
+    background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+}
+
 
 .finance-mobile-card {
     width: 100%;
@@ -2222,13 +2309,15 @@ html[data-theme="light"] .finance-detail-item {
     /* Sales, Customers & Finance: hide table, show cards on mobile */
     #page-sales .table-responsive,
     #page-customers .table-responsive,
-    #page-finance .table-responsive {
+    #page-finance .table-responsive,
+    #page-products .table-responsive {
         display: none;
     }
 
     #page-sales .sales-mobile-list,
     #page-customers .customers-mobile-list,
-    #page-finance .finance-mobile-list {
+    #page-finance .finance-mobile-list,
+    #page-products .products-mobile-list {
         display: flex;
     }
 }
@@ -4283,11 +4372,12 @@ html[data-theme="light"] .profile-tab-btn.active {
         opacity: 0;
         transform: translateY(10px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
 
    /* ============================
    MOBILE LAYOUT FOR CRM
@@ -4488,7 +4578,7 @@ html[data-theme="light"] .profile-tab-btn.active {
     border-radius: 1rem;
   }
 }
-}
+
 
 /* ==========================================
    PREMIUM PROFILE & SETTINGS STYLES
