@@ -5548,6 +5548,10 @@ input[type="checkbox"] {
     z-index: 5;
 }
 
+.status-bubbles-picker.open {
+    z-index: 1100 !important; /* Higher than any row hover */
+}
+
 .status-trigger {
     display: flex;
     align-items: center;
@@ -5606,6 +5610,7 @@ input[type="checkbox"] {
     border-radius: 20px;
     box-shadow: 0 15px 40px rgba(0,0,0,0.5);
     opacity: 0;
+    visibility: hidden; /* Prevent interaction and accidental rendering */
     pointer-events: none;
     transform: translateY(-10px) scale(0.95);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -5614,6 +5619,7 @@ input[type="checkbox"] {
 
 .status-bubbles-picker.open .status-bubble-options {
     opacity: 1;
+    visibility: visible;
     pointer-events: all;
     transform: translateY(0) scale(1);
 }
@@ -5669,38 +5675,7 @@ input[type="checkbox"] {
 }
 
 /* Status Specific Colors */
-.status-select-wrap.status-sotildi {
-    background: rgba(16, 185, 129, 0.1) !important;
-    border-color: rgba(16, 185, 129, 0.2) !important;
-}
-.status-select-wrap.status-sotildi .status-dot,
-.status-select-wrap.status-sotildi .status-ico {
-    background: #10b981;
-    color: #10b981;
-}
-.status-select-wrap.status-sotildi .status-select { color: #10b981; }
-
-.status-select-wrap.status-atkaz {
-    background: rgba(239, 68, 68, 0.1) !important;
-    border-color: rgba(239, 68, 68, 0.2) !important;
-}
-.status-select-wrap.status-atkaz .status-dot,
-.status-select-wrap.status-atkaz .status-ico {
-    background: #ef4444;
-    color: #ef4444;
-}
-.status-select-wrap.status-atkaz .status-select { color: #ef4444; }
-
-.status-select-wrap.status-kutilmoqda {
-    background: rgba(245, 158, 11, 0.1) !important;
-    border-color: rgba(245, 158, 11, 0.2) !important;
-}
-.status-select-wrap.status-kutilmoqda .status-dot,
-.status-select-wrap.status-kutilmoqda .status-ico {
-    background: #f59e0b;
-    color: #f59e0b;
-}
-.status-select-wrap.status-kutilmoqda .status-select { color: #f59e0b; }
+/* Old styles removed */
 
 /* Option Colors (Browser dependent) */
 .status-select option {
