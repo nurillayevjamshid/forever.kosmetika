@@ -1224,9 +1224,9 @@ html[data-theme="light"] input[readonly] {
 }
 
 .status-badge {
-    padding: 6px 14px;
+    padding: 3px 10px; /* More compact */
     border-radius: 99px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -4263,8 +4263,8 @@ html[data-theme="light"] .select-trigger {
 .sale-date-cell {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 13px;
+    gap: 4px; /* Reduced from 8px */
+    font-size: 12px; /* Slightly smaller */
     font-weight: 600;
     color: var(--text-secondary);
 }
@@ -4298,8 +4298,7 @@ html[data-theme="light"] .select-trigger {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
-    width: 280px;
-    /* Fixed width to keep column consistent */
+    width: 220px; /* Reduced from 280px to save space */
 }
 
 .sale-row-item-tag {
@@ -4361,6 +4360,37 @@ html[data-theme="light"] .data-table .amount-highlight {
     text-shadow: none;
 }
 
+/* Sales Table Specific Fixes */
+#salesTable {
+    min-width: 1000px; /* Ensure table has enough room for all columns */
+}
+
+#salesTable thead th {
+    padding: 12px 10px;
+    font-size: 10px; /* Smaller headers */
+}
+
+#salesTable tbody td {
+    padding: 12px 10px;
+    font-size: 13px; /* Smaller body text */
+}
+
+#salesTable .sale-row-item-tag {
+    padding: 1px 8px;
+    font-size: 10px; /* Smaller tags */
+}
+
+#salesTable .status-select-inline {
+    padding: 3px 6px !important;
+    font-size: 11px !important;
+}
+
+/* Ensure the table responsive container doesn't clip shadows */
+.table-responsive {
+    padding: 5px;
+    margin: -5px;
+}
+
 /* Sale Items Card Grouping */
 .sale-items-card {
     background: rgba(255, 255, 255, 0.03);
@@ -4379,7 +4409,7 @@ html[data-theme="light"] .data-table .amount-highlight {
 .sale-items-card:hover {
     background: rgba(255, 255, 255, 0.08);
     border-color: var(--accent-border-soft);
-    transform: scale(1.02);
+    transform: scale(1.01); /* Reduced scale to prevent overflow during hover */
 }
 
 html[data-theme="light"] .sale-items-card {
