@@ -3114,3 +3114,127 @@ document.addEventListener('click', function (e) {
         editFinance(id);
     }
 });
+
+/* ===========================
+   Product Details View & Gallery Logic
+   =========================== */
+var currentProductGalleryImages = [];
+var currentImageIndex = 0;
+
+function openProductDetailModal(p) {
+    if (!p) return;
+    
+    // Set Images
+    currentProductGalleryImages = Array.isArray(p.images) && p.images.length > 0 ? p.images : [];
+    if (currentProductGalleryImages.length === 0 && (p.image || p.imageUrl)) {
+        currentProductGalleryImages = [p.image || p.imageUrl];
+    }
+    
+    currentImageIndex = 0;
+    updateProductGallery();
+    
+    // Set Text Details
+    var contentEl = document.getElementById('productDetailsContent');
+    if (contentEl) {
+        var statusHtml = '<span class="status-badge ' + ((p.status || 'active') === 'active' ? 'active' : 'inactive') + '">' + 
+                        ((p.status || 'active') === 'active' ? 'Active' : 'Nofaol') + '</span>';
+        
+        contentEl.innerHTML = 
+            '<div style="display:flex; justify-content:space-between; align-items:start; margin-bottom: 20px;">' +
+                '<div>' +
+                    '<h3 style="font-size:1.4rem; margin-bottom:4px; color:var(--text)">' + escapeHtml(p.name) + '</h3>' +
+                    '<p style="color:var(--text-muted); font-size:0.9rem; font-weight:500">' + escapeHtml(p.category || 'Boshqa') + '</p>' +
+                '</div>' +
+                statusHtml +
+            '</div>' +
+            
+            '<div class="detail-info-grid">' +
+                '<div class="detail-card">' +
+                    '<span class="label">Sotish narxi</span>' +
+                    '<span class="value">' + formatMoney(p.price) + '</span>' +
+                '</div>' +
+                '<div class="detail-card">' +
+                    '<span class="label">Tannarxi</span>' +
+                    '<span class="value">' + (p.cost ? formatMoney(p.cost) : '\u2014') + '</span>' +
+                '</div>' +
+            '</div>' +
+            
+            (p.description ? 
+                '<div class="detail-description" style="margin-top:16px">' +
+                    '<strong>Tavsif:</strong><br>' + escapeHtml(p.description).replace(/\n/g, '<br>') +
+                '</div>' : '') +
+            
+            '<div style="font-size:0.75rem; color:var(--text-muted); margin-top:20px; border-top:1px solid var(--border); padding-top:10px">' +
+                'ID: ' + p.id + (p.createdAt ? ' | Yaratilgan: ' + formatDate(p.createdAt) : '') +
+            '</div>';
+    }
+    
+    // Prepare Edit Button
+    var editBtn = document.getElementById('productDetailEditBtn');
+    if (editBtn) {
+        editBtn.onclick = function() {
+            closeModal('productDetailsModal');
+            editProduct(p.id);
+        };
+    }
+    
+    openModal('productDetailsModal');
+}
+
+function updateProductGallery() {
+    var viewport = document.getElementById('productGalleryViewport');
+    var currentIdxEl = document.getElementById('currentImgIdx');
+    var totalCountEl = document.getElementById('totalImgCount');
+    var prevBtn = document.getElementById('prevProductImg');
+    var nextBtn = document.getElementById('nextProductImg');
+    
+    if (!viewport || !currentIdxEl || !totalCountEl) return;
+    
+    var images = currentProductGalleryImages;
+    totalCountEl.textContent = images.length || 0;
+    
+    if (images.length === 0) {
+        viewport.innerHTML = '<div style="color:var(--text-muted); text-align:center"><i class="fas fa-image fa-3x" style="display:block; margin-bottom:10px; opacity:0.3"></i>Rasm mavjud emas</div>';
+        if (prevBtn) prevBtn.style.display = 'none';
+        if (nextBtn) nextBtn.style.display = 'none';
+        currentIdxEl.textContent = 0;
+        return;
+    }
+    
+    currentIdxEl.textContent = currentImageIndex + 1;
+    viewport.innerHTML = '<img src="' + images[currentImageIndex] + '" alt="Product Image">';
+    
+    if (prevBtn) prevBtn.style.display = images.length > 1 ? 'flex' : 'none';
+    if (nextBtn) nextBtn.style.display = images.length > 1 ? 'flex' : 'none';
+}
+
+// Global Gallery Listeners
+var prevBtn = document.getElementById('prevProductImg');
+if (prevBtn) {
+    prevBtn.addEventListener('click', function() {
+        if (currentProductGalleryImages.length <= 1) return;
+        currentImageIndex--;
+        if (currentImageIndex < 0) currentImageIndex = currentProductGalleryImages.length - 1;
+        updateProductGallery();
+    });
+}
+
+var nextBtn = document.getElementById('nextProductImg');
+if (nextBtn) {
+    nextBtn.addEventListener('click', function() {
+        if (currentProductGalleryImages.length <= 1) return;
+        currentImageIndex++;
+        if (currentImageIndex >= currentProductGalleryImages.length) currentImageIndex = 0;
+        updateProductGallery();
+    });
+}
+
+// Row Click Handler for Products (Delegation)
+document.addEventListener('click', function(e) {
+    var viewBtn = e.target.closest('.product-view-btn');
+    if (viewBtn) {
+        var pid = viewBtn.getAttribute('data-id');
+        var p = productsArr.find(function(x) { return x.id === pid; });
+        if (p) openProductDetailModal(p);
+    }
+});

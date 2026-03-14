@@ -1288,20 +1288,35 @@
 
     <!-- Product Details Modal -->
     <div class="modal-overlay" id="productDetailsModal">
-        <div class="modal" style="max-width: 500px;">
+        <div class="modal product-detail-modal">
             <div class="modal-header">
                 <h2><i class="fas fa-box"></i> Mahsulot ma'lumotlari</h2>
                 <button class="modal-close" data-modal="productDetailsModal"><i class="fas fa-times"></i></button>
             </div>
-            <div class="modal-body" id="productDetailsBody">
-                <!-- Dynamic details -->
+            <div class="modal-body">
+                <!-- Premium Image Gallery -->
+                <div class="product-gallery">
+                    <div class="gallery-main">
+                        <button class="gallery-nav prev" id="prevProductImg"><i class="fas fa-chevron-left"></i></button>
+                        <div class="gallery-viewport" id="productGalleryViewport">
+                            <!-- Main Image will be injected here -->
+                        </div>
+                        <button class="gallery-nav next" id="nextProductImg"><i class="fas fa-chevron-right"></i></button>
+                        <div class="gallery-counter"><span id="currentImgIdx">1</span> / <span id="totalImgCount">1</span></div>
+                    </div>
+                </div>
+
+                <div id="productDetailsContent" class="product-details-content">
+                    <!-- Dynamic Textual details -->
+                </div>
             </div>
-            <div class="modal-footer" style="display:flex; gap:10px; flex-wrap:wrap">
-                <button type="button" class="btn btn-secondary" style="flex:1" data-modal="productDetailsModal">Yopish</button>
-                <button type="button" class="btn btn-primary" style="flex:1" id="productDetailEditBtn"><i class="fas fa-pen"></i> Tahrirlash</button>
+            <div class="modal-footer premium-footer">
+                <button type="button" class="btn btn-secondary" data-modal="productDetailsModal">Yopish</button>
+                <button type="button" class="btn btn-primary" id="productDetailEditBtn"><i class="fas fa-pen"></i> Tahrirlash</button>
             </div>
         </div>
     </div>
+
 
     <!-- Customer Details Modal -->
     <div class="modal-overlay" id="customerDetailsModal">
