@@ -1615,7 +1615,7 @@ async function updateSaleStatus(saleId, prevStatus, nextStatus) {
             showToast('Status qaytarildi. Avto kirim/chiqim o\'chirildi.', 'info');
         }
 
-        if (selectEl) selectEl.setAttribute('data-prev', nextStatus);
+
 
         // UI ni yangilab qo'yamiz (jadval + mobil kartalar)
         var searchInput = document.getElementById('salesSearch');
@@ -1624,11 +1624,8 @@ async function updateSaleStatus(saleId, prevStatus, nextStatus) {
     } catch (err) {
         console.error(err);
         showToast('Statusni o\'zgartirishda xatolik: ' + (err.message || err), 'error');
-        // revert UI
-        if (selectEl) {
-            selectEl.value = prevStatus;
-            selectEl.setAttribute('data-prev', prevStatus);
-        }
+        var si = document.getElementById('salesSearch');
+        renderSales(si ? si.value : '');
     }
 }
 
