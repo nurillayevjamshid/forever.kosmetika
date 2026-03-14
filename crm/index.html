@@ -335,13 +335,13 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="empty-state" id="customersEmpty" style="display:none;">
-                            <i class="fas fa-address-book"></i>
-                            <p>Hali mijozlar yo'q. "Yangi Mijoz" tugmasini bosing.</p>
-                        </div>
                         <!-- Mobile friendly customers list (cards) -->
                         <div class="customers-mobile-list" id="customersMobileList">
                             <!-- Dynamic mobile cards -->
+                        </div>
+                        <div class="empty-state" id="customersEmpty" style="display:none;">
+                            <i class="fas fa-address-book"></i>
+                            <p>Hali mijozlar yo'q. "Yangi Mijoz" tugmasini bosing.</p>
                         </div>
                     </div>
                 </div>
@@ -438,13 +438,13 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="empty-state" id="financeEmpty" style="display:none;">
-                            <i class="fas fa-wallet"></i>
-                            <p>Hali kirim-chiqimlar yo'q.</p>
-                        </div>
                         <!-- Mobile friendly finance list (cards) -->
                         <div class="finance-mobile-list" id="financeMobileList">
                             <!-- Dynamic mobile cards -->
+                        </div>
+                        <div class="empty-state" id="financeEmpty" style="display:none;">
+                            <i class="fas fa-wallet"></i>
+                            <p>Hali kirim-chiqimlar yo'q.</p>
                         </div>
                     </div>
                 </div>
@@ -492,10 +492,6 @@
                         <div class="empty-state" id="productsEmpty" style="display:none;">
                             <i class="fas fa-box-open"></i>
                             <p>Hali mahsulotlar yo'q. "Yangi Mahsulot" tugmasini bosing.</p>
-                        </div>
-                        <!-- Mobile friendly products list (cards) -->
-                        <div class="products-mobile-list" id="productsMobileList">
-                            <!-- Dynamic mobile cards -->
                         </div>
                     </div>
                 </div>
@@ -1247,6 +1243,45 @@
             <div class="modal-body">
                 <div id="saleImagesGallery" class="sale-images-gallery">
                     <!-- Dynamic images -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer Details Modal -->
+    <div class="modal-overlay" id="customerDetailsModal">
+        <div class="modal" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-user-circle"></i> Mijoz ma'lumotlari</h2>
+                <button class="modal-close" data-modal="customerDetailsModal"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="customerDetailsBody">
+                <!-- Dynamic details -->
+            </div>
+            <div class="modal-footer" style="display:flex; gap:10px; flex-wrap:wrap">
+                <button type="button" class="btn btn-secondary" data-modal="customerDetailsModal">Yopish</button>
+                <div style="margin-left:auto; display:flex; gap:10px;">
+                    <button class="btn btn-info" id="detailHistoryBtn"><i class="fas fa-history"></i> Tarix</button>
+                    <button class="btn btn-primary" id="detailEditBtn"><i class="fas fa-pen"></i> Tahrirlash</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Finance Details Modal -->
+    <div class="modal-overlay" id="financeDetailsModal">
+        <div class="modal" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-file-invoice-dollar"></i> Amaliyot tafsilotlari</h2>
+                <button class="modal-close" data-modal="financeDetailsModal"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="financeDetailsBody">
+                <!-- Dynamic details -->
+            </div>
+            <div class="modal-footer" style="display:flex; gap:10px; flex-wrap:wrap">
+                <button type="button" class="btn btn-secondary" data-modal="financeDetailsModal">Yopish</button>
+                <div style="margin-left:auto; display:flex; gap:10px;">
+                    <button class="btn btn-primary" id="financeDetailEditBtn"><i class="fas fa-pen"></i> Tahrirlash</button>
                 </div>
             </div>
         </div>

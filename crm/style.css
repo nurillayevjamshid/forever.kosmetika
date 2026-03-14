@@ -1644,429 +1644,6 @@ html[data-theme="light"] .form-group select option {
     }
 }
 
-/* ===========================
-   Sales – Mobile cards + detail modal (restored from 570e3e5)
-   =========================== */
-
-/* Hide mobile lists on desktop */
-#salesMobileList,
-#customersMobileList,
-#financeMobileList,
-#productsMobileList {
-    display: none;
-}
-
-@media (max-width: 768px) {
-    /* Prefer dedicated mobile cards for sales */
-    #salesTable {
-        display: none;
-    }
-
-    #salesMobileList {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        padding-top: 8px;
-    }
-
-    .sale-mobile-card {
-        width: 100%;
-        border: 1px solid var(--border);
-        outline: none;
-        text-align: left;
-        border-radius: 14px;
-        padding: 12px 12px;
-        background: rgba(255, 255, 255, 0.03);
-        box-shadow: var(--shadow-md);
-        transition: var(--transition-fast);
-        color: var(--text);
-    }
-
-    .sale-mobile-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
-    }
-
-    .sale-mobile-top-row,
-    .sale-mobile-bottom-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        font-size: 12px;
-        gap: 10px;
-    }
-
-    .sale-mobile-time {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        color: var(--text-secondary);
-    }
-
-    .sale-mobile-time i {
-        font-size: 13px;
-    }
-
-    .sale-mobile-status-badge {
-        padding: 4px 10px;
-        border-radius: 999px;
-        font-size: 11px;
-        font-weight: 700;
-        border: 1px solid var(--border);
-        background: rgba(255, 255, 255, 0.06);
-        color: var(--text);
-        flex-shrink: 0;
-    }
-
-    .sale-mobile-main {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 8px;
-        margin: 8px 0 10px;
-    }
-
-    .sale-mobile-title {
-        font-size: 14px;
-        font-weight: 800;
-        color: var(--text);
-        margin: 0;
-    }
-
-    .sale-mobile-amount {
-        font-size: 14px;
-        font-weight: 900;
-        color: var(--accent);
-        white-space: nowrap;
-    }
-
-    .sale-mobile-region {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        color: var(--text-secondary);
-        min-width: 0;
-    }
-
-    .sale-mobile-region i {
-        font-size: 12px;
-        flex-shrink: 0;
-    }
-
-    .sale-mobile-items {
-        font-weight: 600;
-        color: var(--text-muted);
-        white-space: nowrap;
-    }
-
-    /* Status-based background accents */
-    .sale-mobile-card.status-kutilmoqda {
-        background: linear-gradient(135deg, rgba(41, 182, 246, 0.10), rgba(255, 255, 255, 0.02));
-    }
-
-    .sale-mobile-card.status-sotildi {
-        background: linear-gradient(135deg, rgba(0, 200, 83, 0.10), rgba(255, 255, 255, 0.02));
-    }
-
-    .sale-mobile-card.status-atkaz {
-        background: linear-gradient(135deg, rgba(255, 61, 87, 0.10), rgba(255, 255, 255, 0.02));
-    }
-
-    .sale-mobile-card.status-sotildi .sale-mobile-status-badge {
-        background: var(--success-bg);
-        color: var(--success);
-        border-color: rgba(0, 200, 83, 0.25);
-    }
-
-    .sale-mobile-card.status-atkaz .sale-mobile-status-badge {
-        background: var(--danger-bg);
-        color: var(--danger);
-        border-color: rgba(255, 61, 87, 0.25);
-    }
-
-    .sale-mobile-card.status-kutilmoqda .sale-mobile-status-badge {
-        background: var(--info-bg);
-        color: var(--info);
-        border-color: rgba(41, 182, 246, 0.25);
-    }
-
-    /* === Generic Mobile Card Styles (Reused by other sections) === */
-    .mobile-card {
-        width: 100%;
-        border: 1px solid var(--border);
-        outline: none;
-        text-align: left;
-        border-radius: 14px;
-        padding: 15px;
-        background: rgba(255, 255, 255, 0.03);
-        box-shadow: var(--shadow-md);
-        transition: var(--transition-fast);
-        color: var(--text);
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .mobile-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
-        background: rgba(255, 255, 255, 0.05);
-    }
-
-    .mobile-card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: 10px;
-    }
-
-    .mobile-card-title {
-        font-size: 15px;
-        font-weight: 700;
-        color: var(--text);
-        margin: 0;
-        line-height: 1.3;
-    }
-
-    .mobile-card-subtitle {
-        font-size: 12px;
-        color: var(--text-muted);
-        display: flex;
-        align-items: center;
-        gap: 5px;
-    }
-
-    .mobile-card-body {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-        margin-top: 5px;
-    }
-
-    .mobile-card-info {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-    }
-
-    .mobile-card-label {
-        font-size: 10px;
-        color: var(--text-muted);
-        text-transform: uppercase;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-    }
-
-    .mobile-card-value {
-        font-size: 13px;
-        font-weight: 600;
-        color: var(--text-secondary);
-    }
-
-    .mobile-card-footer {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 10px;
-        padding-top: 10px;
-        border-top: 1px solid var(--border);
-    }
-
-    .mobile-card-badge {
-        padding: 4px 10px;
-        border-radius: 999px;
-        font-size: 11px;
-        font-weight: 700;
-        background: rgba(255, 255, 255, 0.06);
-    }
-
-    /* === Customer Mobile Specifics === */
-    #customersTable { display: none; }
-    #customersMobileList { display: flex; flex-direction: column; gap: 12px; padding-top: 8px; }
-
-    .customer-mobile-card {
-        border-left: 4px solid var(--accent);
-    }
-
-    .customer-mobile-card.vip {
-        border-left-color: #ffd700;
-        background: linear-gradient(135deg, rgba(255, 215, 0, 0.05), rgba(255, 255, 255, 0.02));
-    }
-
-    .customer-mobile-card .amount-debt {
-        color: var(--danger);
-        font-weight: 800;
-    }
-
-    /* === Finance Mobile Specifics === */
-    #financeTable { display: none; }
-    #financeMobileList { display: flex; flex-direction: column; gap: 12px; padding-top: 8px; }
-
-    .finance-mobile-card.income {
-        border-left: 4px solid var(--success);
-        background: linear-gradient(135deg, rgba(0, 200, 83, 0.05), rgba(255, 255, 255, 0.02));
-    }
-
-    .finance-mobile-card.expense {
-        border-left: 4px solid var(--danger);
-        background: linear-gradient(135deg, rgba(255, 61, 87, 0.05), rgba(255, 255, 255, 0.02));
-    }
-
-    .finance-amount-large {
-        font-size: 1.1rem;
-        font-weight: 800;
-    }
-
-    /* === Product Mobile Specifics === */
-    #productsTable { display: none; }
-    #productsMobileList { display: flex; flex-direction: column; gap: 12px; padding-top: 8px; }
-
-    .product-mobile-card {
-        padding: 0;
-        flex-direction: row;
-        height: 110px;
-    }
-
-    .product-mobile-img {
-        width: 100px;
-        height: 100%;
-        object-fit: cover;
-        flex-shrink: 0;
-        border-right: 1px solid var(--border);
-    }
-
-    .product-mobile-placeholder {
-        width: 100px;
-        height: 100%;
-        background: var(--surface-light);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 2rem;
-        color: var(--text-muted);
-        flex-shrink: 0;
-        border-right: 1px solid var(--border);
-    }
-
-    .product-mobile-content {
-        flex: 1;
-        padding: 12px 15px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        min-width: 0;
-    }
-
-    .product-mobile-info-top {
-        display: flex;
-        flex-direction: column;
-        gap: 3px;
-    }
-
-    .product-mobile-price {
-        font-size: 1.1rem;
-        font-weight: 800;
-        color: var(--accent);
-    }
-}
-
-/* Sale detail modal (mostly mobile) */
-.modal-sale-detail {
-    max-width: 480px;
-}
-
-.sale-detail-body {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-}
-
-.sale-detail-top {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 10px;
-}
-
-.sale-detail-date {
-    font-size: 12px;
-    color: var(--text-muted);
-}
-
-.sale-detail-title {
-    font-size: 16px;
-    font-weight: 800;
-}
-
-.sale-detail-amount-block {
-    padding: 10px 12px;
-    border-radius: 14px;
-    background: rgba(255, 255, 255, 0.04);
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-    align-items: baseline;
-}
-
-.sale-detail-amount-block .label {
-    font-size: 13px;
-    color: var(--text-muted);
-}
-
-.sale-detail-amount-block .value {
-    font-size: 16px;
-    font-weight: 900;
-    color: var(--accent);
-}
-
-.sale-detail-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 8px;
-}
-
-.sale-detail-item {
-    padding: 8px 10px;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid var(--border);
-}
-
-.sale-detail-item .label {
-    display: block;
-    font-size: 11px;
-    color: var(--text-muted);
-    margin-bottom: 2px;
-}
-
-.sale-detail-item .value {
-    font-size: 13px;
-    font-weight: 700;
-}
-
-.sale-detail-products h4,
-.sale-detail-note h4 {
-    font-size: 13px;
-    font-weight: 700;
-    margin-bottom: 6px;
-    color: var(--text-secondary);
-}
-
-.sale-detail-products ul {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    padding: 0;
-    margin: 0;
-}
-
-.sale-detail-products li {
-    font-size: 12px;
-}
-
 @media (max-width: 480px) {
     /* Global spacing */
     .pages-container {
@@ -2130,6 +1707,532 @@ html[data-theme="light"] .form-group select option {
 
 /* Extra–small devices: 375px and 320px
    Fokus: yanada ixcham shriftlar, paddings va yanada qulay scroll */
+/* ===========================
+   Sales - Mobile Card View
+   =========================== */
+
+.sales-mobile-list {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.sale-mobile-card {
+    width: 100%;
+    border: none;
+    outline: none;
+    text-align: left;
+    border-radius: 20px;
+    padding: 14px 16px;
+    color: #0f172a;
+    /* default gradient (will be overridden by status- classes) */
+    background: linear-gradient(135deg, #e0f2fe, #f9fafb);
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.22);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.sale-mobile-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 26px rgba(15, 23, 42, 0.3);
+}
+
+.sale-mobile-top-row,
+.sale-mobile-bottom-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+}
+
+.sale-mobile-time {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #0f172a;
+    opacity: 0.8;
+}
+
+/* calendar icon biroz yirik va yaqqol */
+.sale-mobile-time i {
+    font-size: 15px;
+}
+
+.sale-mobile-status-badge {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    background: rgba(15, 23, 42, 0.06);
+    color: #0f172a;
+}
+
+.sale-mobile-main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.sale-mobile-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.sale-mobile-amount {
+    font-size: 14px;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.sale-mobile-region {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #111827;
+}
+
+.sale-mobile-region i {
+    font-size: 12px;
+}
+
+.sale-mobile-items {
+    font-weight: 500;
+    color: #4b5563;
+}
+
+/* Status-based background colors */
+.sale-mobile-card.status-kutilmoqda {
+    /* yumshoq sariq */
+    background: linear-gradient(135deg, #fef9c3, #fffbeb);
+}
+
+.sale-mobile-card.status-sotildi {
+    background: linear-gradient(135deg, #dcfce7, #ecfdf5);
+}
+
+.sale-mobile-card.status-atkaz {
+    background: linear-gradient(135deg, #fee2e2, #fef2f2);
+}
+
+.sale-mobile-card.status-sotildi .sale-mobile-status-badge {
+    background: rgba(22, 163, 74, 0.12);
+    color: #15803d;
+}
+
+.sale-mobile-card.status-atkaz .sale-mobile-status-badge {
+    background: rgba(239, 68, 68, 0.14);
+    color: #b91c1c;
+}
+
+.sale-mobile-card.status-kutilmoqda .sale-mobile-status-badge {
+    background: rgba(59, 130, 246, 0.12);
+    color: #1d4ed8;
+}
+
+/* ===========================
+   Customers - Mobile Card View
+   =========================== */
+
+.customers-mobile-list {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.customer-mobile-card {
+    width: 100%;
+    border: none;
+    outline: none;
+    text-align: left;
+    border-radius: 20px;
+    padding: 14px 16px;
+    color: #0f172a;
+    background: linear-gradient(135deg, #e0f7fa, #b2ebf2); /* Light blue background */
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.10);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.customer-mobile-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 26px rgba(15, 23, 42, 0.18);
+}
+
+.customer-mobile-top-row,
+.customer-mobile-bottom-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+}
+
+.customer-mobile-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: #006064;
+}
+
+.customer-mobile-phone {
+    font-weight: 600;
+    color: #00838f;
+}
+
+.customer-mobile-region {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #006064;
+    font-size: 13px;
+}
+
+/* Customer details modal styles */
+.customer-detail-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.customer-detail-item {
+    padding: 12px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.customer-detail-item i {
+    font-size: 20px;
+    color: var(--accent);
+    width: 24px;
+    text-align: center;
+}
+.customer-detail-item .label {
+    display: block;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+}
+.customer-detail-item .value {
+    font-weight: 600;
+    font-size: 14px;
+}
+html[data-theme="light"] .customer-detail-item {
+    background: #f8fafc;
+}
+
+/* Sale detail modal (used mainly on mobile) */
+.modal-sale-detail {
+    max-width: 480px;
+}
+
+.sale-detail-body {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.sale-detail-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.sale-detail-date {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.sale-detail-title {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.sale-detail-status-badge {
+    align-self: flex-start;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.sale-detail-status-badge.status-kutilmoqda {
+    background: var(--warning-bg);
+    color: var(--warning);
+}
+
+.sale-detail-status-badge.status-sotildi {
+    background: var(--success-bg);
+    color: var(--success);
+}
+
+.sale-detail-status-badge.status-atkaz {
+    background: var(--danger-bg);
+    color: var(--danger);
+}
+
+/* Container for status select inside sale detail modal */
+.sale-detail-status-wrap .status-select-wrap {
+    min-width: 0;
+}
+
+.sale-detail-amount-block {
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.04);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.sale-detail-amount-block .label {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.sale-detail-amount-block .value {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--accent);
+}
+
+.sale-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 8px;
+}
+
+.sale-detail-item {
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.sale-detail-item .label {
+    display: block;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+}
+
+.sale-detail-item .value {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.sale-detail-products h4,
+.sale-detail-note h4 {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--text-secondary);
+}
+
+.sale-detail-products ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sale-detail-products li {
+    list-style: none;
+}
+
+.btn-product-full {
+    width: 100%;
+    border: none;
+    outline: none;
+    text-align: left;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    display: grid;
+    grid-template-columns: 1.4fr auto auto;
+    gap: 8px;
+    font-size: 13px;
+    align-items: center;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.btn-product-full:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-1px);
+}
+
+.sale-detail-products .p-name {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--accent);
+}
+
+.sale-detail-products .p-qty {
+    font-weight: 600;
+    color: var(--accent);
+}
+
+.sale-detail-products .p-price {
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-align: right;
+}
+
+.sale-detail-note p {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+/* ===========================
+   Finance - Mobile Card View
+   =========================== */
+
+.finance-mobile-list {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.finance-mobile-card {
+    width: 100%;
+    border: none;
+    outline: none;
+    text-align: left;
+    border-radius: 20px;
+    padding: 14px 16px;
+    color: #0f172a;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.10);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.finance-mobile-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 26px rgba(15, 23, 42, 0.18);
+}
+
+.finance-mobile-card.type-income {
+    background: linear-gradient(135deg, #dcfce7, #ecfdf5); /* Light green */
+}
+
+.finance-mobile-card.type-expense {
+    background: linear-gradient(135deg, #fee2e2, #fef2f2); /* Light red/pink */
+}
+
+.finance-mobile-top-row,
+.finance-mobile-bottom-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+}
+
+.finance-mobile-category {
+    font-size: 15px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.finance-mobile-amount {
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.finance-mobile-card.type-income .finance-mobile-amount {
+    color: #15803d;
+}
+
+.finance-mobile-card.type-expense .finance-mobile-amount {
+    color: #b91c1c;
+}
+
+.finance-mobile-date {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #4b5563;
+}
+
+.finance-mobile-desc {
+    color: #6b7280;
+    font-style: italic;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+
+/* Finance details modal styles */
+.finance-detail-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.finance-detail-item {
+    padding: 12px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.finance-detail-item i {
+    font-size: 20px;
+    color: var(--accent);
+    width: 24px;
+    text-align: center;
+}
+
+.finance-detail-item .label {
+    display: block;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+}
+
+.finance-detail-item .value {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+html[data-theme="light"] .finance-detail-item {
+    background: #f8fafc;
+}
+
+
+@media (max-width: 768px) {
+    /* Sales, Customers & Finance: hide table, show cards on mobile */
+    #page-sales .table-responsive,
+    #page-customers .table-responsive,
+    #page-finance .table-responsive {
+        display: none;
+    }
+
+    #page-sales .sales-mobile-list,
+    #page-customers .customers-mobile-list,
+    #page-finance .finance-mobile-list {
+        display: flex;
+    }
+}
+
 @media (max-width: 375px) {
     body {
         font-size: 13px;
@@ -4180,11 +4283,11 @@ html[data-theme="light"] .profile-tab-btn.active {
         opacity: 0;
         transform: translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
     }
-}
 
    /* ============================
    MOBILE LAYOUT FOR CRM
