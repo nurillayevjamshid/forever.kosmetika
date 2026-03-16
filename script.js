@@ -544,22 +544,21 @@ function createProductCard(product) {
 
             </div>
 
-            <div class="product-info">
+            <div class="product-info" style="padding: 12px 12px 0; display: flex; flex-direction: column; gap: 4px; flex: 1;">
 
-                <h3 class="product-name">${product.name}</h3>
+                <h3 class="product-name" style="font-size: 0.9rem; line-height: 1.3; color: #1a1a2e; font-weight: 500; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.34rem; margin: 0; margin-bottom: 4px;">${product.name}</h3>
+                
+                <div class="current-price" style="font-size: 1.15rem; font-weight: 700; color: #1a1a2e; margin-bottom: 2px;">${formatPrice(product.price)} so'm</div>
+                
+                <div class="product-brand" style="font-size: 0.8rem; color: #8b8b9f; font-weight: 500;">${product.category ? getCategoryName(product.category) : 'Kosmetika'}</div>
 
             </div>
 
         </div>
 
-        <div class="product-footer-container">
+        <div class="product-footer-container" style="padding: 10px 12px 12px; margin-top: auto;">
 
-            <div class="product-footer" id="footer-${product.id}">
-
-                <div class="product-price-block">
-                    <span class="price-label">Narxi</span>
-                    <span class="current-price">${formatPrice(product.price)} so'm</span>
-                </div>
+            <div class="product-footer" id="footer-${product.id}" style="width: 100%; display: flex; padding: 0; border: none;">
 
                 ${getProductFooterHTML(product)}
 
@@ -583,13 +582,13 @@ function getProductFooterHTML(product) {
 
         return `
 
-            <div class="qty-counter-uzum">
+            <div class="qty-counter-uzum" style="width: 100%; display: flex; align-items: center; justify-content: space-between; background: #f5edff; border-radius: 8px; padding: 6px;">
 
-                <button class="qty-btn" onclick="changeQuantity('${product.id}', -1)">−</button>
+                <button class="qty-btn" style="width: 32px; height: 32px; border: none; background: transparent; font-size: 1.2rem; color: #9c27b0; cursor: pointer; display: flex; align-items: center; justify-content: center;" onclick="event.stopPropagation(); changeQuantity('${product.id}', -1)">−</button>
 
-                <span class="qty-display">${cartItem.quantity}</span>
+                <span class="qty-display" style="font-weight: 600; font-size: 1.05rem; color: #000;">${cartItem.quantity}</span>
 
-                <button class="qty-btn" onclick="changeQuantity('${product.id}', 1)">+</button>
+                <button class="qty-btn" style="width: 32px; height: 32px; border: none; background: transparent; font-size: 1.2rem; color: #9c27b0; cursor: pointer; display: flex; align-items: center; justify-content: center;" onclick="event.stopPropagation(); changeQuantity('${product.id}', 1)">+</button>
 
             </div>
 
@@ -601,9 +600,9 @@ function getProductFooterHTML(product) {
 
         return `
 
-            <button class="cart-icon-btn" onclick="event.stopPropagation(); addToCart('${product.id}')">
+            <button class="add-cart-new-btn" style="width: 100%; height: 44px; background: #a62eea; color: white; border: none; border-radius: 8px; font-weight: 500; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: 0.2s; font-family: inherit;" onclick="event.stopPropagation(); addToCart('${product.id}')" onmouseover="this.style.background='#8c1ac6'" onmouseout="this.style.background='#a62eea'">
 
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 
                     <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4H6z"></path>
 
@@ -612,6 +611,8 @@ function getProductFooterHTML(product) {
                     <path d="M16 10a4 4 0 0 1-8 0"></path>
 
                 </svg>
+
+                Tanlash
 
             </button>
 
@@ -631,14 +632,8 @@ function updateProductUI(productId) {
 
         if (product) {
 
-            // Footer ichida har doim narx qismi ham, cart / qty qismi ham bo'lishi uchun
-            footer.innerHTML = `
-                <div class="product-price-block">
-                    <span class="price-label">Narxi</span>
-                    <span class="current-price">${formatPrice(product.price)} so'm</span>
-                </div>
-                ${getProductFooterHTML(product)}
-            `;
+            // Footer ichida endi faqat tugma
+            footer.innerHTML = getProductFooterHTML(product);
 
             // Agar detail modal ochiq bo'lsa, uni ham yangilash
 
