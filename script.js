@@ -1605,23 +1605,16 @@ async function submitOrder(event, isPage = false) {
         // ============================
 
         if (typeof firebaseSaveSale === 'function') {
-
             const saleId = await firebaseSaveSale({
-
                 customerName: name,
-
                 viloyat: viloyat,
-
                 items: cart,
-
+                subtotalAmount: total,
+                deliveryAmount: deliveryPrice,
                 totalAmount: grandTotal,
-
                 orderNumber: orderResult?.orderNumber || ''
-
             });
-
             console.log('🛒 Sotuv Firebase ga saqlandi:', saleId);
-
         }
 
         // ============================
