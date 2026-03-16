@@ -1951,3 +1951,16 @@ window.closeProductDetailModal = closeProductDetailModal;
 
 window.closeSuccessModal = closeSuccessModal;
 
+
+function calculateDeliveryPrice(total, regionType) {
+    // regionType: 'tashkent' | 'regions'
+    if (regionType === 'tashkent') {
+        if (total < 120000) return 20000;
+        if (total < 220000) return 15000;
+        return 0;
+    } else {
+        if (total < 220000) return 35000;
+        if (total < 320000) return 30000;
+        return 0;
+    }
+}

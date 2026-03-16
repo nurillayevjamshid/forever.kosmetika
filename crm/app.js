@@ -1282,8 +1282,16 @@ function getRegionType(region) {
 }
 
 function calculateDeliveryPrice(subtotal, regionType) {
-    if (subtotal >= 500000) return 0;
-    return regionType === 'tashkent' ? 25000 : 35000;
+    // regionType: 'tashkent' | 'regions'
+    if (regionType === 'tashkent') {
+        if (subtotal < 120000) return 20000;
+        if (subtotal < 220000) return 15000;
+        return 0;
+    } else {
+        if (subtotal < 220000) return 35000;
+        if (subtotal < 320000) return 30000;
+        return 0;
+    }
 }
 
 function computeSaleCostTotal(items) {
