@@ -550,7 +550,13 @@ function createProductCard(product) {
                 
                 <div class="current-price" style="font-size: 1.15rem; font-weight: 700; color: #1a1a2e; margin-bottom: 2px;">${formatPrice(product.price)} so'm</div>
                 
-                <div class="product-brand" style="font-size: 0.8rem; color: #8b8b9f; font-weight: 500;">${product.category ? getCategoryName(product.category) : 'Kosmetika'}</div>
+                <div class="product-brand" style="font-size: 0.8rem; color: #8b8b9f; font-weight: 500; display: flex; align-items: center; gap: 4px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                        <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                    </svg>
+                    test
+                </div>
 
             </div>
 
@@ -600,20 +606,13 @@ function getProductFooterHTML(product) {
 
         return `
 
-            <button class="add-cart-new-btn" style="width: 100%; height: 44px; background: #a62eea; color: white; border: none; border-radius: 8px; font-weight: 500; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: 0.2s; font-family: inherit;" onclick="event.stopPropagation(); addToCart('${product.id}')" onmouseover="this.style.background='#8c1ac6'" onmouseout="this.style.background='#a62eea'">
-
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-
-                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4H6z"></path>
-
-                    <path d="M3 6h18"></path>
-
-                    <path d="M16 10a4 4 0 0 1-8 0"></path>
-
+            <button class="add-cart-new-btn" style="width: 100%; height: 44px; background: #57B1E5; color: white; border: none; border-radius: 8px; font-weight: 500; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: 0.2s; font-family: inherit;" onclick="event.stopPropagation(); addToCart('${product.id}')" onmouseover="this.style.background='#469ecf'" onmouseout="this.style.background='#57B1E5'">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="9" cy="21" r="1"></circle>
+                    <circle cx="20" cy="21" r="1"></circle>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
                 </svg>
-
                 Tanlash
-
             </button>
 
         `;
