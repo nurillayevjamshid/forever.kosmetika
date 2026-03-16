@@ -550,13 +550,14 @@ function createProductCard(product) {
                 
                 <div class="current-price" style="font-size: 1.15rem; font-weight: 700; color: #1a1a2e; margin-bottom: 2px;">${formatPrice(product.price)} so'm</div>
                 
+                ${product.brand ? `
                 <div class="product-brand" style="font-size: 0.8rem; color: #8b8b9f; font-weight: 500; display: flex; align-items: center; gap: 4px;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
                         <line x1="7" y1="7" x2="7.01" y2="7"></line>
                     </svg>
-                    test
-                </div>
+                    ${product.brand}
+                </div>` : ''}
 
             </div>
 
@@ -1848,6 +1849,17 @@ function openProductDetailModal(productId) {
     document.getElementById('detailName').textContent = product.name;
 
     document.getElementById('detailPrice').textContent = formatPrice(product.price) + " so'm";
+
+    const brandRow = document.getElementById('detailBrandRow');
+    const brandEl = document.getElementById('detailBrand');
+    if (brandRow && brandEl) {
+        if (product.brand) {
+            brandEl.textContent = product.brand;
+            brandRow.style.display = 'flex';
+        } else {
+            brandRow.style.display = 'none';
+        }
+    }
 
     document.getElementById('detailDescription').textContent = product.description || "Mahsulot haqida batafsil ma'lumot tez orada joylanadi.";
 
