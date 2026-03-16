@@ -375,7 +375,7 @@ function renderProducts(searchTerm) {
                     imgHtml +
                     '<div class="product-detail-text">' +
                         '<div class="product-name">' + escapeHtml(p.name) + '</div>' +
-                        '<div class="product-category">' + escapeHtml(p.category || 'Boshqa') + '</div>' +
+                        '<div class="product-category">' + escapeHtml(p.category || 'Boshqa') + (p.brand ? ' | ' + escapeHtml(p.brand) : '') + '</div>' +
                     '</div>' +
                 '</div>' +
             '</td>' +
@@ -402,7 +402,7 @@ function renderProducts(searchTerm) {
                 '<div class="pm-img-wrap">' + imgHtml + '</div>' +
                 '<div class="pm-name-wrap">' +
                 '<span class="pm-name">' + escapeHtml(p.name) + '</span>' +
-                '<span class="pm-category">' + escapeHtml(p.category || 'Boshqa') + '</span>' +
+                '<span class="pm-category">' + escapeHtml(p.category || 'Boshqa') + (p.brand ? ' | ' + escapeHtml(p.brand) : '') + '</span>' +
                 '</div>' +
                 '<div class="pm-price">' + formatMoney(p.price) + '</div>' +
                 '</button>';
@@ -876,6 +876,7 @@ function editProduct(id) {
     if (!p) return;
     document.getElementById('productId').value = p.id;
     document.getElementById('productName').value = p.name;
+    document.getElementById('productBrand').value = p.brand || '';
     document.getElementById('productPrice').value = p.price || 0;
     document.getElementById('productCost').value = p.cost || p.costPrice || 0;
     document.getElementById('productCost').readOnly = true;
@@ -894,6 +895,7 @@ function editProduct(id) {
 document.getElementById('addProductBtn').addEventListener('click', function () {
     document.getElementById('productForm').reset();
     document.getElementById('productId').value = '';
+    document.getElementById('productBrand').value = '';
     document.getElementById('productCost').readOnly = false;
     initSelectPicker('productCategoryPicker', allProductCategories);
     setSelectValue('productCategoryPicker', '', 'Tanlang...');
@@ -979,6 +981,7 @@ document.getElementById('productForm').addEventListener('submit', function (e) {
 
     var data = {
         name: document.getElementById('productName').value.trim(),
+        brand: document.getElementById('productBrand').value.trim(),
         category: document.getElementById('productCategory').value,
         price: parseFloat(document.getElementById('productPrice').value) || 0,
         status: document.getElementById('productStatus').value || 'active',
