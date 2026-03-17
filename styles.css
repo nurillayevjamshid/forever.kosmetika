@@ -88,7 +88,7 @@ body {
 .nav-container {
     max-width: 1280px;
     margin: 0 auto;
-    padding: 1rem var(--spacing-md);
+    padding: 0.5rem var(--spacing-md);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -101,7 +101,7 @@ body {
 }
 
 .logo-img {
-    height: 50px;
+    height: 80px;
     width: auto;
     object-fit: contain;
     transition: transform var(--transition-base);
