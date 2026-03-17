@@ -1961,3 +1961,436 @@ function calculateDeliveryPrice(total, regionType) {
         return 0;
     }
 }
+
+// ================================
+// CART PAGE FUNCTIONS
+// ================================
+
+function showStep(stepId) {
+    const steps = document.querySelectorAll('.step-container');
+    steps.forEach(s => s.classList.remove('active'));
+    const target = document.getElementById(stepId);
+    if (target) target.classList.add('active');
+}
+
+function renderCartPage() {
+    const container = document.getElementById('cartContent');
+    if (!container) return;
+
+    cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    if (cart.length === 0) {
+        container.innerHTML = `
+            <div class="empty-cart-page">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#c0c0d0" stroke-width="1.5" style="margin-bottom: 1.5rem;">
+                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4H6z"></path>
+                    <path d="M3 6h18"></path>
+                    <path d="M16 10a4 4 0 0 1-8 0"></path>
+                </svg>
+                <h2>Savatingiz bo'sh</h2>
+                <p>Mahsulotlar qo'shish uchun do'konga qaytib, yoqtirgan mahsulotingizni tanlang.</p>
+                <a href="index.html" class="btn btn-primary" style="display: inline-flex; width: auto;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"></path>
+                    </svg>
+                    Do'konga qaytish
+                </a>
+            </div>
+        `;
+        return;
+    }
+
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+    // Viloyat options
+    let viloyatOptions = '<option value="" disabled selected>Viloyatni tanlang</option>';
+    Object.keys(tumanlarData).forEach(v => {
+        viloyatOptions += `<option value="${v}">${v}</option>`;
+    });
+
+    container.innerHTML = `
+        <!-- Step 1: Savat + Buyurtma -->
+        <div class="step-container active" id="cartStep">
+            <div class="checkout-header">
+                <h1>Savatingiz</h1>
+                <button class="clear-cart-btn" onclick="clearCart()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    Tozalash
+                </button>
+            </div>
+
+            <div class="modal-body-layout">
+                <!-- Chap tomon: Mahsulotlar ro'yxati -->
+                <div class="modal-main-content">
+                    <div class="cart-items-list" id="cartItemsList">
+                        ${renderCartItems()}
+                    </div>
+                </div>
+
+                <!-- O'ng tomon: Buyurtma berish -->
+                <div class="modal-sidebar">
+                    <div class="order-summary-card order-summary-premium">
+                        <div class="summary-header-premium">
+                            <div class="summary-header-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4H6z"></path>
+                                    <path d="M3 6h18"></path>
+                                    <path d="M16 10a4 4 0 0 1-8 0"></path>
+                                </svg>
+                            </div>
+                            <h3>Buyurtma xulosasi</h3>
+                        </div>
+
+                        <div class="summary-items-list summary-items-premium" id="summaryItemsList">
+                            ${renderSummaryItems()}
+                        </div>
+
+                        <div id="deliverySectionPremium" class="delivery-section-premium" style="display: none;"></div>
+
+                        <div class="summary-breakdown-premium" id="summaryBreakdown">
+                            <div class="breakdown-row">
+                                <span>Mahsulotlar</span>
+                                <span>${formatPrice(total)} so'm</span>
+                            </div>
+                            <div class="breakdown-row delivery-row" id="deliveryBreakdownRow" style="display: none;">
+                                <span>Yetkazib berish</span>
+                                <span class="delivery-price-tag" id="deliveryPriceTag">—</span>
+                            </div>
+                        </div>
+
+                        <div class="summary-total summary-total-premium">
+                            <span>Jami:</span>
+                            <span id="cartPageTotal">${formatPrice(total)} so'm</span>
+                        </div>
+
+                        <button class="btn btn-primary btn-full checkout-btn checkout-btn-premium" onclick="showStep('orderStep')">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"></path>
+                            </svg>
+                            Buyurtma berish
+                        </button>
+
+                        <button class="continue-shopping" onclick="window.location.href='index.html'">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 12H5M12 19l-7-7 7-7"></path>
+                            </svg>
+                            Xaridni davom ettirish
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Buyurtma ma'lumotlari -->
+        <div class="step-container" id="orderStep">
+            <div class="checkout-header">
+                <h1>Buyurtma berish</h1>
+                <button class="back-link" onclick="showStep('cartStep')" style="cursor: pointer; background: none; border: none; font-size: 1rem; font-family: inherit;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"></path>
+                    </svg>
+                    <span>Savatga qaytish</span>
+                </button>
+            </div>
+
+            <div class="modal-body-layout">
+                <div class="modal-main-content">
+                    <form id="orderFormPage" onsubmit="submitOrder(event, true)">
+                        <!-- Shaxsiy ma'lumotlar -->
+                        <div class="order-section-card" style="margin-bottom: 1.5rem;">
+                            <div class="section-title-row">
+                                <div class="section-icon">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                </div>
+                                <h3>Shaxsiy ma'lumotlar</h3>
+                            </div>
+                            <div class="form-grid two-cols">
+                                <div class="form-group">
+                                    <label class="field-label">
+                                        <span class="label-icon">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                        </span>
+                                        Ismingiz
+                                    </label>
+                                    <input type="text" id="orderNamePage" required placeholder="Ismingizni kiriting">
+                                </div>
+                                <div class="form-group">
+                                    <label class="field-label">
+                                        <span class="label-icon">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                                        </span>
+                                        Telefon raqam
+                                    </label>
+                                    <div class="phone-input-wrapper">
+                                        <span class="country-code">+998</span>
+                                        <input type="tel" id="orderPhonePage" required placeholder="90 123 45 67" pattern="[0-9 ]{9,12}" maxlength="12">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Manzil -->
+                        <div class="order-section-card" style="margin-bottom: 1.5rem;">
+                            <div class="section-title-row">
+                                <div class="section-icon">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                        <circle cx="12" cy="10" r="3"></circle>
+                                    </svg>
+                                </div>
+                                <h3>Yetkazib berish manzili</h3>
+                            </div>
+                            <div class="form-grid two-cols">
+                                <div class="form-group">
+                                    <label class="field-label">
+                                        <span class="label-icon">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                        </span>
+                                        Viloyat
+                                    </label>
+                                    <div class="custom-select" data-placeholder="Viloyatni tanlang">
+                                        <select id="orderViloyatPage" class="native-select" required onchange="handleViloyatChange(true)">
+                                            ${viloyatOptions}
+                                        </select>
+                                        <button type="button" class="custom-select-trigger" aria-expanded="false">
+                                            <span class="custom-select-value">Viloyatni tanlang</span>
+                                            <span class="custom-select-caret"></span>
+                                        </button>
+                                        <div class="custom-select-panel" role="listbox"></div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="field-label">
+                                        <span class="label-icon dot-icon"></span>
+                                        Tuman
+                                    </label>
+                                    <div class="custom-select" data-placeholder="Tumanni tanlang">
+                                        <select id="orderTumanPage" class="native-select" required disabled onchange="updateOrderDeliveryTextFromInputs()">
+                                            <option value="" disabled selected>Tumanni tanlang</option>
+                                        </select>
+                                        <button type="button" class="custom-select-trigger" aria-expanded="false" disabled>
+                                            <span class="custom-select-value">Tumanni tanlang</span>
+                                            <span class="custom-select-caret"></span>
+                                        </button>
+                                        <div class="custom-select-panel" role="listbox"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-full checkout-btn checkout-btn-premium" style="width: 100%;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                            Buyurtmani tasdiqlash
+                        </button>
+                    </form>
+                </div>
+
+                <!-- O'ng sidebar: Buyurtma xulosasi -->
+                <div class="modal-sidebar">
+                    <div class="order-summary-card order-summary-premium">
+                        <div class="summary-header-premium">
+                            <div class="summary-header-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"></path>
+                                    <rect x="9" y="3" width="6" height="4" rx="2"></rect>
+                                </svg>
+                            </div>
+                            <h3>Buyurtma tafsiloti</h3>
+                        </div>
+                        <div class="summary-items-list summary-items-premium" id="orderSummaryItemsList">
+                            ${renderSummaryItems()}
+                        </div>
+                        <div id="orderDeliverySectionPremium" class="delivery-section-premium" style="display: none;"></div>
+                        <div class="summary-breakdown-premium" id="orderSummaryBreakdown">
+                            <div class="breakdown-row">
+                                <span>Mahsulotlar</span>
+                                <span>${formatPrice(total)} so'm</span>
+                            </div>
+                            <div class="breakdown-row delivery-row" id="orderDeliveryBreakdownRow" style="display: none;">
+                                <span>Yetkazib berish</span>
+                                <span class="delivery-price-tag" id="orderDeliveryPriceTag">—</span>
+                            </div>
+                        </div>
+                        <div class="summary-total summary-total-premium">
+                            <span>Jami:</span>
+                            <span id="orderPageTotal">${formatPrice(total)} so'm</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Muvaffaqiyat -->
+        <div class="step-container" id="successStep">
+            <div class="success-page-content" style="text-align: center; padding: 5rem 0;">
+                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #22c55e, #16a34a); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </div>
+                <h2 style="font-size: 2rem; font-family: var(--font-display); color: var(--text-primary); margin-bottom: 0.5rem;">Buyurtma qabul qilindi!</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 2rem; max-width: 400px; margin-left: auto; margin-right: auto;">Buyurtmangiz muvaffaqiyatli yuborildi. Tez orada menejerimiz siz bilan bog'lanadi.</p>
+                <a href="index.html" class="btn btn-primary" style="display: inline-flex; width: auto;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                    Bosh sahifaga qaytish
+                </a>
+            </div>
+        </div>
+    `;
+
+    // Custom selectlarni qayta ishga tushirish
+    initCustomSelects();
+}
+
+function renderCartItems() {
+    return cart.map(item => {
+        const imgUrl = item.imageUrl || item.image || (Array.isArray(item.imageUrls) && item.imageUrls[0]) || `https://via.placeholder.com/100x100?text=${encodeURIComponent(item.name)}`;
+        return `
+            <div class="cart-item">
+                <img class="cart-item-image" src="${imgUrl}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/100x100?text=No+Image'">
+                <div class="cart-item-info">
+                    <h4>${item.name}</h4>
+                    <div class="cart-item-price">${formatPrice(item.price)} so'm</div>
+                    <div class="cart-item-controls">
+                        <div class="qty-counter">
+                            <button class="qty-btn" onclick="changeQuantityPage('${item.id}', -1)">−</button>
+                            <span class="qty-display">${item.quantity}</span>
+                            <button class="qty-btn" onclick="changeQuantityPage('${item.id}', 1)">+</button>
+                        </div>
+                        <button class="cart-item-remove-icon" onclick="removeFromCartPage('${item.id}')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function renderSummaryItems() {
+    return cart.map(item => `
+        <div class="summary-item-row summary-item-row-premium">
+            <span class="item-name-col">
+                <span class="item-dot"></span>
+                ${item.name}
+                <span class="item-qty-badge">x${item.quantity}</span>
+            </span>
+            <span class="item-price-col">${formatPrice(item.price * item.quantity)} so'm</span>
+        </div>
+    `).join('');
+}
+
+function updateCartPageUI() {
+    cart = JSON.parse(localStorage.getItem('cart')) || [];
+    renderCartPage();
+    updateCartCount();
+}
+
+function changeQuantityPage(productId, change) {
+    const item = cart.find(i => i.id.toString() === productId.toString());
+    if (item) {
+        item.quantity += change;
+        if (item.quantity <= 0) {
+            cart = cart.filter(i => i.id.toString() !== productId.toString());
+        }
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartPageUI();
+    }
+}
+
+function removeFromCartPage(productId) {
+    cart = cart.filter(i => i.id.toString() !== productId.toString());
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartPageUI();
+}
+
+function updateOrderDeliveryTextFromInputs() {
+    const viloyatEl = document.getElementById('orderViloyatPage');
+    const tumanEl = document.getElementById('orderTumanPage');
+    if (!viloyatEl || !tumanEl) return;
+
+    const viloyat = viloyatEl.value;
+    const tuman = tumanEl.value;
+
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+    // Delivery section elements in both steps
+    const deliverySection = document.getElementById('deliverySectionPremium');
+    const deliveryRow = document.getElementById('deliveryBreakdownRow');
+    const deliveryTag = document.getElementById('deliveryPriceTag');
+    const cartTotalEl = document.getElementById('cartPageTotal');
+
+    const orderDeliverySection = document.getElementById('orderDeliverySectionPremium');
+    const orderDeliveryRow = document.getElementById('orderDeliveryBreakdownRow');
+    const orderDeliveryTag = document.getElementById('orderDeliveryPriceTag');
+    const orderTotalEl = document.getElementById('orderPageTotal');
+
+    if (viloyat && tuman) {
+        const regionType = viloyat === 'Toshkent shahri' ? 'tashkent' : 'regions';
+        const deliveryPrice = calculateDeliveryPrice(total, regionType);
+        const grandTotal = total + deliveryPrice;
+
+        const deliveryText = deliveryPrice > 0
+            ? `${formatPrice(deliveryPrice)} so'm`
+            : 'Tekin';
+
+        const deliveryBadgeHTML = `
+            <div class="delivery-badge-premium">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="1" y="3" width="15" height="13"></rect>
+                    <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                    <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                    <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                </svg>
+                <span>${viloyat}, ${tuman} — ${deliveryPrice > 0 ? formatPrice(deliveryPrice) + " so'm" : 'Tekin yetkazib berish'}</span>
+            </div>
+        `;
+
+        // Order step delivery
+        if (orderDeliverySection) {
+            orderDeliverySection.innerHTML = deliveryBadgeHTML;
+            orderDeliverySection.style.display = '';
+        }
+        if (orderDeliveryRow) orderDeliveryRow.style.display = '';
+        if (orderDeliveryTag) {
+            orderDeliveryTag.textContent = deliveryText;
+            orderDeliveryTag.className = 'delivery-price-tag' + (deliveryPrice === 0 ? ' free-delivery' : '');
+        }
+        if (orderTotalEl) orderTotalEl.textContent = formatPrice(grandTotal) + " so'm";
+
+        // Cart step delivery (mirror)
+        if (deliverySection) {
+            deliverySection.innerHTML = deliveryBadgeHTML;
+            deliverySection.style.display = '';
+        }
+        if (deliveryRow) deliveryRow.style.display = '';
+        if (deliveryTag) {
+            deliveryTag.textContent = deliveryText;
+            deliveryTag.className = 'delivery-price-tag' + (deliveryPrice === 0 ? ' free-delivery' : '');
+        }
+        if (cartTotalEl) cartTotalEl.textContent = formatPrice(grandTotal) + " so'm";
+    }
+}
+
+// Make cart page functions globally available
+window.renderCartPage = renderCartPage;
+window.updateCartPageUI = updateCartPageUI;
+window.showStep = showStep;
+window.changeQuantityPage = changeQuantityPage;
+window.removeFromCartPage = removeFromCartPage;
+window.updateOrderDeliveryTextFromInputs = updateOrderDeliveryTextFromInputs;
