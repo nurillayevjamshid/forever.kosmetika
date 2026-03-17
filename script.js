@@ -2184,6 +2184,27 @@ function renderCartPage() {
                             </div>
                         </div>
 
+                        <!-- Prepayment Notice (pochta orqali viloyatga) -->
+                        <div id="prepaymentNotice" class="prepayment-notice-card" style="display: none;">
+                            <div class="prepayment-notice-inner">
+                                <div class="prepayment-icon-wrap">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                                        <line x1="1" y1="10" x2="23" y2="10"></line>
+                                    </svg>
+                                </div>
+                                <p class="prepayment-main-text">
+                                    Hurmatli mijoz, siz mahsulotingiz pochta orqali yuborilishi uchun oldindan <strong id="prepaymentAmount">0</strong> so'm to'lov qilishingiz kerak.
+                                </p>
+                                <p class="prepayment-sub-text">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                                    </svg>
+                                    Buyurtmadan so'ng mutaxassislarimiz to'lov masalasida siz bilan bog'lanishadi
+                                </p>
+                            </div>
+                        </div>
+
                         <button type="submit" class="btn btn-primary btn-full checkout-btn checkout-btn-premium" style="width: 100%;">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
@@ -2340,6 +2361,10 @@ function updateOrderDeliveryTextFromInputs() {
     const orderDeliveryTag = document.getElementById('orderDeliveryPriceTag');
     const orderTotalEl = document.getElementById('orderPageTotal');
 
+    // Prepayment notice elements
+    const prepaymentNotice = document.getElementById('prepaymentNotice');
+    const prepaymentAmount = document.getElementById('prepaymentAmount');
+
     if (viloyat && tuman) {
         const regionType = viloyat === 'Toshkent shahri' ? 'tashkent' : 'regions';
         const deliveryPrice = calculateDeliveryPrice(total, regionType);
@@ -2384,6 +2409,26 @@ function updateOrderDeliveryTextFromInputs() {
             deliveryTag.className = 'delivery-price-tag' + (deliveryPrice === 0 ? ' free-delivery' : '');
         }
         if (cartTotalEl) cartTotalEl.textContent = formatPrice(grandTotal) + " so'm";
+
+        // Prepayment notice for viloyat (pochta) deliveries
+        const isRegionDelivery = viloyat !== 'Toshkent shahri';
+        if (isRegionDelivery && prepaymentNotice && prepaymentAmount) {
+            // Calculate: sum(tannarx * quantity) + deliveryPrice
+            const costTotal = cart.reduce((sum, item) => {
+                const costPrice = parseFloat(item.cost) || 0;
+                return sum + (costPrice * item.quantity);
+            }, 0);
+            const prepayment = costTotal + deliveryPrice;
+            prepaymentAmount.textContent = formatPrice(prepayment);
+            prepaymentNotice.style.display = 'block';
+        } else if (prepaymentNotice) {
+            prepaymentNotice.style.display = 'none';
+        }
+    } else {
+        // Hide prepayment notice if no region/district selected
+        if (prepaymentNotice) {
+            prepaymentNotice.style.display = 'none';
+        }
     }
 }
 
