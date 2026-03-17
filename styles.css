@@ -88,7 +88,7 @@ body {
 .nav-container {
     max-width: 1280px;
     margin: 0 auto;
-    padding: 0.5rem var(--spacing-md);
+    padding: 0.25rem var(--spacing-md);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -97,11 +97,11 @@ body {
 .logo {
     display: flex;
     align-items: center;
-    line-height: 1.2;
+    line-height: 1;
 }
 
 .logo-img {
-    height: 85px; /* Adjust as needed */
+    height: 50px; /* Adjust as needed */
     width: auto;
     object-fit: contain;
     transition: transform var(--transition-base);
@@ -226,7 +226,7 @@ body {
     min-height: 100vh;
     display: flex;
     align-items: center;
-    padding-top: 80px;
+    padding-top: 70px;
     overflow: hidden;
     background: linear-gradient(180deg, #f8f9fe 0%, #ffffff 100%);
 }
