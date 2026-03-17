@@ -2426,6 +2426,7 @@ body {
    ================================ */
 .prepayment-notice-card {
     margin-top: 2rem;
+    margin-bottom: 2rem;
     padding: 1.5rem;
     background: linear-gradient(135deg, #fffcf5 0%, #fff9e6 100%);
     border: 1px solid rgba(217, 119, 6, 0.15);
