@@ -741,7 +741,7 @@ var categoryIcons = {
     'Yandex': { icon: 'fa-taxi', color: '#fcd34d' },
     'Pochta': { icon: 'fa-envelope', color: '#64748b' },
     // Product Categories
-    'Yuz kremi': { icon: 'fa-cream', color: '#f472b6' },
+    'Yuz kremi': { icon: 'fa-face-smile', color: '#f472b6' },
     'Parfyumeriya': { icon: 'fa-spray-can', color: '#a78bfa' },
     'Soqol parvarishi': { icon: 'fa-user-ninja', color: '#4b5563' },
     'Soch parvarishi': { icon: 'fa-scissors', color: '#fbbf24' },
