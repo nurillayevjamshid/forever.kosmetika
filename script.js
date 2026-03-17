@@ -424,9 +424,13 @@ function displayProducts(filter = 'all') {
 
             if (f === 'soch' && cat.includes('soch')) return true;
 
+            // Yuz kremi
+
+            if (f === 'yuz kremi' && cat.includes('yuz kremi')) return true;
+
             // CRM dagi "Tana parvarishi" -> websitedagi "parvarish"
 
-            if (f === 'parvarish' && (cat.includes('tana') || cat.includes('parvarish') || cat.includes('krem'))) return true;
+            if (f === 'parvarish' && (cat.includes('tana') || cat.includes('parvarish'))) return true;
 
             // CRM dagi "Atir" yoki "Parfyumeriya" -> websitedagi "atir"
 
