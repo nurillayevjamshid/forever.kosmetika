@@ -4,20 +4,20 @@
 
 :root {
     /* Primary Palette - Deep Navy & Gold */
-    --primary: #1a1a2e;
-    --primary-light: #16213e;
-    --primary-dark: #0e1018;
-    --accent: #ffffff;
-    --accent-light: #ffffff;
-    --accent-dark: #dbe3f2;
-    --accent-glow: rgba(255, 255, 255, 0.14);
-    --accent-border-soft: rgba(255, 255, 255, 0.22);
-    --accent-border-mid: rgba(255, 255, 255, 0.38);
-    --accent-border-strong: rgba(255, 255, 255, 0.58);
-    --accent-bg-soft: rgba(255, 255, 255, 0.1);
-    --accent-bg-mid: rgba(255, 255, 255, 0.14);
-    --accent-ring: rgba(255, 255, 255, 0.2);
-    --accent-shadow-strong: 0 0 30px rgba(255, 255, 255, 0.25);
+    --primary: #0f172a;
+    --primary-light: #1e293b;
+    --primary-dark: #020617;
+    --accent: #6188FF;
+    --accent-light: #80a1ff;
+    --accent-dark: #4a6dd9;
+    --accent-glow: rgba(97, 136, 255, 0.14);
+    --accent-border-soft: rgba(97, 136, 255, 0.22);
+    --accent-border-mid: rgba(97, 136, 255, 0.38);
+    --accent-border-strong: rgba(97, 136, 255, 0.58);
+    --accent-bg-soft: rgba(97, 136, 255, 0.1);
+    --accent-bg-mid: rgba(97, 136, 255, 0.14);
+    --accent-ring: rgba(97, 136, 255, 0.2);
+    --accent-shadow-strong: 0 0 30px rgba(97, 136, 255, 0.25);
 
     /* Semantic Colors */
     --success: #00c853;
@@ -44,7 +44,7 @@
 
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    --gradient-accent: linear-gradient(135deg, #ffffff 0%, #e8efff 100%);
+    --gradient-accent: linear-gradient(135deg, #6188FF 0%, #4a6dd9 100%);
     --gradient-income: linear-gradient(135deg, #00c853 0%, #69f0ae 100%);
     --gradient-expense: linear-gradient(135deg, #ff3d57 0%, #ff8a80 100%);
     --gradient-profit: linear-gradient(135deg, #7c4dff 0%, #b388ff 100%);

@@ -321,14 +321,17 @@ async function firebaseSaveSale(saleData) {
             region: saleData.viloyat || saleData.region || '',
             items: items,
             totalAmount: saleData.totalAmount || 0,
+            subtotalAmount: saleData.subtotalAmount || 0,
+            deliveryAmount: saleData.deliveryAmount || 0,
             note: saleData.note || '',
             source: saleData.source || 'website',
             orderNumber: saleData.orderNumber || '',
+            status: 'yangi',
             createdAt: nowIso,
             updatedAt: nowIso
         };
 
-        const docRef = await db.collection('sales').add(sale);
+        const docRef = await salesCollection.add(sale);
         console.log('✅ Sotuv saqlandi, ID:', docRef.id);
         return docRef.id;
     } catch (error) {

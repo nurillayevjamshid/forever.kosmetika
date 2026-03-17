@@ -375,7 +375,7 @@ function renderProducts(searchTerm) {
                     imgHtml +
                     '<div class="product-detail-text">' +
                         '<div class="product-name">' + escapeHtml(p.name) + '</div>' +
-                        '<div class="product-category">' + escapeHtml(p.category || 'Boshqa') + '</div>' +
+                        '<div class="product-category">' + escapeHtml(p.category || 'Boshqa') + (p.brand ? ' | ' + escapeHtml(p.brand) : '') + '</div>' +
                     '</div>' +
                 '</div>' +
             '</td>' +
@@ -402,7 +402,7 @@ function renderProducts(searchTerm) {
                 '<div class="pm-img-wrap">' + imgHtml + '</div>' +
                 '<div class="pm-name-wrap">' +
                 '<span class="pm-name">' + escapeHtml(p.name) + '</span>' +
-                '<span class="pm-category">' + escapeHtml(p.category || 'Boshqa') + '</span>' +
+                '<span class="pm-category">' + escapeHtml(p.category || 'Boshqa') + (p.brand ? ' | ' + escapeHtml(p.brand) : '') + '</span>' +
                 '</div>' +
                 '<div class="pm-price">' + formatMoney(p.price) + '</div>' +
                 '</button>';
@@ -741,7 +741,7 @@ var categoryIcons = {
     'Yandex': { icon: 'fa-taxi', color: '#fcd34d' },
     'Pochta': { icon: 'fa-envelope', color: '#64748b' },
     // Product Categories
-    'Yuz kremi': { icon: 'fa-sparkles', color: '#f472b6' },
+    'Yuz kremi': { icon: 'fa-face-smile', color: '#f472b6' },
     'Parfyumeriya': { icon: 'fa-spray-can', color: '#a78bfa' },
     'Soqol parvarishi': { icon: 'fa-user-ninja', color: '#4b5563' },
     'Soch parvarishi': { icon: 'fa-scissors', color: '#fbbf24' },
@@ -876,6 +876,7 @@ function editProduct(id) {
     if (!p) return;
     document.getElementById('productId').value = p.id;
     document.getElementById('productName').value = p.name;
+    document.getElementById('productBrand').value = p.brand || '';
     document.getElementById('productPrice').value = p.price || 0;
     document.getElementById('productCost').value = p.cost || p.costPrice || 0;
     document.getElementById('productCost').readOnly = true;
@@ -894,6 +895,7 @@ function editProduct(id) {
 document.getElementById('addProductBtn').addEventListener('click', function () {
     document.getElementById('productForm').reset();
     document.getElementById('productId').value = '';
+    document.getElementById('productBrand').value = '';
     document.getElementById('productCost').readOnly = false;
     initSelectPicker('productCategoryPicker', allProductCategories);
     setSelectValue('productCategoryPicker', '', 'Tanlang...');
@@ -979,6 +981,7 @@ document.getElementById('productForm').addEventListener('submit', function (e) {
 
     var data = {
         name: document.getElementById('productName').value.trim(),
+        brand: document.getElementById('productBrand').value.trim(),
         category: document.getElementById('productCategory').value,
         price: parseFloat(document.getElementById('productPrice').value) || 0,
         status: document.getElementById('productStatus').value || 'active',
@@ -1279,8 +1282,16 @@ function getRegionType(region) {
 }
 
 function calculateDeliveryPrice(subtotal, regionType) {
-    if (subtotal >= 500000) return 0;
-    return regionType === 'tashkent' ? 25000 : 35000;
+    // regionType: 'tashkent' | 'regions'
+    if (regionType === 'tashkent') {
+        if (subtotal < 120000) return 20000;
+        if (subtotal < 220000) return 15000;
+        return 0;
+    } else {
+        if (subtotal < 220000) return 35000;
+        if (subtotal < 320000) return 30000;
+        return 0;
+    }
 }
 
 function computeSaleCostTotal(items) {
