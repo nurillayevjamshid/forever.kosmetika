@@ -97,7 +97,6 @@ body {
 .logo {
     display: flex;
     align-items: center;
-<<<<<<< HEAD
     line-height: 1.2;
 }
 
@@ -120,16 +119,6 @@ body {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-=======
-    text-decoration: none;
-}
-
-.logo-img {
-    height: 80px;
-    width: auto;
-    object-fit: contain;
-    transition: transform var(--transition-base);
->>>>>>> d0b42361a496af64cb14ec4a5edb118daaa15c94
 }
 
 .logo:hover .logo-img {
