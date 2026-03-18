@@ -5940,7 +5940,7 @@ html[data-theme="light"] .form-group input[type="date"] {
    Cost Card Height Alignment
    =========================== */
 .cost-card {
-    height: 280px;
+    height: 350px;
     display: flex;
     flex-direction: column;
     position: relative;
