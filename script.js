@@ -841,6 +841,9 @@ function initCategories() {
 
     categoryCards.forEach(card => {
 
+        // Remove click event - cards are now info only
+
+        /*
         card.addEventListener('click', function () {
 
             const category = this.getAttribute('data-category');
@@ -861,9 +864,10 @@ function initCategories() {
 
                 }
 
-            }, 500);
+            }, 100);
 
         });
+        */
 
     });
 
