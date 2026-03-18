@@ -478,13 +478,18 @@ function renderFinance(searchTerm) {
     if (mobileList) {
         cardsHtml = filtered.map(function (f) {
             var isInc = f.type === 'income';
-            return '<button class="finance-mobile-card ' + f.type + '" data-id="' + f.id + '">' +
-                '<div class="finance-mobile-top">' +
-                '<span class="finance-mobile-date">' + formatDate(f.date) + '</span>' +
+            var typeClass = isInc ? 'type-income' : 'type-expense';
+            var icon = isInc ? 'fa-arrow-down' : 'fa-arrow-up';
+            return '<button class="finance-mobile-card ' + typeClass + '" data-id="' + f.id + '">' +
+                '<div class="finance-mobile-top-row">' +
+                '<span class="finance-mobile-date"><i class="far fa-calendar-alt"></i> ' + formatDate(f.date) + '</span>' +
                 '<span class="finance-mobile-category">' + escapeHtml(f.category) + '</span>' +
                 '</div>' +
-                '<div class="finance-mobile-main">' +
-                '<span class="finance-mobile-desc">' + escapeHtml(f.description || '...') + '</span>' +
+                '<div class="finance-mobile-bottom-row">' +
+                '<div class="finance-mobile-info">' +
+                '<span class="finance-mobile-icon"><i class="fas ' + icon + '"></i></span>' +
+                '<span class="finance-mobile-desc">' + escapeHtml(f.description || 'Tavsif yo\'q') + '</span>' +
+                '</div>' +
                 '<span class="finance-mobile-amount">' + (isInc ? '+' : '-') + formatMoney(f.amount) + '</span>' +
                 '</div>' +
                 '</button>';
