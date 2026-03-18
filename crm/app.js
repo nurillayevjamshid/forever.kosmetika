@@ -481,15 +481,15 @@ function renderFinance(searchTerm) {
             var typeClass = isInc ? 'type-income' : 'type-expense';
             var icon = isInc ? 'fa-arrow-down' : 'fa-arrow-up';
             return '<button class="finance-mobile-card ' + typeClass + '" data-id="' + f.id + '">' +
-                '<div class="finance-mobile-top-row">' +
+                '<div class="finance-mobile-header">' +
                 '<span class="finance-mobile-date"><i class="far fa-calendar-alt"></i> ' + formatDate(f.date) + '</span>' +
-                '<span class="finance-mobile-category">' + escapeHtml(f.category) + '</span>' +
+                '<span class="finance-mobile-icon-badge"><i class="fas ' + icon + '"></i></span>' +
                 '</div>' +
-                '<div class="finance-mobile-bottom-row">' +
-                '<div class="finance-mobile-info">' +
-                '<span class="finance-mobile-icon"><i class="fas ' + icon + '"></i></span>' +
+                '<div class="finance-mobile-category-section">' +
+                '<span class="finance-mobile-category-label"><i class="fas fa-tag"></i> ' + escapeHtml(f.category) + '</span>' +
+                '</div>' +
+                '<div class="finance-mobile-content">' +
                 '<span class="finance-mobile-desc">' + escapeHtml(f.description || 'Tavsif yo\'q') + '</span>' +
-                '</div>' +
                 '<span class="finance-mobile-amount">' + (isInc ? '+' : '-') + formatMoney(f.amount) + '</span>' +
                 '</div>' +
                 '</button>';

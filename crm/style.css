@@ -2594,13 +2594,13 @@ html[data-theme="light"] .product-mobile-card:hover {
     border: 1px solid var(--border);
     outline: none;
     text-align: left;
-    border-radius: 16px;
-    padding: 16px;
+    border-radius: 14px;
+    padding: 14px;
     margin-bottom: 12px;
     cursor: pointer;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
     transition: all 0.2s ease;
     position: relative;
     overflow: hidden;
@@ -2613,7 +2613,7 @@ html[data-theme="light"] .product-mobile-card:hover {
     left: 0;
     top: 0;
     bottom: 0;
-    width: 5px;
+    width: 4px;
 }
 
 .finance-mobile-card.type-income {
@@ -2636,7 +2636,8 @@ html[data-theme="light"] .product-mobile-card:hover {
     background: var(--danger-bg);
 }
 
-.finance-mobile-top-row {
+/* Header: Sana va Icon */
+.finance-mobile-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -2644,39 +2645,14 @@ html[data-theme="light"] .product-mobile-card:hover {
 }
 
 .finance-mobile-date {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--text-muted);
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
 }
 
-.finance-mobile-category {
-    font-size: 12px;
-    font-weight: 600;
-    padding: 4px 10px;
-    border-radius: 20px;
-    background: var(--surface-light);
-    color: var(--text-secondary);
-    border: 1px solid var(--border);
-}
-
-.finance-mobile-bottom-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-}
-
-.finance-mobile-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex: 1;
-    min-width: 0;
-}
-
-.finance-mobile-icon {
+.finance-mobile-icon-badge {
     width: 32px;
     height: 32px;
     border-radius: 8px;
@@ -2687,14 +2663,53 @@ html[data-theme="light"] .product-mobile-card:hover {
     flex-shrink: 0;
 }
 
-.type-income .finance-mobile-icon {
+.type-income .finance-mobile-icon-badge {
     background: var(--success-bg);
     color: var(--success);
 }
 
-.type-expense .finance-mobile-icon {
+.type-expense .finance-mobile-icon-badge {
     background: var(--danger-bg);
     color: var(--danger);
+}
+
+/* Kategoriya bo'limi */
+.finance-mobile-category-section {
+    width: 100%;
+}
+
+.finance-mobile-category-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: var(--surface-light);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+}
+
+.type-income .finance-mobile-category-label {
+    background: rgba(0, 200, 83, 0.08);
+    color: var(--success);
+    border-color: var(--success-bg);
+}
+
+.type-expense .finance-mobile-category-label {
+    background: rgba(255, 61, 87, 0.08);
+    color: var(--danger);
+    border-color: var(--danger-bg);
+}
+
+/* Content: Tavsif va Summa */
+.finance-mobile-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 10px;
 }
 
 .finance-mobile-desc {
@@ -2704,13 +2719,13 @@ html[data-theme="light"] .product-mobile-card:hover {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    flex: 1;
 }
 
 .finance-mobile-amount {
     font-size: 16px;
     font-weight: 700;
     white-space: nowrap;
-    margin-left: 10px;
 }
 
 .type-income .finance-mobile-amount {
@@ -2727,9 +2742,10 @@ html[data-theme="light"] .finance-mobile-card {
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-html[data-theme="light"] .finance-mobile-category {
+html[data-theme="light"] .finance-mobile-category-label {
     background: #f1f5f9;
     color: #475569;
+    border-color: #cbd5e1;
 }
 
 /* Finance details modal styles */
