@@ -88,7 +88,7 @@ body {
 .nav-container {
     max-width: 1280px;
     margin: 0 auto;
-    padding: 0.25rem var(--spacing-md);
+    padding: 0 var(--spacing-md);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -97,11 +97,11 @@ body {
 .logo {
     display: flex;
     align-items: center;
-    line-height: 1;
+    line-height: 0.8;
 }
 
 .logo-img {
-    height: 50px; /* Adjust as needed */
+    height: 80px; /* Increased from 50px */
     width: auto;
     object-fit: contain;
     transition: transform var(--transition-base);
@@ -513,7 +513,7 @@ body {
 
 .categories-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: var(--spacing-md);
 }
 
@@ -522,7 +522,7 @@ body {
     padding: var(--spacing-lg);
     border-radius: var(--radius-lg);
     text-align: center;
-    cursor: pointer;
+    cursor: default;
     transition: all var(--transition-base);
     border: 2px solid transparent;
     position: relative;
@@ -539,9 +539,7 @@ body {
 }
 
 .category-card:hover {
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-lg);
-    border-color: var(--primary-color);
+    /* Hover effects removed - info card only */
 }
 
 .category-card:hover::before {
@@ -1068,7 +1066,7 @@ body {
    FOOTER
    ================================ */
 .footer {
-    background: var(--bg-dark);
+    background: linear-gradient(135deg, #7B68EE 0%, #6A5ACD 100%);
     color: white;
     padding: var(--spacing-lg) 0 var(--spacing-md);
 }
@@ -1735,7 +1733,7 @@ body {
     width: 100%;
     background: none;
     border: none;
-    margin-top: 1.5rem;
+    margin-top: 2rem;
     color: var(--text-light);
     font-weight: 500;
     cursor: pointer;
@@ -2426,6 +2424,7 @@ body {
    ================================ */
 .prepayment-notice-card {
     margin-top: 2rem;
+    margin-bottom: 2rem;
     padding: 1.5rem;
     background: linear-gradient(135deg, #fffcf5 0%, #fff9e6 100%);
     border: 1px solid rgba(217, 119, 6, 0.15);

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tizimga kirish - CosmeticaCRM</title>
+    <title>Tizimga kirish - Forever Kosmetika</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -58,6 +58,15 @@
             max-width: 280px;
             height: auto;
             margin-bottom: 20px;
+            background: transparent;
+            border-radius: 30px;
+            filter: drop-shadow(0 8px 16px rgba(97, 136, 255, 0.15));
+            transition: all 0.3s ease;
+        }
+
+        .logo-img:hover {
+            filter: drop-shadow(0 12px 24px rgba(97, 136, 255, 0.25));
+            transform: scale(1.02);
         }
 
         .logo-icon {
@@ -159,7 +168,7 @@
     <div class="login-wrapper">
         <div class="logo">
             <img src="logo.png?v=2.0" alt="Forever Kosmetika" class="logo-img">
-            <div class="logo-text">Cosmetica<span class="logo-accent">CRM</span></div>
+
         </div>
 
         <div class="error-message" id="errorMessage">
