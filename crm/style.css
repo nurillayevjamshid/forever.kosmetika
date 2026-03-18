@@ -3667,8 +3667,12 @@ html[data-theme="light"] .sale-items-add-btn {
 
 /* Dashboard Layout Grids (New Simplified) */
 .dashboard-top-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
     margin-top: 24px;
     margin-bottom: 24px;
+    align-items: stretch;
 }
 
 .dashboard-main-grid {
@@ -3715,15 +3719,17 @@ html[data-theme="light"] .sale-items-add-btn {
     gap: 12px;
 }
 
-/* Limit expense list height so only ~2 items are visible, rest via scroll */
-.expense-card {
-    height: 280px;
+/* Limit expense/cost list height so only ~2 items are visible, rest via scroll */
+.expense-card,
+.cost-card {
+    height: 350px;
     display: flex;
     flex-direction: column;
     position: relative;
 }
 
-.expense-card .card-body {
+.expense-card .card-body,
+.cost-card .card-body {
     flex: 1;
     overflow-y: auto;
 }
