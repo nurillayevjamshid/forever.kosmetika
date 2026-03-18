@@ -2338,9 +2338,11 @@ function renderUsers(searchTerm) {
         var realPassword = u.password || u.parol || u.pass || u.userPassword;
         var hasPassword = !!realPassword;
         var pwdToShow = hasPassword ? realPassword : "Parol topilmadi";
+        // Parolni yulduzcha bilan yashirish (default holat)
+        var maskedPassword = hasPassword ? '••••••' : "Parol topilmadi";
 
         var passwordHtml = '<div class="password-cell-inner' + (hasPassword ? '' : ' no-password') + '">' +
-            '<span class="password-text" data-original="' + escapeHtml(pwdToShow) + '" data-has-pwd="' + hasPassword + '"></span>' +
+            '<span class="password-text" data-original="' + escapeHtml(pwdToShow) + '" data-masked="' + escapeHtml(maskedPassword) + '" data-has-pwd="' + hasPassword + '">' + escapeHtml(maskedPassword) + '</span>' +
             '<button type="button" class="password-eye-btn" data-visible="false" title="Ko\'rsatish/Yashirish"><i class="fas fa-eye"></i></button>' +
             '</div>';
 
@@ -2393,15 +2395,18 @@ document.addEventListener('click', function (e) {
         var txt = wrap.querySelector('.password-text');
         var icon = eyeBtn.querySelector('i');
         var original = txt.getAttribute('data-original');
+        var masked = txt.getAttribute('data-masked');
         var isVisible = eyeBtn.getAttribute('data-visible') === 'true';
 
         if (!isVisible) {
+            // Parolni ko'rsatish
             txt.textContent = original;
             icon.classList.replace('fa-eye', 'fa-eye-slash');
             eyeBtn.classList.add('active');
             eyeBtn.setAttribute('data-visible', 'true');
         } else {
-            txt.textContent = '';
+            // Parolni yashirish (yulduzcha bilan)
+            txt.textContent = masked;
             icon.classList.replace('fa-eye-slash', 'fa-eye');
             eyeBtn.classList.remove('active');
             eyeBtn.setAttribute('data-visible', 'false');
