@@ -447,6 +447,16 @@ body {
     margin-left: var(--sidebar-width);
     min-height: 100vh;
     transition: var(--transition);
+    width: calc(100% - var(--sidebar-width));
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+@media (max-width: 992px) {
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+    }
 }
 
 /* ===========================
@@ -464,6 +474,14 @@ body {
     top: 0;
     z-index: 100;
     backdrop-filter: blur(20px);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+    .topbar {
+        padding: 0 16px;
+    }
 }
 
 .topbar-left {
@@ -527,11 +545,16 @@ body {
    =========================== */
 .pages-container {
     padding: 28px 32px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 @media (max-width: 768px) {
     .pages-container {
         padding: 16px 12px;
+        width: 100%;
+        max-width: 100vw;
+        box-sizing: border-box;
         overflow-x: hidden;
     }
 }
@@ -719,6 +742,8 @@ body {
     border-radius: var(--radius-lg);
     overflow: hidden;
     transition: var(--transition);
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .card:hover {
@@ -749,6 +774,12 @@ body {
 
 .card-body {
     padding: 20px 24px;
+}
+
+@media (max-width: 768px) {
+    .card-body {
+        padding: 12px 12px;
+    }
 }
 
 /* ===========================
