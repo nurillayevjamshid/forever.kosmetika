@@ -101,7 +101,7 @@ body {
 }
 
 .logo-img {
-    height: 50px; /* Adjust as needed */
+    height: 80px; /* Increased from 50px */
     width: auto;
     object-fit: contain;
     transition: transform var(--transition-base);
