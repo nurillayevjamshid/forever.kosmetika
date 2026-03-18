@@ -14,22 +14,36 @@ auth.onAuthStateChanged(function (user) {
         window.location.href = 'login.html';
     } else {
         document.getElementById('displayUserName').textContent = user.email || 'Foydalanuvchi';
-        // Load user role from Firestore (default admin)
+        // Load user data from Firestore
         db.collection('users').doc(user.uid).get().then(function (doc) {
             if (doc.exists) {
                 var data = doc.data() || {};
                 if (data.role) currentUserRole = String(data.role).trim().toLowerCase();
+                
                 // Update role text in UI
                 var roleTextEl = document.querySelector('.user-role');
                 if (roleTextEl) {
                     roleTextEl.textContent = (currentUserRole === 'admin') ? 'Admin' : 'Menejer';
+                }
+
+                // Update avatars if exists
+                if (data.avatar) {
+                    var sidebarAvatar = document.getElementById('sidebarAvatar');
+                    if (sidebarAvatar) sidebarAvatar.innerHTML = '<img src="' + data.avatar + '" alt="Avatar" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">';
+                    
+                    var profileAvatar = document.getElementById('profileAvatarDisplay');
+                    if (profileAvatar) profileAvatar.innerHTML = '<img src="' + data.avatar + '" alt="Avatar" style="width:100%; height:100%; object-fit:cover; border-radius:inherit;">';
+                }
+                
+                if (data.name) {
+                    document.getElementById('displayUserName').textContent = data.name;
                 }
             }
             renderProducts();
             var savedPage = localStorage.getItem('crm-active-page') || 'dashboard';
             navigateTo(savedPage);
         }).catch(function (error) {
-            console.error("Error loading user role:", error);
+            console.error("Error loading user data:", error);
             currentUserRole = 'admin';
             renderProducts();
             var savedPage = localStorage.getItem('crm-active-page') || 'dashboard';
@@ -625,12 +639,21 @@ function loadUserProfile() {
     // Load performance stats
     var userSales = salesArr.filter(function (s) { return false; });
 
-    // Ruxsatnomalarni yuklash
+    // Ma'lumotlarni yuklash
     db.collection('users').doc(user.uid).get().then(function (doc) {
         if (doc.exists) {
             var data = doc.data();
             if (data.name) document.getElementById('profileName').textContent = data.name;
             
+            // Avatar yuklash
+            if (data.avatar) {
+                var profileAvatar = document.getElementById('profileAvatarDisplay');
+                if (profileAvatar) profileAvatar.innerHTML = '<img src="' + data.avatar + '" alt="Avatar" style="width:100%; height:100%; object-fit:cover; border-radius:inherit;">';
+                
+                var sidebarAvatar = document.getElementById('sidebarAvatar');
+                if (sidebarAvatar) sidebarAvatar.innerHTML = '<img src="' + data.avatar + '" alt="Avatar" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">';
+            }
+
             // Faqat adminlar ruxsatnomalarni ko'ra oladi va o'zgartira oladi
             var isAdmin = (currentUserRole === 'admin');
             var card = document.getElementById('profilePermissionsCard');
@@ -2343,14 +2366,29 @@ document.getElementById('avatarUpload').addEventListener('change', function(e) {
     var file = e.target.files[0];
     if (!file) return;
     
+    // Check file size (limit to 1MB for Firestore/Base64 efficiency)
+    if (file.size > 1024 * 1024) {
+        showToast('Rasm hajmi juda katta! (Max: 1MB)', 'error');
+        return;
+    }
+    
     var reader = new FileReader();
     reader.onload = function(event) {
         var base64 = event.target.result;
-        var uid = document.getElementById('infoUid').textContent;
-        if (uid && uid !== '---') {
-            db.collection('users').doc(uid).update({ avatar: base64 }).then(function() {
-                document.getElementById('profileAvatarDisplay').innerHTML = '<img src="' + base64 + '" alt="Avatar">';
-                showToast('Profil rasmi yangilandi!');
+        var user = auth.currentUser;
+        if (user) {
+            db.collection('users').doc(user.uid).update({ avatar: base64 }).then(function() {
+                // Update profile avatar
+                var profileAvatar = document.getElementById('profileAvatarDisplay');
+                if (profileAvatar) profileAvatar.innerHTML = '<img src="' + base64 + '" alt="Avatar" style="width:100%; height:100%; object-fit:cover; border-radius:inherit;">';
+                
+                // Update sidebar avatar
+                var sidebarAvatar = document.getElementById('sidebarAvatar');
+                if (sidebarAvatar) sidebarAvatar.innerHTML = '<img src="' + base64 + '" alt="Avatar" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">';
+                
+                showToast('Profil rasmi muvaffaqiyatli yangilandi!');
+            }).catch(function(err) {
+                showToast('Rasmni saqlashda xatolik: ' + err.message, 'error');
             });
         }
     };
