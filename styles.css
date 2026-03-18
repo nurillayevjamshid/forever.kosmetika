@@ -1066,7 +1066,7 @@ body {
    FOOTER
    ================================ */
 .footer {
-    background: var(--bg-dark);
+    background: linear-gradient(135deg, #7B68EE 0%, #6A5ACD 100%);
     color: white;
     padding: var(--spacing-lg) 0 var(--spacing-md);
 }
