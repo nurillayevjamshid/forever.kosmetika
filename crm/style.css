@@ -5928,3 +5928,19 @@ html[data-theme="light"] .form-group input[type="date"] {
     box-shadow: 0 0 0 4px var(--accent-glow), inset 0 2px 4px rgba(0, 0, 0, 0.05);
     transform: translateY(-1px);
 }
+
+
+/* ===========================
+   Cost Card Height Alignment
+   =========================== */
+.cost-card {
+    height: 280px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.cost-card .card-body {
+    flex: 1;
+    overflow-y: auto;
+}
