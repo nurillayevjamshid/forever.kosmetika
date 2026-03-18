@@ -5897,3 +5897,34 @@ html[data-theme="light"] .status-select option {
         display: none !important; /* Hide clock on very small screens to fit title */
     }
 }
+
+
+/* ===========================
+   Date Input Fix
+   =========================== */
+.form-group input[type="date"] {
+    width: 100%;
+    padding: 14px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1.5px solid rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    color: var(--text);
+    font-size: 15px;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+html[data-theme="light"] .form-group input[type="date"] {
+    background: #ffffff;
+    border: 1.5px solid #d1d5db;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.form-group input[type="date"]:focus {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-glow), inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    transform: translateY(-1px);
+}
