@@ -955,9 +955,15 @@
             <form id="financeForm" class="modal-body">
                 <input type="hidden" id="financeId">
                 <input type="hidden" id="financeType" value="income">
-                <div class="form-group">
-                    <label for="financeDate"><i class="fas fa-calendar"></i> Sana</label>
-                    <input type="date" id="financeDate" required>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="financeDate"><i class="fas fa-calendar"></i> Sana</label>
+                        <input type="date" id="financeDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="financeAmount"><i class="fas fa-money-bill"></i> Summa (so'm)</label>
+                        <input type="number" id="financeAmount" min="0" step="100" required>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="financeCategory"><i class="fas fa-tag"></i> Kategoriya</label>
@@ -972,10 +978,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="financeAmount"><i class="fas fa-money-bill"></i> Summa (so'm)</label>
-                    <input type="number" id="financeAmount" min="0" step="100" required>
-                </div>
+
                 <div class="form-group">
                     <label for="financeDescription"><i class="fas fa-pencil-alt"></i> Tavsif</label>
                     <textarea id="financeDescription" rows="2" placeholder="Izoh yozing..."></textarea>
