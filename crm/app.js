@@ -548,7 +548,11 @@ function updateUIVisibility(currentPage) {
                 item.style.display = 'block';
             } else {
                 // Admin bo'lmaganlar uchun ruxsatnomalarni tekshirish
-                if (perms[page] === false) {
+                // 'staff' sahifasi uchun ruxsat tekshirish
+                if (page === 'staff' && perms.view_staff !== true) {
+                    item.style.display = 'none';
+                    if (currentPage === page) navigateTo('dashboard');
+                } else if (perms[page] === false) {
                     item.style.display = 'none';
                     // Agar hozirgi sahifa yashirilgan bo'lsa, dashboardga yo'naltirish
                     if (currentPage === page) navigateTo('dashboard');
@@ -594,9 +598,14 @@ function updateUIVisibility(currentPage) {
             });
 
             // Xodimlar va Sozlamalar bo'limidagi amallar
-            document.querySelectorAll('.user-edit-btn, .user-delete-btn, #addUserBtn').forEach(function (btn) {
-                btn.style.display = 'none'; // Managerlar xodimlarni o'zgartira olmaydi
+            // Faqat admin bo'lmaganlar uchun tahrirlash/o'chirish tugmalarini yashirish
+            document.querySelectorAll('.user-edit-btn, .user-delete-btn').forEach(function (btn) {
+                btn.style.display = 'none'; // Managerlar xodimlarni tahrirlash/o'chira olmaydi
             });
+            var addUserBtnEl = document.getElementById('addUserBtn');
+            if (addUserBtnEl) {
+                addUserBtnEl.style.display = 'none'; // Managerlar yangi xodim qo'sha olmaydi
+            }
         }
 
     }).catch(function (error) {
@@ -2275,6 +2284,17 @@ function renderUsers(searchTerm) {
         });
     }
 
+    // Admin bo'lsa barcha xodimlarni ko'rsatish
+    // Manager bo'lsa faqat o'zini ko'rsatish
+    if (currentUserRole !== 'admin') {
+        var currentUser = firebase.auth().currentUser;
+        if (currentUser) {
+            filtered = filtered.filter(function (u) {
+                return u.id === currentUser.uid;
+            });
+        }
+    }
+
     if (filtered.length === 0) {
         tbody.innerHTML = '';
         if (empty) empty.style.display = 'block';
@@ -2306,6 +2326,14 @@ function renderUsers(searchTerm) {
             '<button class="btn-icon delete user-delete-btn" data-id="' + u.id + '" data-name="' + escapeHtml(u.name) + '" title="O\'chirish"><i class="fas fa-trash"></i></button></td>' +
             '</tr>';
     }).join('');
+    
+    // Tahrirlash/o'chirish tugmalarini admin uchun ko'rsatish, manager uchun yashirish
+    if (currentUserRole !== 'admin') {
+        document.querySelectorAll('.user-edit-btn, .user-delete-btn').forEach(function (btn) {
+            btn.style.display = 'none';
+        });
+    }
+    
     updateUIVisibility('staff');
 }
 
