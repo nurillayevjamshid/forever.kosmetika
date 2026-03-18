@@ -524,6 +524,36 @@ function navigateTo(pageName) {
     updateUIVisibility(pageName);
     if (pageName === 'customers') renderCustomers();
     if (pageName === 'profile') loadUserProfile();
+    
+    // Har bir sahifaga o'tganda qidiruv maydonlarini tozalash
+    if (pageName === 'staff') {
+        var staffSearch = document.getElementById('staffSearch');
+        if (staffSearch) {
+            staffSearch.value = '';
+            renderUsers(''); // Bo'sh qidiruv bilan qayta render qilish
+        }
+    }
+    if (pageName === 'sales') {
+        var salesSearch = document.getElementById('salesSearch');
+        if (salesSearch) {
+            salesSearch.value = '';
+            renderSales('');
+        }
+    }
+    if (pageName === 'products') {
+        var productsSearch = document.getElementById('productsSearch');
+        if (productsSearch) {
+            productsSearch.value = '';
+            renderProducts('');
+        }
+    }
+    if (pageName === 'finance') {
+        var financeSearch = document.getElementById('financeSearch');
+        if (financeSearch) {
+            financeSearch.value = '';
+            renderFinance('');
+        }
+    }
 }
 
 function updateUIVisibility(currentPage) {
