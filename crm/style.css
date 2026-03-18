@@ -276,12 +276,12 @@ body {
 }
 
 .sidebar-header {
-    padding: 16px 20px;
+    padding: 0 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid var(--border);
-    min-height: auto;
+    height: var(--topbar-height);
 }
 
 .logo {
