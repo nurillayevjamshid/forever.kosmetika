@@ -832,6 +832,12 @@ body {
     white-space: nowrap;
 }
 
+.data-table tbody td[data-label="Amallar"] {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
 /* Rounded corners for the "Card" rows */
 .data-table tbody tr td:first-child {
     border-left: 1px solid rgba(255, 255, 255, 0.03);
@@ -3015,7 +3021,7 @@ html[data-theme="light"] .finance-detail-item {
     #customersTable tbody td[data-label="Amallar"],
     #usersTable tbody td[data-label="Amallar"] {
         justify-content: flex-end;
-        gap: 6px;
+        gap: 12px;
     }
 
     #financeTable tbody td[data-label="Amallar"]::before,
