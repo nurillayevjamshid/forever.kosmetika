@@ -3883,7 +3883,7 @@ html[data-theme="light"] .sale-items-add-btn {
 .expense-feed-container {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
 }
 
 /* Limit expense/cost list height so only ~2 items are visible, rest via scroll */
@@ -3904,11 +3904,13 @@ html[data-theme="light"] .sale-items-add-btn {
 .expense-row {
     display: flex;
     align-items: center;
-    padding: 16px 20px;
+    padding: 0 20px;
     background: rgba(255, 255, 255, 0.03);
     border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.05);
     transition: var(--transition);
+    height: 40px;
+    min-height: 40px;
 }
 
 .expense-row:hover {
@@ -3918,15 +3920,15 @@ html[data-theme="light"] .sale-items-add-btn {
 }
 
 .expense-icon-wrap {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
     background: var(--surface-light);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
-    margin-right: 18px;
+    font-size: 0.9rem;
+    margin-right: 12px;
     flex-shrink: 0;
     transition: var(--transition);
 }
@@ -3955,18 +3957,21 @@ html[data-theme="light"] .sale-items-add-btn {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 1px;
+    justify-content: center;
 }
 
 .expense-title {
     font-weight: 700;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     color: var(--text);
+    line-height: 1.2;
 }
 
 .expense-date {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: var(--text-muted);
+    line-height: 1.2;
 }
 
 .expense-value-wrap {
@@ -3975,9 +3980,10 @@ html[data-theme="light"] .sale-items-add-btn {
 
 .expense-value {
     font-weight: 800;
-    font-size: 1.1rem;
+    font-size: 0.9rem;
     color: #fff;
     /* Static white for dark mode, logic in JS for light */
+    line-height: 1.2;
 }
 
 html[data-theme="light"] .expense-value {
