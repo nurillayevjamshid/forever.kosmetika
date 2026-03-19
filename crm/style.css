@@ -3889,7 +3889,7 @@ html[data-theme="light"] .sale-items-add-btn {
 /* Limit expense/cost list height so only ~2 items are visible, rest via scroll */
 .expense-card,
 .cost-card {
-    height: 350px;
+    height: 500px;
     display: flex;
     flex-direction: column;
     position: relative;
