@@ -219,11 +219,19 @@ body.show-chatbot .chatbot {
     color: #666 !important;
 }
 
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .chatbot-toggler {
+        bottom: 100px;
+        /* Adjusted to be above bottom nav and sticky buttons */
+    }
+}
+
 @media (max-width: 490px) {
     .chatbot-toggler {
         right: 20px;
-        bottom: 80px;
-        /* Adjusted to be above bottom nav */
+        bottom: 100px;
+        /* Adjusted to be above bottom nav and sticky buttons */
     }
 
     .chatbot {
