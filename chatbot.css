@@ -1,7 +1,7 @@
 /* Chatbot Button */
 .chatbot-toggler {
     position: fixed;
-    bottom: 30px;
+    bottom: 45px;
     right: 30px;
     outline: none;
     border: none;
@@ -222,7 +222,7 @@ body.show-chatbot .chatbot {
 /* Mobile adjustments */
 @media (max-width: 768px) {
     .chatbot-toggler {
-        bottom: 100px;
+        bottom: 115px;
         /* Adjusted to be above bottom nav and sticky buttons */
     }
 }
@@ -230,7 +230,7 @@ body.show-chatbot .chatbot {
 @media (max-width: 490px) {
     .chatbot-toggler {
         right: 20px;
-        bottom: 100px;
+        bottom: 115px;
         /* Adjusted to be above bottom nav and sticky buttons */
     }
 
