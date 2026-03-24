@@ -3042,18 +3042,25 @@ body {
     }
 
     .image-nav {
-        width: 28px;
-        height: 28px;
+        width: 24px;
+        height: 24px;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        border: 0.5px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
 
     .image-nav svg {
-        width: 14px;
-        height: 14px;
+        width: 12px;
+        height: 12px;
+        stroke-width: 2.5px;
     }
 
     .product-detail-image .image-nav {
-        width: 34px;
-        height: 34px;
+        width: 32px;
+        height: 32px;
+        background: rgba(255, 255, 255, 0.9);
     }
 
     .product-detail-image .image-nav.prev {
