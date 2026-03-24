@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
-        content="For.Ever Cosmetics - Dubay va Xitoydan keltirilgan sifatli ayollar kosmetikalari, atirlar va soch parvarish vositalari">
-    <title>Forever kosmetika</title>
+        content="For.Ever Cosmetics - Original kosmetika | 24 soatda yetkazib berish. Eng sifatli brendlar eng yaxshi narxlarda.">
+    <title>Forever kosmetika — Original kosmetika | 24 soatda yetkazib berish</title>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="icon" href="favicon-32x32.png" type="image/png" sizes="32x32">
     <link rel="apple-touch-icon" href="favicon-192x192.png">
@@ -14,13 +14,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
 </head>
 
 <body>
     <!-- Header -->
-    <header class="header">
+    <header class="header" id="siteHeader">
         <nav class="nav-container">
             <div class="logo">
                 <a href="index.html" style="text-decoration: none; display: flex; align-items: center;">
@@ -56,27 +56,37 @@
 
     <!-- Hero Section -->
     <section class="hero" id="home">
-        <div class="hero-background">
-            <div class="gradient-orb orb-1"></div>
-            <div class="gradient-orb orb-2"></div>
-            <div class="gradient-orb orb-3"></div>
+        <!-- Animated background elements -->
+        <div class="hero-bg-shapes">
+            <div class="hero-shape shape-1"></div>
+            <div class="hero-shape shape-2"></div>
+            <div class="hero-shape shape-3"></div>
+            <div class="hero-glow"></div>
         </div>
-        <div class="hero-content">
+
+        <div class="hero-body">
+            <div class="hero-content">
             <div class="hero-text">
-                <span class="hero-badge">Premium Sifat</span>
+                <div class="hero-badge-row">
+                    <span class="hero-badge">
+                        <span class="badge-dot"></span>
+                        ✨ Premium Sifat
+                    </span>
+                    <span class="hero-badge hero-badge-delivery">
+                        🚚 24 soatda yetkazib berish
+                    </span>
+                </div>
                 <h1 class="hero-title">
-                    Go'zalligingizni
-                    <span class="gradient-text">Mukammal</span>
-                    Qiling
+                    Original kosmetika
+                    <span class="hero-title-divider"></span>
+                    <span class="hero-highlight">24 soatda yetkazib berish</span>
                 </h1>
                 <p class="hero-description">
-                    Dubay, Turkiya va Xitoydan keltirilgan yuqori sifatli kosmetika, atirlar va soch parvarish
-                    mahsulotlari.
-                    Har bir ayol o'zini maxsus his qilishi kerak.
+                    Eng sifatli brendlar eng yaxshi narxlarda. Dubay, Turkiya va Xitoydan keltirilgan yuqori sifatli kosmetika mahsulotlari.
                 </p>
                 <div class="hero-buttons">
-                    <a href="#products" class="btn btn-primary">
-                        Mahsulotlarni ko'rish
+                    <a href="#products" class="btn btn-primary btn-hero">
+                        Hozir sotib olish
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">
                             <path d="M5 12h14M12 5l7 7-7 7"></path>
@@ -91,22 +101,73 @@
                         Instagram
                     </a>
                 </div>
-            </div>
-            <div class="hero-image">
-                <div class="product-showcase">
-                    <div class="showcase-card card-1">
-                        <div class="card-glow"></div>
-                        <div class="card-content">💄</div>
+                <!-- Trust indicators -->
+                <div class="hero-trust">
+                    <div class="trust-item">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        <span>100% Original</span>
                     </div>
-                    <div class="showcase-card card-2">
-                        <div class="card-glow"></div>
-                        <div class="card-content">💅</div>
+                    <div class="trust-item">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+                        <span>Tez yetkazish</span>
                     </div>
-                    <div class="showcase-card card-3">
-                        <div class="card-glow"></div>
-                        <div class="card-content">👄</div>
+                    <div class="trust-item">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                        <span>250+ mijoz</span>
                     </div>
                 </div>
+            </div>
+            <div class="hero-visual">
+                <div class="hero-visual-inner">
+                    <div class="hero-card hero-card-1">
+                        <div class="hero-card-icon">💄</div>
+                        <div class="hero-card-label">Kosmetika</div>
+                    </div>
+                    <div class="hero-card hero-card-2">
+                        <div class="hero-card-icon">🌸</div>
+                        <div class="hero-card-label">Atirlar</div>
+                    </div>
+                    <div class="hero-card hero-card-3">
+                        <div class="hero-card-icon">✨</div>
+                        <div class="hero-card-label">Parvarish</div>
+                    </div>
+                    <div class="hero-card hero-card-4">
+                        <div class="hero-card-icon">💅</div>
+                        <div class="hero-card-label">Aksesuar</div>
+                    </div>
+                    <!-- Floating stats -->
+                    <div class="hero-floating-stat stat-left">
+                        <span class="stat-num">100+</span>
+                        <span class="stat-txt">Mahsulotlar</span>
+                    </div>
+                    <div class="hero-floating-stat stat-right">
+                        <span class="stat-num">99%</span>
+                        <span class="stat-txt">Ijobiy fikrlar</span>
+                    </div>
+                </div>
+            </div>
+            </div><!-- /hero-content -->
+        </div><!-- /hero-body -->
+
+        <!-- Scrolling marquee -->
+        <div class="hero-marquee">
+            <div class="marquee-track">
+                <span>Original kosmetika</span>
+                <span class="marquee-dot">✦</span>
+                <span>24 soat yetkazib berish</span>
+                <span class="marquee-dot">✦</span>
+                <span>Eng yaxshi narxlar</span>
+                <span class="marquee-dot">✦</span>
+                <span>100% sifat kafolati</span>
+                <span class="marquee-dot">✦</span>
+                <span>Original kosmetika</span>
+                <span class="marquee-dot">✦</span>
+                <span>24 soat yetkazib berish</span>
+                <span class="marquee-dot">✦</span>
+                <span>Eng yaxshi narxlar</span>
+                <span class="marquee-dot">✦</span>
+                <span>100% sifat kafolati</span>
+                <span class="marquee-dot">✦</span>
             </div>
         </div>
     </section>
@@ -406,7 +467,7 @@
                                 <span class="qty-display" id="modalQty">1</span>
                                 <button class="qty-btn" id="modalQtyPlus">+</button>
                             </div>
-                            <button class="btn btn-primary btn-full buyurtma-btn" id="modalBuyurtmaBtn" style="background: linear-gradient(135deg, #7B68EE 0%, #6A5ACD 100%); border: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                            <button class="btn btn-primary btn-full buyurtma-btn" id="modalBuyurtmaBtn" style="background: linear-gradient(135deg, #2D2B55 0%, #4A3F8A 100%); border: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <circle cx="9" cy="21" r="1"></circle>
                                     <circle cx="20" cy="21" r="1"></circle>
