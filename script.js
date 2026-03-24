@@ -101,6 +101,10 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     initHeaderScroll();
 
+    // Premium hero showcase
+
+    initHeroShowcase();
+
     // Firebase real-time listener (agar Firebase ulangan bo'lsa)
 
     if (isFirebaseReady && typeof firebaseListenProducts === 'function') {
@@ -1169,6 +1173,78 @@ function initHeaderScroll() {
 
 }
 
+// ================================
+// HERO SHOWCASE
+// ================================
+function initHeroShowcase() {
+    const thumbs = document.querySelectorAll('.hero-thumb');
+    const productName = document.getElementById('heroProductName');
+    const productDescription = document.getElementById('heroProductDescription');
+    const productChip = document.getElementById('heroProductChip');
+    const productMeta = document.getElementById('heroProductMeta');
+    const productCard = document.getElementById('heroProductCard');
+    const variantLabel = document.getElementById('heroVariantLabel');
+    const variantType = document.getElementById('heroVariantType');
+    const noteTop = document.getElementById('heroNoteTop');
+    const noteBottom = document.getElementById('heroNoteBottom');
+    const tiltTarget = document.querySelector('[data-tilt-target]');
+    const variantClasses = ['hero-product-card--serum', 'hero-product-card--perfume', 'hero-product-card--lipstick'];
+
+    if (!thumbs.length || !productName || !productDescription || !productCard) {
+        return;
+    }
+
+    const activateThumb = (thumb) => {
+        if (!thumb) return;
+
+        thumbs.forEach((button) => {
+            button.classList.remove('is-active');
+            button.setAttribute('aria-selected', 'false');
+        });
+
+        thumb.classList.add('is-active');
+        thumb.setAttribute('aria-selected', 'true');
+
+        productName.textContent = thumb.dataset.name || '';
+        productDescription.textContent = thumb.dataset.description || '';
+        if (productChip) productChip.textContent = thumb.dataset.chip || '';
+        if (productMeta) productMeta.textContent = thumb.dataset.meta || '';
+        if (variantLabel) variantLabel.textContent = thumb.dataset.label || '';
+        if (variantType) variantType.textContent = thumb.dataset.type || '';
+        if (noteTop) noteTop.textContent = thumb.dataset.noteTop || '';
+        if (noteBottom) noteBottom.textContent = thumb.dataset.noteBottom || '';
+
+        productCard.classList.remove(...variantClasses);
+        productCard.classList.add(`hero-product-card--${thumb.dataset.variant || 'serum'}`);
+    };
+
+    thumbs.forEach((thumb) => {
+        thumb.addEventListener('click', () => activateThumb(thumb));
+    });
+
+    activateThumb(document.querySelector('.hero-thumb.is-active') || thumbs[0]);
+
+    if (tiltTarget && window.matchMedia('(pointer: fine)').matches) {
+        const resetTilt = () => {
+            tiltTarget.style.transform = 'perspective(1400px) rotateX(0deg) rotateY(0deg) translateY(0)';
+        };
+
+        resetTilt();
+
+        tiltTarget.addEventListener('pointermove', (event) => {
+            const rect = tiltTarget.getBoundingClientRect();
+            const offsetX = (event.clientX - rect.left) / rect.width - 0.5;
+            const offsetY = (event.clientY - rect.top) / rect.height - 0.5;
+            const rotateX = (-offsetY * 5).toFixed(2);
+            const rotateY = (offsetX * 7).toFixed(2);
+
+            tiltTarget.style.transform = `perspective(1400px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
+        });
+
+        tiltTarget.addEventListener('pointerleave', resetTilt);
+        tiltTarget.addEventListener('pointercancel', resetTilt);
+    }
+}
 // ================================
 
 // CART BUTTON & MODAL
