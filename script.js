@@ -930,19 +930,20 @@ function updateCartCount() {
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
     cartCounts.forEach(cartCount => {
-
         cartCount.textContent = totalItems;
+        
+        // Hide if 0
+        if (totalItems === 0) {
+            cartCount.style.display = 'none';
+        } else {
+            cartCount.style.display = 'flex';
+        }
 
         // Add animation
-
         cartCount.style.transform = 'scale(1.3)';
-
         setTimeout(() => {
-
             cartCount.style.transform = 'scale(1)';
-
         }, 200);
-
     });
 
     // Mobile UX event
