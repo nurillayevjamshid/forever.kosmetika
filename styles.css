@@ -3356,10 +3356,9 @@ body {
    STICKY BUY BUTTON (MOBILE)
    ================================ */
 .sticky-buy-button {
-    display: none !important;
     display: none;
     position: fixed;
-    bottom: 80px;
+    bottom: 75px;
     left: 0;
     right: 0;
     z-index: 999;
@@ -3439,11 +3438,10 @@ body {
 
 /* Scroll to top button */
 .scroll-to-top {
-    display: none !important;
     display: none;
     position: fixed;
-    bottom: 200px;
-    right: 30px;
+    bottom: 145px;
+    right: 16px;
     z-index: 998;
     width: 48px;
     height: 48px;
@@ -3477,8 +3475,8 @@ body {
     .scroll-to-top {
         width: 44px;
         height: 44px;
-        bottom: 200px;
-        right: 30px;
+        bottom: 135px;
+        right: 12px;
     }
 }
 
