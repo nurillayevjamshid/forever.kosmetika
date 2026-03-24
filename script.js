@@ -945,6 +945,8 @@ function updateCartCount() {
 
     });
 
+    // Mobile UX event
+    window.dispatchEvent(new Event('cartUpdated'));
 }
 
 // ================================
@@ -1302,6 +1304,8 @@ function changeQuantity(productId, change) {
 
     }
 
+    // Mobile UX event
+    window.dispatchEvent(new Event('cartUpdated'));
 }
 
 function updateCartTotal() {
