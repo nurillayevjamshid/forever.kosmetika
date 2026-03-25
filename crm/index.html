@@ -1519,16 +1519,10 @@
 
         const storage = createLocalStorageShim();
         window.storage = storage;
-        firebase.storage = function () {
-            return storage;
-        };
-        firebase.storage.TaskEvent = { STATE_CHANGED: 'state_changed' };
-        firebase.storage.TaskState = {
-            RUNNING: 'running',
-            PAUSED: 'paused',
-            SUCCESS: 'success',
-            ERROR: 'error'
-        };
+        // Global o'zgaruvchilar (app.js da ishlatiladi)
+        window.db = firebase.firestore();
+        window.storage = firebase.storage();
+        window.auth = firebase.auth();
     </script>
 
     <script src="app.js?v=20260325-2"></script>

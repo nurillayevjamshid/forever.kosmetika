@@ -4,9 +4,35 @@
  */
 
 // ==========================================
+// FIREBASE INITIALIZATION
+// ==========================================
+// Firebase o'zgaruvchilarini global scope'da aniqlaymiz
+// Agar index.html'da allaqachon aniqlanmagan bo'lsa, bu yerda aniqlaymiz
+if (typeof window.db === 'undefined') {
+    window.db = firebase.firestore();
+}
+if (typeof window.storage === 'undefined') {
+    window.storage = firebase.storage();
+}
+if (typeof window.auth === 'undefined') {
+    window.auth = firebase.auth();
+}
+
+// Global o'zgaruvchilarni local scope'da ham oson ishlatish uchun
+var db = window.db;
+var storage = window.storage;
+var auth = window.auth;
+
+var productsCollection = db.collection('products');
+var ordersCollection = db.collection('orders');
+var customersCollection = db.collection('customers');
+var salesCollection = db.collection('sales');
+var financesCollection = db.collection('finances');
+var usersCollection = db.collection('users');
+
+// ==========================================
 // AUTHENTICATION CHECK
 // ==========================================
-var auth = firebase.auth();
 var currentUserRole = 'admin';
 
 auth.onAuthStateChanged(function (user) {
@@ -563,7 +589,7 @@ function navigateTo(pageName) {
 
 function updateUIVisibility(currentPage) {
     // Hozirgi foydalanuvchi ma'lumotlarini olish
-    var user = firebase.auth().currentUser;
+    var user = auth.currentUser;
     if (!user) return;
 
     db.collection('users').doc(user.uid).get().then(function (doc) {
@@ -908,30 +934,48 @@ var productsFilter = { category: 'all', status: 'all' };
 // ==========================================
 // REAL-TIME FIRESTORE LISTENERS
 // ==========================================
-db.collection("products").onSnapshot(function (snapshot) {
-    productsArr = [];
-    snapshot.forEach(function (doc) { productsArr.push(Object.assign({ id: doc.id }, doc.data())); });
-    renderProducts();
-    syncSaleItemRowOptions();
-    updateSaleTotal();
-    refreshDashboard();
-});
+db.collection("products").onSnapshot(
+    function (snapshot) {
+        productsArr = [];
+        snapshot.forEach(function (doc) { productsArr.push(Object.assign({ id: doc.id }, doc.data())); });
+        renderProducts();
+        syncSaleItemRowOptions();
+        updateSaleTotal();
+        refreshDashboard();
+    },
+    function (error) {
+        console.error('Products listener xatolik:', error);
+        showToast('Mahsulotlarni yuklashda xatolik: ' + error.message, 'error');
+    }
+);
 
 
 
-db.collection("sales").onSnapshot(function (snapshot) {
-    salesArr = [];
-    snapshot.forEach(function (doc) { salesArr.push(Object.assign({ id: doc.id }, doc.data())); });
-    renderSales();
-    refreshDashboard();
-});
+db.collection("sales").onSnapshot(
+    function (snapshot) {
+        salesArr = [];
+        snapshot.forEach(function (doc) { salesArr.push(Object.assign({ id: doc.id }, doc.data())); });
+        renderSales();
+        refreshDashboard();
+    },
+    function (error) {
+        console.error('Sales listener xatolik:', error);
+        showToast('Sotuvlarni yuklashda xatolik: ' + error.message, 'error');
+    }
+);
 
-db.collection("finances").onSnapshot(function (snapshot) {
-    financesArr = [];
-    snapshot.forEach(function (doc) { financesArr.push(Object.assign({ id: doc.id }, doc.data())); });
-    renderFinance();
-    refreshDashboard();
-});
+db.collection("finances").onSnapshot(
+    function (snapshot) {
+        financesArr = [];
+        snapshot.forEach(function (doc) { financesArr.push(Object.assign({ id: doc.id }, doc.data())); });
+        renderFinance();
+        refreshDashboard();
+    },
+    function (error) {
+        console.error('Finances listener xatolik:', error);
+        showToast('Moliyaviy malumotlarni yuklashda xatolik: ' + error.message, 'error');
+    }
+);
 
 // ==========================================
 // === PRODUCTS CRUD ===
@@ -1036,66 +1080,102 @@ initSelectPicker('productStatusPicker');
 initSelectPicker('newUserRolePicker');
 
 
-document.getElementById('productForm').addEventListener('submit', function (e) {
+document.getElementById('productForm').addEventListener('submit', async function (e) {
     e.preventDefault();
     var id = document.getElementById('productId').value;
     var saveBtn = document.getElementById('saveProductBtn');
     var prevBtnHtml = saveBtn ? saveBtn.innerHTML : '';
+    
     if (saveBtn) {
         saveBtn.disabled = true;
         saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saqlanmoqda...';
     }
 
-    var data = {
-        name: document.getElementById('productName').value.trim(),
-        brand: document.getElementById('productBrand').value.trim(),
-        category: document.getElementById('productCategory').value,
-        price: parseFloat(document.getElementById('productPrice').value) || 0,
-        status: document.getElementById('productStatus').value || 'active',
-        cost: parseFloat(document.getElementById('productCost').value) || 0,
-        description: document.getElementById('productDescription').value.trim(),
-        updatedAt: new Date().toISOString()
-    };
+    try {
+        var data = {
+            name: document.getElementById('productName').value.trim(),
+            brand: document.getElementById('productBrand').value.trim(),
+            category: document.getElementById('productCategory').value || '',
+            price: parseFloat(document.getElementById('productPrice').value) || 0,
+            status: document.getElementById('productStatus').value || 'active',
+            cost: parseFloat(document.getElementById('productCost').value) || 0,
+            description: document.getElementById('productDescription').value.trim(),
+            updatedAt: new Date().toISOString()
+        };
+        
+        // Kategoriya validatsiyasi
+        if (!data.category || data.category.trim() === '') {
+            showToast('Kategoriyani tanlang!', 'error');
+            return;
+        }
 
-    // Rasmlar (ko'p rasm qo'llab-quvvatlash)
-    if (productFormImages.length) {
-        data.imageUrls = productFormImages.slice();
-        data.imageUrl = productFormImages[0];
-        if (!productImagesTouched && id) {
+        // Rasmlarni yuklash (Storage ga)
+        var finalImageUrls = [];
+        var firstStoragePath = '';
+
+        if (productFormImages.length > 0) {
+            // Progress ko'rsatish
+            var progressArea = document.getElementById('uploadProgress');
+            var progressFill = document.getElementById('progressFill');
+            var progressText = document.getElementById('progressText');
+            
+            if (progressArea) progressArea.style.display = 'block';
+
+            var totalBase64Size = 0;
+            for (var i = 0; i < productFormImages.length; i++) {
+                if (progressText) progressText.textContent = (i + 1) + ' / ' + productFormImages.length + ' rasm yuklanmoqda...';
+                if (progressFill) progressFill.style.width = ((i / productFormImages.length) * 100) + '%';
+                
+                var uploadRes = await uploadBase64ToStorage(productFormImages[i], i);
+                finalImageUrls.push(uploadRes.url);
+                if (i === 0) firstStoragePath = uploadRes.storagePath;
+                
+                // Agar fallback (Base64) bo'lsa, hajmini hisoblaymiz
+                if (!uploadRes.storagePath && uploadRes.url.startsWith('data:')) {
+                    totalBase64Size += uploadRes.url.length;
+                }
+            }
+            
+            // Agar jami Base64 hajmi 800KB dan oshsa, ogohlantirish beramiz (Firestore limitiga yaqinlashmaslik uchun)
+            if (totalBase64Size > 800 * 1024) {
+                showToast("Rasmlar hajmi juda katta! Storage sozlamalarini tekshiring.", "error");
+                // Davom etaveramiz, lekin foydalanuvchi bilishi kerak
+            }
+
+            if (progressFill) progressFill.style.width = '100%';
+            data.imageUrls = finalImageUrls;
+            data.imageUrl = finalImageUrls[0];
+            data.imageStoragePath = firstStoragePath;
+        } else {
+            // Agar rasm tanlanmagan bo'lsa, mavjud ma'lumotni saqlab qolamiz
             var existingProduct = productsArr.find(function (p) { return p.id === id; });
-            data.imageStoragePath = existingProduct ? (existingProduct.imageStoragePath || '') : '';
-        } else {
-            data.imageStoragePath = ''; // Base64 uchun storage path kerak emas
+            if (existingProduct && !productImagesTouched) {
+                var existingImages = getProductImagesList(existingProduct);
+                data.imageUrls = existingImages;
+                data.imageUrl = existingImages[0] || '';
+                data.imageStoragePath = existingProduct.imageStoragePath || '';
+            } else {
+                data.imageUrls = [];
+                data.imageUrl = '';
+                data.imageStoragePath = '';
+            }
         }
-    } else {
-        // Agar rasm tanlanmagan bo'lsa, mavjud ma'lumotni saqlab qolamiz
-        var existingProduct = productsArr.find(function (p) { return p.id === id; });
-        if (existingProduct && !productImagesTouched) {
-            var existingImages = getProductImagesList(existingProduct);
-            data.imageUrls = existingImages;
-            data.imageUrl = existingImages[0] || '';
-            data.imageStoragePath = existingProduct.imageStoragePath || '';
-        } else {
-            data.imageUrls = [];
-            data.imageUrl = '';
-            data.imageStoragePath = '';
+
+        await saveProductData(id, data);
+        
+        // Formani tozalash
+        if (progressArea) progressArea.style.display = 'none';
+        document.getElementById('imageUploadArea').classList.remove('uploading');
+
+    } catch (error) {
+        console.error("Saqlashda xatolik:", error);
+        var errorMsg = error.message || 'Noma'lum xatolik yuz berdi';
+        showToast('Xatolik: ' + errorMsg, 'error');
+    } finally {
+        if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = prevBtnHtml || '<i class="fas fa-save"></i> Saqlash';
         }
-    }
-
-    document.getElementById('uploadProgress').style.display = 'none';
-    document.getElementById('imageUploadArea').classList.remove('uploading');
-
-    function finishSave() {
-        if (!saveBtn) return;
-        saveBtn.disabled = false;
-        saveBtn.innerHTML = prevBtnHtml || '<i class="fas fa-save"></i> Saqlash';
-    }
-
-    var savePromise = saveProductData(id, data);
-    if (savePromise && typeof savePromise.then === 'function') {
-        savePromise.then(function () { finishSave(); }, function () { finishSave(); });
-    } else {
-        finishSave();
     }
 });
 
@@ -2322,7 +2402,7 @@ function renderUsers(searchTerm) {
     // Admin bo'lsa barcha xodimlarni ko'rsatish
     // Manager bo'lsa faqat o'zini ko'rsatish
     if (currentUserRole !== 'admin') {
-        var currentUser = firebase.auth().currentUser;
+        var currentUser = auth.currentUser;
         if (currentUser) {
             filtered = filtered.filter(function (u) {
                 return u.id === currentUser.uid;
@@ -2851,23 +2931,97 @@ navigateTo('dashboard');
 
 // ==========================================
 // === FIREBASE STORAGE - RASM YUKLASH ===
-// Stub: rasm yuklash endi ishlatilmaydi
-function uploadProductImage(file, callback) {
-    if (typeof callback === 'function') callback('', '');
+// ==========================================
+
+/**
+ * Base64 rasmni Firebase Storage'ga yuklaydi
+ * Firestore'dagi 'resource-exhausted' xatoligini oldini olish uchun
+ */
+async function uploadBase64ToStorage(base64String, index) {
+    try {
+        // Agar allaqachon URL bo'lsa (yuklangan rasm), yuklash shart emas
+        if (base64String.startsWith('http')) {
+            return { url: base64String, storagePath: '' };
+        }
+
+        // Base64 string validatsiyasi
+        if (!base64String || typeof base64String !== 'string') {
+            throw new Error('Rasm formati notogri');
+        }
+
+        var fileName = 'products/' + Date.now() + '_img' + (index || 0) + '.jpg';
+        var storageRef = storage.ref(fileName);
+
+        // Base64 dan blob yaratish
+        var response = await fetch(base64String);
+        if (!response.ok) {
+            throw new Error('Rasm fetch qilishda xatolik: ' + response.statusText);
+        }
+        var blob = await response.blob();
+
+        // Blob hajmini tekshirish (10MB limit)
+        if (blob.size > 10 * 1024 * 1024) {
+            throw new Error('Rasm hajmi 10MB dan oshmasligi kerak');
+        }
+
+        var snapshot = await storageRef.put(blob);
+        var downloadURL = await snapshot.ref.getDownloadURL();
+
+        console.log('✅ Rasm Storage\'ga yuklandi:', downloadURL);
+        return {
+            url: downloadURL,
+            storagePath: fileName
+        };
+    } catch (error) {
+        console.error('Rasm yuklashda xatolik:', error);
+        showToast('Rasm yuklashda xatolik: ' + (error.message || 'Noma'lum xatolik'), 'error');
+        throw error;
+    }
 }
 
-
 // Mahsulot ma'lumotlarini Firestore ga saqlash
-function saveProductData(id, data) {
-    if (id) {
-        return db.collection('products').doc(id).update(data)
-            .then(function () { showToast('Mahsulot yangilandi!'); closeModal('productModal'); })
-            .catch(function (err) { showToast('Xatolik: ' + err.message, 'error'); });
-    } else {
-        data.createdAt = new Date().toISOString();
-        return db.collection('products').add(data)
-            .then(function () { showToast("Yangi mahsulot qo'shildi!"); closeModal('productModal'); })
-            .catch(function (err) { showToast('Xatolik: ' + err.message, 'error'); });
+async function saveProductData(id, data) {
+    try {
+        // Ma'lumotlarni tekshirish
+        if (!data.name || data.name.trim() === '') {
+            throw new Error('Mahsulot nomi boSh bolishi mumkin emas!');
+        }
+        if (data.price < 0) {
+            throw new Error('Narx manfiy bolishi mumkin emas!');
+        }
+        if (data.cost < 0) {
+            throw new Error('Tannarxi manfiy bolishi mumkin emas!');
+        }
+        
+        // Rasm ma'lumotlarini tekshirish va tozalash
+        if (Array.isArray(data.imageUrls)) {
+            data.imageUrls = data.imageUrls.filter(function(url) {
+                return typeof url === 'string' && url.trim().length > 0;
+            });
+        } else {
+            data.imageUrls = [];
+        }
+        
+        if (id) {
+            // Tahrirlash
+            await productsCollection.doc(id).update(data);
+            console.log('✅ Mahsulot yangilandi:', id);
+            showToast('Mahsulot yangilandi!');
+            closeModal('productModal');
+        } else {
+            // Yangi mahsulot qoshish
+            data.createdAt = new Date().toISOString();
+            var docRef = await productsCollection.add(data);
+            console.log('✅ Yangi mahsulot qoshildi:', docRef.id);
+            showToast("Yangi mahsulot qo'shildi!");
+            closeModal('productModal');
+        }
+        return true;
+    } catch (err) {
+        console.error("Firestore saqlashda xatolik:", err);
+        var errorMsg = err.message || 'Noma'lum xatolik yuz berdi';
+        showToast('Xatolik: ' + errorMsg, 'error');
+        throw err;
     }
 }
 
