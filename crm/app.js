@@ -1036,66 +1036,83 @@ initSelectPicker('productStatusPicker');
 initSelectPicker('newUserRolePicker');
 
 
-document.getElementById('productForm').addEventListener('submit', function (e) {
+document.getElementById('productForm').addEventListener('submit', async function (e) {
     e.preventDefault();
     var id = document.getElementById('productId').value;
     var saveBtn = document.getElementById('saveProductBtn');
     var prevBtnHtml = saveBtn ? saveBtn.innerHTML : '';
+    
     if (saveBtn) {
         saveBtn.disabled = true;
         saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saqlanmoqda...';
     }
 
-    var data = {
-        name: document.getElementById('productName').value.trim(),
-        brand: document.getElementById('productBrand').value.trim(),
-        category: document.getElementById('productCategory').value,
-        price: parseFloat(document.getElementById('productPrice').value) || 0,
-        status: document.getElementById('productStatus').value || 'active',
-        cost: parseFloat(document.getElementById('productCost').value) || 0,
-        description: document.getElementById('productDescription').value.trim(),
-        updatedAt: new Date().toISOString()
-    };
+    try {
+        var data = {
+            name: document.getElementById('productName').value.trim(),
+            brand: document.getElementById('productBrand').value.trim(),
+            category: document.getElementById('productCategory').value,
+            price: parseFloat(document.getElementById('productPrice').value) || 0,
+            status: document.getElementById('productStatus').value || 'active',
+            cost: parseFloat(document.getElementById('productCost').value) || 0,
+            description: document.getElementById('productDescription').value.trim(),
+            updatedAt: new Date().toISOString()
+        };
 
-    // Rasmlar (ko'p rasm qo'llab-quvvatlash)
-    if (productFormImages.length) {
-        data.imageUrls = productFormImages.slice();
-        data.imageUrl = productFormImages[0];
-        if (!productImagesTouched && id) {
+        // Rasmlarni yuklash (Storage ga)
+        var finalImageUrls = [];
+        var firstStoragePath = '';
+
+        if (productFormImages.length > 0) {
+            // Progress ko'rsatish
+            var progressArea = document.getElementById('uploadProgress');
+            var progressFill = document.getElementById('progressFill');
+            var progressText = document.getElementById('progressText');
+            
+            if (progressArea) progressArea.style.display = 'block';
+
+            for (var i = 0; i < productFormImages.length; i++) {
+                if (progressText) progressText.textContent = (i + 1) + ' / ' + productFormImages.length + ' rasm yuklanmoqda...';
+                if (progressFill) progressFill.style.width = ((i / productFormImages.length) * 100) + '%';
+                
+                var uploadRes = await uploadBase64ToStorage(productFormImages[i], i);
+                finalImageUrls.push(uploadRes.url);
+                if (i === 0) firstStoragePath = uploadRes.storagePath;
+            }
+            
+            if (progressFill) progressFill.style.width = '100%';
+            data.imageUrls = finalImageUrls;
+            data.imageUrl = finalImageUrls[0];
+            data.imageStoragePath = firstStoragePath;
+        } else {
+            // Agar rasm tanlanmagan bo'lsa, mavjud ma'lumotni saqlab qolamiz
             var existingProduct = productsArr.find(function (p) { return p.id === id; });
-            data.imageStoragePath = existingProduct ? (existingProduct.imageStoragePath || '') : '';
-        } else {
-            data.imageStoragePath = ''; // Base64 uchun storage path kerak emas
+            if (existingProduct && !productImagesTouched) {
+                var existingImages = getProductImagesList(existingProduct);
+                data.imageUrls = existingImages;
+                data.imageUrl = existingImages[0] || '';
+                data.imageStoragePath = existingProduct.imageStoragePath || '';
+            } else {
+                data.imageUrls = [];
+                data.imageUrl = '';
+                data.imageStoragePath = '';
+            }
         }
-    } else {
-        // Agar rasm tanlanmagan bo'lsa, mavjud ma'lumotni saqlab qolamiz
-        var existingProduct = productsArr.find(function (p) { return p.id === id; });
-        if (existingProduct && !productImagesTouched) {
-            var existingImages = getProductImagesList(existingProduct);
-            data.imageUrls = existingImages;
-            data.imageUrl = existingImages[0] || '';
-            data.imageStoragePath = existingProduct.imageStoragePath || '';
-        } else {
-            data.imageUrls = [];
-            data.imageUrl = '';
-            data.imageStoragePath = '';
+
+        await saveProductData(id, data);
+        
+        // Formani tozalash
+        if (progressArea) progressArea.style.display = 'none';
+        document.getElementById('imageUploadArea').classList.remove('uploading');
+
+    } catch (error) {
+        console.error("Saqlashda xatolik:", error);
+        showToast('Saqlashda xatolik: ' + error.message, 'error');
+    } finally {
+        if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = prevBtnHtml || '<i class="fas fa-save"></i> Saqlash';
         }
-    }
-
-    document.getElementById('uploadProgress').style.display = 'none';
-    document.getElementById('imageUploadArea').classList.remove('uploading');
-
-    function finishSave() {
-        if (!saveBtn) return;
-        saveBtn.disabled = false;
-        saveBtn.innerHTML = prevBtnHtml || '<i class="fas fa-save"></i> Saqlash';
-    }
-
-    var savePromise = saveProductData(id, data);
-    if (savePromise && typeof savePromise.then === 'function') {
-        savePromise.then(function () { finishSave(); }, function () { finishSave(); });
-    } else {
-        finishSave();
     }
 });
 
@@ -2851,23 +2868,58 @@ navigateTo('dashboard');
 
 // ==========================================
 // === FIREBASE STORAGE - RASM YUKLASH ===
-// Stub: rasm yuklash endi ishlatilmaydi
-function uploadProductImage(file, callback) {
-    if (typeof callback === 'function') callback('', '');
+// ==========================================
+
+/**
+ * Base64 rasmni Firebase Storage'ga yuklaydi
+ * Firestore'dagi 'resource-exhausted' xatoligini oldini olish uchun
+ */
+async function uploadBase64ToStorage(base64String, index) {
+    try {
+        // Agar allaqachon URL bo'lsa (yuklangan rasm), yuklash shart emas
+        if (base64String.startsWith('http')) {
+            return { url: base64String, storagePath: '' };
+        }
+
+        var fileName = 'products/' + Date.now() + '_img' + (index || 0) + '.jpg';
+        var storageRef = firebase.storage().ref(fileName);
+
+        // Base64 dan blob yaratish
+        var response = await fetch(base64String);
+        var blob = await response.blob();
+
+        var snapshot = await storageRef.put(blob);
+        var downloadURL = await snapshot.ref.getDownloadURL();
+
+        console.log('✅ Rasm Storage\'ga yuklandi:', downloadURL);
+        return {
+            url: downloadURL,
+            storagePath: fileName
+        };
+    } catch (error) {
+        console.error('Rasm yuklashda xatolik:', error);
+        throw error;
+    }
 }
 
-
 // Mahsulot ma'lumotlarini Firestore ga saqlash
-function saveProductData(id, data) {
-    if (id) {
-        return db.collection('products').doc(id).update(data)
-            .then(function () { showToast('Mahsulot yangilandi!'); closeModal('productModal'); })
-            .catch(function (err) { showToast('Xatolik: ' + err.message, 'error'); });
-    } else {
-        data.createdAt = new Date().toISOString();
-        return db.collection('products').add(data)
-            .then(function () { showToast("Yangi mahsulot qo'shildi!"); closeModal('productModal'); })
-            .catch(function (err) { showToast('Xatolik: ' + err.message, 'error'); });
+async function saveProductData(id, data) {
+    try {
+        if (id) {
+            await db.collection('products').doc(id).update(data);
+            showToast('Mahsulot yangilandi!');
+            closeModal('productModal');
+        } else {
+            data.createdAt = new Date().toISOString();
+            await db.collection('products').add(data);
+            showToast("Yangi mahsulot qo'shildi!");
+            closeModal('productModal');
+        }
+        return true;
+    } catch (err) {
+        console.error("Firestore saqlashda xatolik:", err);
+        showToast('Xatolik: ' + err.message, 'error');
+        throw err;
     }
 }
 
