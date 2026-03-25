@@ -8,12 +8,21 @@
 // ==========================================
 // Firebase o'zgaruvchilarini global scope'da aniqlaymiz
 // Agar index.html'da allaqachon aniqlanmagan bo'lsa, bu yerda aniqlaymiz
-if (typeof db === 'undefined') {
-    var db = firebase.firestore();
+if (typeof window.db === 'undefined') {
+    window.db = firebase.firestore();
 }
-if (typeof storage === 'undefined') {
-    var storage = firebase.storage();
+if (typeof window.storage === 'undefined') {
+    window.storage = firebase.storage();
 }
+if (typeof window.auth === 'undefined') {
+    window.auth = firebase.auth();
+}
+
+// Global o'zgaruvchilarni local scope'da ham oson ishlatish uchun
+var db = window.db;
+var storage = window.storage;
+var auth = window.auth;
+
 var productsCollection = db.collection('products');
 var ordersCollection = db.collection('orders');
 var customersCollection = db.collection('customers');
@@ -24,7 +33,6 @@ var usersCollection = db.collection('users');
 // ==========================================
 // AUTHENTICATION CHECK
 // ==========================================
-var auth = firebase.auth();
 var currentUserRole = 'admin';
 
 auth.onAuthStateChanged(function (user) {
@@ -581,7 +589,7 @@ function navigateTo(pageName) {
 
 function updateUIVisibility(currentPage) {
     // Hozirgi foydalanuvchi ma'lumotlarini olish
-    var user = firebase.auth().currentUser;
+    var user = auth.currentUser;
     if (!user) return;
 
     db.collection('users').doc(user.uid).get().then(function (doc) {
@@ -926,30 +934,48 @@ var productsFilter = { category: 'all', status: 'all' };
 // ==========================================
 // REAL-TIME FIRESTORE LISTENERS
 // ==========================================
-db.collection("products").onSnapshot(function (snapshot) {
-    productsArr = [];
-    snapshot.forEach(function (doc) { productsArr.push(Object.assign({ id: doc.id }, doc.data())); });
-    renderProducts();
-    syncSaleItemRowOptions();
-    updateSaleTotal();
-    refreshDashboard();
-});
+db.collection("products").onSnapshot(
+    function (snapshot) {
+        productsArr = [];
+        snapshot.forEach(function (doc) { productsArr.push(Object.assign({ id: doc.id }, doc.data())); });
+        renderProducts();
+        syncSaleItemRowOptions();
+        updateSaleTotal();
+        refreshDashboard();
+    },
+    function (error) {
+        console.error('Products listener xatolik:', error);
+        showToast('Mahsulotlarni yuklashda xatolik: ' + error.message, 'error');
+    }
+);
 
 
 
-db.collection("sales").onSnapshot(function (snapshot) {
-    salesArr = [];
-    snapshot.forEach(function (doc) { salesArr.push(Object.assign({ id: doc.id }, doc.data())); });
-    renderSales();
-    refreshDashboard();
-});
+db.collection("sales").onSnapshot(
+    function (snapshot) {
+        salesArr = [];
+        snapshot.forEach(function (doc) { salesArr.push(Object.assign({ id: doc.id }, doc.data())); });
+        renderSales();
+        refreshDashboard();
+    },
+    function (error) {
+        console.error('Sales listener xatolik:', error);
+        showToast('Sotuvlarni yuklashda xatolik: ' + error.message, 'error');
+    }
+);
 
-db.collection("finances").onSnapshot(function (snapshot) {
-    financesArr = [];
-    snapshot.forEach(function (doc) { financesArr.push(Object.assign({ id: doc.id }, doc.data())); });
-    renderFinance();
-    refreshDashboard();
-});
+db.collection("finances").onSnapshot(
+    function (snapshot) {
+        financesArr = [];
+        snapshot.forEach(function (doc) { financesArr.push(Object.assign({ id: doc.id }, doc.data())); });
+        renderFinance();
+        refreshDashboard();
+    },
+    function (error) {
+        console.error('Finances listener xatolik:', error);
+        showToast('Moliyaviy malumotlarni yuklashda xatolik: ' + error.message, 'error');
+    }
+);
 
 // ==========================================
 // === PRODUCTS CRUD ===
@@ -2376,7 +2402,7 @@ function renderUsers(searchTerm) {
     // Admin bo'lsa barcha xodimlarni ko'rsatish
     // Manager bo'lsa faqat o'zini ko'rsatish
     if (currentUserRole !== 'admin') {
-        var currentUser = firebase.auth().currentUser;
+        var currentUser = auth.currentUser;
         if (currentUser) {
             filtered = filtered.filter(function (u) {
                 return u.id === currentUser.uid;
