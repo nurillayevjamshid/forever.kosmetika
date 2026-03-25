@@ -1399,8 +1399,9 @@
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const storage = firebase.storage();
+        // Global o'zgaruvchilar (app.js da ishlatiladi)
+        var db = firebase.firestore();
+        var storage = firebase.storage();
     </script>
 
     <script src="app.js"></script>

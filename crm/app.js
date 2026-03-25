@@ -4,6 +4,24 @@
  */
 
 // ==========================================
+// FIREBASE INITIALIZATION
+// ==========================================
+// Firebase o'zgaruvchilarini global scope'da aniqlaymiz
+// Agar index.html'da allaqachon aniqlanmagan bo'lsa, bu yerda aniqlaymiz
+if (typeof db === 'undefined') {
+    var db = firebase.firestore();
+}
+if (typeof storage === 'undefined') {
+    var storage = firebase.storage();
+}
+var productsCollection = db.collection('products');
+var ordersCollection = db.collection('orders');
+var customersCollection = db.collection('customers');
+var salesCollection = db.collection('sales');
+var financesCollection = db.collection('finances');
+var usersCollection = db.collection('users');
+
+// ==========================================
 // AUTHENTICATION CHECK
 // ==========================================
 var auth = firebase.auth();
@@ -1051,13 +1069,19 @@ document.getElementById('productForm').addEventListener('submit', async function
         var data = {
             name: document.getElementById('productName').value.trim(),
             brand: document.getElementById('productBrand').value.trim(),
-            category: document.getElementById('productCategory').value,
+            category: document.getElementById('productCategory').value || '',
             price: parseFloat(document.getElementById('productPrice').value) || 0,
             status: document.getElementById('productStatus').value || 'active',
             cost: parseFloat(document.getElementById('productCost').value) || 0,
             description: document.getElementById('productDescription').value.trim(),
             updatedAt: new Date().toISOString()
         };
+        
+        // Kategoriya validatsiyasi
+        if (!data.category || data.category.trim() === '') {
+            showToast('Kategoriyani tanlang!', 'error');
+            return;
+        }
 
         // Rasmlarni yuklash (Storage ga)
         var finalImageUrls = [];
@@ -1119,7 +1143,8 @@ document.getElementById('productForm').addEventListener('submit', async function
 
     } catch (error) {
         console.error("Saqlashda xatolik:", error);
-        showToast('Saqlashda xatolik: ' + error.message, 'error');
+        var errorMsg = error.message || 'Noma'lum xatolik yuz berdi';
+        showToast('Xatolik: ' + errorMsg, 'error');
     } finally {
         if (saveBtn) {
             saveBtn.disabled = false;
@@ -2893,12 +2918,25 @@ async function uploadBase64ToStorage(base64String, index) {
             return { url: base64String, storagePath: '' };
         }
 
+        // Base64 string validatsiyasi
+        if (!base64String || typeof base64String !== 'string') {
+            throw new Error('Rasm formati notogri');
+        }
+
         var fileName = 'products/' + Date.now() + '_img' + (index || 0) + '.jpg';
-        var storageRef = firebase.storage().ref(fileName);
+        var storageRef = storage.ref(fileName);
 
         // Base64 dan blob yaratish
         var response = await fetch(base64String);
+        if (!response.ok) {
+            throw new Error('Rasm fetch qilishda xatolik: ' + response.statusText);
+        }
         var blob = await response.blob();
+
+        // Blob hajmini tekshirish (10MB limit)
+        if (blob.size > 10 * 1024 * 1024) {
+            throw new Error('Rasm hajmi 10MB dan oshmasligi kerak');
+        }
 
         var snapshot = await storageRef.put(blob);
         var downloadURL = await snapshot.ref.getDownloadURL();
@@ -2910,32 +2948,53 @@ async function uploadBase64ToStorage(base64String, index) {
         };
     } catch (error) {
         console.error('Rasm yuklashda xatolik:', error);
-        // CORS yoki boshqa xatolik bo'lsa, Base64 ni qaytaramiz (Fallback)
-        console.warn('Fallback: Rasmni Base64 formatida saqlashga harakat qilinadi.');
-        return {
-            url: base64String,
-            storagePath: ''
-        };
+        showToast('Rasm yuklashda xatolik: ' + (error.message || 'Noma'lum xatolik'), 'error');
+        throw error;
     }
 }
 
 // Mahsulot ma'lumotlarini Firestore ga saqlash
 async function saveProductData(id, data) {
     try {
+        // Ma'lumotlarni tekshirish
+        if (!data.name || data.name.trim() === '') {
+            throw new Error('Mahsulot nomi boSh bolishi mumkin emas!');
+        }
+        if (data.price < 0) {
+            throw new Error('Narx manfiy bolishi mumkin emas!');
+        }
+        if (data.cost < 0) {
+            throw new Error('Tannarxi manfiy bolishi mumkin emas!');
+        }
+        
+        // Rasm ma'lumotlarini tekshirish va tozalash
+        if (Array.isArray(data.imageUrls)) {
+            data.imageUrls = data.imageUrls.filter(function(url) {
+                return typeof url === 'string' && url.trim().length > 0;
+            });
+        } else {
+            data.imageUrls = [];
+        }
+        
         if (id) {
-            await db.collection('products').doc(id).update(data);
+            // Tahrirlash
+            await productsCollection.doc(id).update(data);
+            console.log('✅ Mahsulot yangilandi:', id);
             showToast('Mahsulot yangilandi!');
             closeModal('productModal');
         } else {
+            // Yangi mahsulot qoshish
             data.createdAt = new Date().toISOString();
-            await db.collection('products').add(data);
+            var docRef = await productsCollection.add(data);
+            console.log('✅ Yangi mahsulot qoshildi:', docRef.id);
             showToast("Yangi mahsulot qo'shildi!");
             closeModal('productModal');
         }
         return true;
     } catch (err) {
         console.error("Firestore saqlashda xatolik:", err);
-        showToast('Xatolik: ' + err.message, 'error');
+        var errorMsg = err.message || 'Noma'lum xatolik yuz berdi';
+        showToast('Xatolik: ' + errorMsg, 'error');
         throw err;
     }
 }
