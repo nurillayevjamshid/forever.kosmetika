@@ -1071,6 +1071,7 @@ document.getElementById('productForm').addEventListener('submit', async function
             
             if (progressArea) progressArea.style.display = 'block';
 
+            var totalBase64Size = 0;
             for (var i = 0; i < productFormImages.length; i++) {
                 if (progressText) progressText.textContent = (i + 1) + ' / ' + productFormImages.length + ' rasm yuklanmoqda...';
                 if (progressFill) progressFill.style.width = ((i / productFormImages.length) * 100) + '%';
@@ -1078,8 +1079,19 @@ document.getElementById('productForm').addEventListener('submit', async function
                 var uploadRes = await uploadBase64ToStorage(productFormImages[i], i);
                 finalImageUrls.push(uploadRes.url);
                 if (i === 0) firstStoragePath = uploadRes.storagePath;
+                
+                // Agar fallback (Base64) bo'lsa, hajmini hisoblaymiz
+                if (!uploadRes.storagePath && uploadRes.url.startsWith('data:')) {
+                    totalBase64Size += uploadRes.url.length;
+                }
             }
             
+            // Agar jami Base64 hajmi 800KB dan oshsa, ogohlantirish beramiz (Firestore limitiga yaqinlashmaslik uchun)
+            if (totalBase64Size > 800 * 1024) {
+                showToast("Rasmlar hajmi juda katta! Storage sozlamalarini tekshiring.", "error");
+                // Davom etaveramiz, lekin foydalanuvchi bilishi kerak
+            }
+
             if (progressFill) progressFill.style.width = '100%';
             data.imageUrls = finalImageUrls;
             data.imageUrl = finalImageUrls[0];
@@ -2898,7 +2910,12 @@ async function uploadBase64ToStorage(base64String, index) {
         };
     } catch (error) {
         console.error('Rasm yuklashda xatolik:', error);
-        throw error;
+        // CORS yoki boshqa xatolik bo'lsa, Base64 ni qaytaramiz (Fallback)
+        console.warn('Fallback: Rasmni Base64 formatida saqlashga harakat qilinadi.');
+        return {
+            url: base64String,
+            storagePath: ''
+        };
     }
 }
 
