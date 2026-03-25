@@ -1382,7 +1382,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-storage-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
@@ -1391,7 +1390,7 @@
             apiKey: "AIzaSyCcXc0svgxLtPvOYwpNUIzyRJGgajbyR9M",
             authDomain: "foreverkosmetika.firebaseapp.com",
             projectId: "foreverkosmetika",
-            storageBucket: "foreverkosmetika.appspot.com",
+            storageBucket: "foreverkosmetika.firebasestorage.app",
             messagingSenderId: "1013746676566",
             appId: "1:1013746676566:web:0032dfcb13239db2d15cf7",
             measurementId: "G-B71E70JH2Z"
@@ -1400,10 +1399,139 @@
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        const storage = firebase.storage();
+
+        // CRM mahsulot rasmlari local/base64 ko'rinishida saqlanadi.
+        // Bu shim eski cached app.js Firebase Storage upload chaqirsa ham
+        // uni brauzer ichida bajarib, CORS xatolarini oldini oladi.
+        function createLocalStorageShim() {
+            var uploads = {};
+
+            function ensureDataUrl(value, format) {
+                if (typeof value !== 'string') return '';
+                if (value.indexOf('data:') === 0) return value;
+                if (format === 'base64') return 'data:image/jpeg;base64,' + value;
+                return value;
+            }
+
+            function readAsDataUrl(input, format) {
+                return new Promise(function (resolve, reject) {
+                    if (!input) {
+                        resolve('');
+                        return;
+                    }
+
+                    if (typeof input === 'string') {
+                        resolve(ensureDataUrl(input, format));
+                        return;
+                    }
+
+                    var reader = new FileReader();
+                    reader.onload = function (event) {
+                        resolve(event && event.target ? event.target.result : '');
+                    };
+                    reader.onerror = function () {
+                        reject(new Error('Rasmni o\'qib bo\'lmadi'));
+                    };
+                    reader.readAsDataURL(input);
+                });
+            }
+
+            function makeRef(path) {
+                var fullPath = path || '';
+                var refApi = {
+                    fullPath: fullPath,
+                    child: function (name) {
+                        var nextPath = fullPath ? fullPath.replace(/\/+$/, '') + '/' + name : name;
+                        return makeRef(nextPath);
+                    },
+                    put: function (file) {
+                        return createUploadTask(refApi, file);
+                    },
+                    putString: function (value, format) {
+                        return createUploadTask(refApi, value, format);
+                    },
+                    delete: function () {
+                        delete uploads[fullPath];
+                        return Promise.resolve();
+                    },
+                    getDownloadURL: function () {
+                        return Promise.resolve(uploads[fullPath] || '');
+                    }
+                };
+                return refApi;
+            }
+
+            function createUploadTask(refApi, source, format) {
+                var listeners = [];
+                var snapshot = {
+                    bytesTransferred: 0,
+                    totalBytes: source && source.size ? source.size : 0,
+                    ref: refApi,
+                    state: 'running'
+                };
+
+                function emit(kind, payload) {
+                    listeners.forEach(function (listener) {
+                        if (kind === 'progress' && typeof listener.progress === 'function') listener.progress(payload);
+                        if (kind === 'error' && typeof listener.error === 'function') listener.error(payload);
+                        if (kind === 'complete' && typeof listener.complete === 'function') listener.complete();
+                    });
+                }
+
+                var promise = readAsDataUrl(source, format).then(function (dataUrl) {
+                    uploads[refApi.fullPath] = dataUrl;
+                    snapshot.bytesTransferred = snapshot.totalBytes || dataUrl.length || 0;
+                    snapshot.totalBytes = snapshot.bytesTransferred;
+                    snapshot.state = 'success';
+                    emit('progress', snapshot);
+                    emit('complete');
+                    return {
+                        ref: refApi,
+                        metadata: { fullPath: refApi.fullPath },
+                        totalBytes: snapshot.totalBytes
+                    };
+                }).catch(function (error) {
+                    snapshot.state = 'error';
+                    emit('error', error);
+                    throw error;
+                });
+
+                return {
+                    snapshot: snapshot,
+                    on: function (eventName, progress, error, complete) {
+                        if (eventName === 'state_changed') {
+                            listeners.push({ progress: progress, error: error, complete: complete });
+                        }
+                        return function () {};
+                    },
+                    then: promise.then.bind(promise),
+                    catch: promise.catch.bind(promise),
+                    finally: promise.finally ? promise.finally.bind(promise) : undefined
+                };
+            }
+
+            return {
+                ref: function (path) {
+                    return makeRef(path);
+                }
+            };
+        }
+
+        const storage = createLocalStorageShim();
+        window.storage = storage;
+        firebase.storage = function () {
+            return storage;
+        };
+        firebase.storage.TaskEvent = { STATE_CHANGED: 'state_changed' };
+        firebase.storage.TaskState = {
+            RUNNING: 'running',
+            PAUSED: 'paused',
+            SUCCESS: 'success',
+            ERROR: 'error'
+        };
     </script>
 
-    <script src="app.js"></script>
+    <script src="app.js?v=20260325-2"></script>
 </body>
 
 </html>
