@@ -484,6 +484,7 @@ function displayProducts(filter = 'all') {
             return cat === f;
 
         });
+    }
 
     // Clear grid
 
