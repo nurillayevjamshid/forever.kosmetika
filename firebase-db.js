@@ -602,3 +602,9 @@ async function firebaseGetWishlist() {
         return [];
     }
 }
+
+// Wishlist funksiyalarini global qilish
+window.firebaseAddToWishlist = firebaseAddToWishlist;
+window.firebaseRemoveFromWishlist = firebaseRemoveFromWishlist;
+window.firebaseGetWishlist = firebaseGetWishlist;
+window.getDeviceId = getDeviceId;

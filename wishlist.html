@@ -463,41 +463,52 @@
             const totalPriceEl = document.getElementById('totalPrice');
 
             window.renderWishlist = async function renderWishlist() {
+                console.log('🔄 Wishlist yuklanmoqda...');
                 loadingState.style.display = 'block';
                 grid.style.display = 'none';
                 emptyState.style.display = 'none';
+                statsContainer.style.display = 'none';
                 
-                // Firebase-dan wishlistni olish
-                let firebaseWishlist = [];
-                if (typeof firebaseGetWishlist === 'function') {
-                    firebaseWishlist = await firebaseGetWishlist();
+                try {
+                    // Firebase-dan wishlistni olish
+                    let firebaseWishlist = [];
+                    if (typeof firebaseGetWishlist === 'function') {
+                        firebaseWishlist = await firebaseGetWishlist();
+                        console.log('📦 Firebase wishlist ma\'lumotlari:', firebaseWishlist);
+                    } else {
+                        console.error('❌ firebaseGetWishlist funksiyasi topilmadi!');
+                    }
+                    
+                    loadingState.style.display = 'none';
+                    
+                    if (!firebaseWishlist || firebaseWishlist.length === 0) {
+                        console.log('ℹ️ Wishlist bo\'sh');
+                        grid.style.display = 'none';
+                        emptyState.style.display = 'block';
+                        statsContainer.style.display = 'none';
+                        countText.textContent = "Hozircha hech narsa yo'q";
+                        return;
+                    }
+
+                    grid.innerHTML = '';
+                    let totalPrice = 0;
+
+                    firebaseWishlist.forEach(item => {
+                        const card = createWishlistCard(item);
+                        grid.appendChild(card);
+                        totalPrice += Number(item.price) || 0;
+                    });
+
+                    grid.style.display = 'grid';
+                    emptyState.style.display = 'none';
+                    statsContainer.style.display = 'flex';
+                    countText.textContent = `${firebaseWishlist.length} ta mahsulot saqlangan`;
+                    totalItemsEl.textContent = firebaseWishlist.length;
+                    totalPriceEl.textContent = formatPrice(totalPrice) + " so'm";
+                } catch (error) {
+                    console.error('❌ Wishlist render qilishda xatolik:', error);
+                    loadingState.textContent = 'Xatolik yuz berdi. Iltimos, sahifani yangilang.';
                 }
-                
-                loadingState.style.display = 'none';
-                
-                if (firebaseWishlist.length === 0) {
-                    grid.style.display = 'none';
-                    emptyState.style.display = 'block';
-                    statsContainer.style.display = 'none';
-                    countText.textContent = "Hozircha hech narsa yo'q";
-                    return;
-                }
-
-                grid.innerHTML = '';
-                let totalPrice = 0;
-
-                firebaseWishlist.forEach(item => {
-                    const card = createWishlistCard(item);
-                    grid.appendChild(card);
-                    totalPrice += item.price || 0;
-                });
-
-                grid.style.display = 'grid';
-                emptyState.style.display = 'none';
-                statsContainer.style.display = 'flex';
-                countText.textContent = `${firebaseWishlist.length} ta mahsulot saqlangan`;
-                totalItemsEl.textContent = firebaseWishlist.length;
-                totalPriceEl.textContent = formatPrice(totalPrice) + " so'm";
             }
 
             function createWishlistCard(item) {
