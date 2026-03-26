@@ -427,37 +427,36 @@
         </div>
     </main>
 
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="firebase-config.js"></script>
     <script src="firebase-db.js"></script>
     <script src="script_helpers.js"></script>
     <script src="script.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Mahsulotlar yuklanishini kutish
+            if (typeof loadProducts === 'function') {
+                await loadProducts();
+            }
             initWishlistPage();
         });
 
-        async function initWishlistPage() {
+        function initWishlistPage() {
             const grid = document.getElementById('wishlistGrid');
             const emptyState = document.getElementById('emptyWishlist');
             const countText = document.getElementById('wishlistCountText');
             const statsContainer = document.getElementById('wishlistStats');
             const totalItemsEl = document.getElementById('totalItems');
             const totalPriceEl = document.getElementById('totalPrice');
-            
-            // Mahsulotlarni yuklash
-            if (typeof products === 'undefined' || products.length === 0) {
-                if (typeof firebaseGetProducts === 'function') {
-                    try {
-                        products = await firebaseGetProducts();
-                    } catch (e) {
-                        console.error("Mahsulotlarni yuklashda xatolik:", e);
-                    }
-                }
-            }
 
             window.renderWishlist = function renderWishlist() {
                 const wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
                 grid.innerHTML = '';
+                
+                // Global products o'zgaruvchisini tekshirish
+                const currentProducts = window.products || [];
                 
                 if (wishlist.length === 0) {
                     grid.style.display = 'none';
@@ -467,15 +466,11 @@
                     return;
                 }
 
-                grid.style.display = 'grid';
-                emptyState.style.display = 'none';
-                statsContainer.style.display = 'flex';
-                
-                let totalPrice = 0;
                 let foundCount = 0;
+                let totalPrice = 0;
 
                 wishlist.forEach(productId => {
-                    const product = products.find(p => p.id.toString() === productId.toString());
+                    const product = currentProducts.find(p => p.id.toString() === productId.toString());
                     if (product) {
                         const card = createWishlistCard(product);
                         grid.appendChild(card);
@@ -484,11 +479,15 @@
                     }
                 });
 
-                if (foundCount === 0 && products.length > 0) {
+                if (foundCount === 0) {
                     grid.style.display = 'none';
                     emptyState.style.display = 'block';
                     statsContainer.style.display = 'none';
+                    countText.textContent = "Hozircha hech narsa yo'q";
                 } else {
+                    grid.style.display = 'grid';
+                    emptyState.style.display = 'none';
+                    statsContainer.style.display = 'flex';
                     countText.textContent = `${foundCount} ta mahsulot saqlangan`;
                     totalItemsEl.textContent = foundCount;
                     totalPriceEl.textContent = formatPrice(totalPrice) + " so'm";
@@ -534,40 +533,26 @@
                 wishlist = wishlist.filter(id => id.toString() !== productId.toString());
                 localStorage.setItem('wishlist', JSON.stringify(wishlist));
                 
-                // Update header count if function exists
-                if (typeof updateWishlistCount === 'function') updateWishlistCount();
-                
+                if (typeof updateWishlistUI === 'function') updateWishlistUI();
                 renderWishlist();
             };
 
             window.addToCartFromWishlist = function(productId) {
-                const product = products.find(p => p.id.toString() === productId.toString());
-                if (product) {
-                    if (typeof addToCart === 'function') {
-                        addToCart(product.id);
-                    } else {
-                        // Fallback manual add
-                        let cart = JSON.parse(localStorage.getItem('cart')) || [];
-                        const existingItem = cart.find(item => item.id.toString() === productId.toString());
-                        if (existingItem) {
-                            existingItem.quantity += 1;
-                        } else {
-                            cart.push({
-                                id: product.id,
-                                name: product.name,
-                                price: product.price,
-                                image: product.imageUrl || product.image,
-                                quantity: 1
-                            });
-                        }
-                        localStorage.setItem('cart', JSON.stringify(cart));
-                        if (typeof updateCartCount === 'function') updateCartCount();
-                        alert('Mahsulot savatga qo\'shildi!');
-                    }
+                if (typeof addToCart === 'function') {
+                    addToCart(productId);
+                } else {
+                    alert('Savatga qo\'shish funksiyasi yuklanmadi.');
                 }
             };
 
             renderWishlist();
+        }
+
+        // Helper function if not loaded from script.js
+        if (typeof formatPrice !== 'function') {
+            window.formatPrice = function(price) {
+                return new Intl.NumberFormat('uz-UZ').format(price);
+            };
         }
     </script>
 </body>
