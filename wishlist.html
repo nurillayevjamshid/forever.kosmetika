@@ -274,8 +274,8 @@
         }
 
         .empty-icon {
-            font-size: 5rem;
-            margin-bottom: 25px;
+            font-size: 4rem;
+            margin-bottom: 20px;
             display: block;
             animation: float 3s ease-in-out infinite;
         }
@@ -302,6 +302,11 @@
             margin-bottom: 30px;
             font-size: 1rem;
             line-height: 1.6;
+        }
+
+        .empty-wishlist .empty-description {
+            margin-bottom: 30px;
+            color: var(--text-secondary);
         }
 
         .btn-primary {
@@ -571,8 +576,10 @@
             <div id="emptyWishlist" class="empty-wishlist" style="display: none;">
                 <span class="empty-icon">💖</span>
                 <h2>Sevimlilar ro'yxati bo'sh</h2>
-                <p>Hali hech qanday mahsulotni sevimlilarga qo'shmadingiz. O'zingizga yoqqan mahsulotlarni shu yerda saqlashingiz mumkin.</p>
-                <a href="index.html#products" class="btn-primary">Xaridni boshlash</a>
+                <div class="empty-description">
+                    <p>Siz hali hech qanday mahsulotni sevimlilarga qo'shmadingiz. Katalogimizni ko'zdan kechiring va o'zingizga yoqqanlarini saqlab qo'ying.</p>
+                </div>
+                <a href="index.html#products" class="btn-primary">Katalogga qaytish</a>
             </div>
         </div>
     </main>
@@ -613,7 +620,7 @@
                     grid.style.display = 'none';
                     emptyState.style.display = 'block';
                     statsContainer.style.display = 'none';
-                    countText.textContent = "Sizda hozircha sevimlilar yo'q";
+                    countText.textContent = "Sevimlilar ro'yxati bo'sh";
                     return;
                 }
 

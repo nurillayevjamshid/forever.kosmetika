@@ -638,15 +638,22 @@ body {
     box-shadow: var(--shadow-sm);
     z-index: 2;
     transition: var(--transition-fast);
-    color: #ccc;
+    color: #d0d0d0;
 }
 
 .favorite-btn:hover {
     transform: scale(1.1);
+    color: #E29E7D;
 }
 
 .favorite-btn.active {
-    color: #FF5C5C;
+    color: #E29E7D;
+    background: rgba(226, 158, 125, 0.08);
+}
+
+.favorite-btn.active:hover {
+    background: rgba(226, 158, 125, 0.15);
+    box-shadow: 0 4px 12px rgba(226, 158, 125, 0.2);
 }
 
 .product-info {
