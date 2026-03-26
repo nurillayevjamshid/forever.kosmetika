@@ -577,7 +577,7 @@ function createProductCard(product) {
             </div>
         `;
         badgeHTML = `
-            <div style="position: absolute; top: 10px; right: 10px; background: linear-gradient(135deg, #ff3d57 0%, #ff8a80 100%); color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; z-index: 2; display: flex; align-items: center; gap: 4px; box-shadow: 0 4px 10px rgba(255, 61, 87, 0.3);">
+            <div style="position: absolute; top: 10px; left: 10px; background: linear-gradient(135deg, #ff3d57 0%, #ff8a80 100%); color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; z-index: 2; display: flex; align-items: center; gap: 4px; box-shadow: 0 4px 10px rgba(255, 61, 87, 0.3);">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
                     <line x1="7" y1="7" x2="7.01" y2="7"></line>
