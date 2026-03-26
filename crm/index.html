@@ -1382,6 +1382,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-storage-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
@@ -1398,7 +1399,7 @@
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        // const db = firebase.firestore(); // Removed to avoid redeclaration in app.js
 
         // CRM mahsulot rasmlari local/base64 ko'rinishida saqlanadi.
         // Bu shim eski cached app.js Firebase Storage upload chaqirsa ham
@@ -1517,8 +1518,6 @@
             };
         }
 
-        const storage = createLocalStorageShim();
-        // window.storage = storage; // Removed this line to avoid conflict
         // Global o'zgaruvchilar (app.js da ishlatiladi)
         window.db = firebase.firestore();
         window.storage = firebase.storage();
