@@ -17,7 +17,8 @@ function initStickyBuyButton() {
         e.stopPropagation();
 
         // Agar savat bo'sh bo'lsa - mahsulotlar bo'limiga o'tish
-        if (!cart || cart.length === 0) {
+        const currentCart = typeof cart !== 'undefined' ? cart : [];
+        if (!currentCart || currentCart.length === 0) {
             document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
             return;
         }
@@ -28,11 +29,12 @@ function initStickyBuyButton() {
 
     // Savat holati o'zgarishi bilan tugma matnini yangilash
     const updateStickyButton = () => {
-        if (!cart || cart.length === 0) {
+        const currentCart = typeof cart !== 'undefined' ? cart : [];
+        if (!currentCart || currentCart.length === 0) {
             stickyBuyText.textContent = 'Savat';
             stickyBuyButton.classList.remove('show');
         } else {
-            const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+            const totalItems = currentCart.reduce((sum, item) => sum + (item.quantity || 1), 0);
             stickyBuyText.textContent = `Savat (${totalItems})`;
             stickyBuyButton.classList.add('show');
         }
