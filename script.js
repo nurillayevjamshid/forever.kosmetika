@@ -443,7 +443,7 @@ function displayProducts(filter = 'all') {
 
     let filteredProducts;
     
-    if (filter.startsWith('search:')) {
+    if (filter && typeof filter === 'string' && filter.startsWith('search:')) {
         const term = filter.replace('search:', '').toLowerCase();
         filteredProducts = products.filter(p => 
             (p.name || '').toLowerCase().includes(term) || 
@@ -451,7 +451,7 @@ function displayProducts(filter = 'all') {
             (p.category || '').toLowerCase().includes(term)
         );
     } else {
-        filteredProducts = filter === 'all'
+        filteredProducts = (filter === 'all' || !filter)
             ? products
             : filter === 'favorites'
             ? products.filter(p => wishlist.includes(p.id.toString()))
