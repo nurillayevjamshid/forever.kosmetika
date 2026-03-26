@@ -2587,22 +2587,34 @@ window.updateOrderDeliveryTextFromInputs = updateOrderDeliveryTextFromInputs;
 // WISHLIST FUNCTIONS
 // ================================
 
-function toggleWishlist(event, productId) {
+async function toggleWishlist(event, productId) {
     event.stopPropagation();
     event.preventDefault();
     
     const index = wishlist.indexOf(productId.toString());
+    const product = products.find(p => p.id.toString() === productId.toString());
+    
     if (index === -1) {
         // Qo'shish
         wishlist.push(productId.toString());
         if (typeof showNotification === 'function') {
             showNotification("Mahsulot sevimlilarga qo'shildi");
         }
+        
+        // Firebase-ga saqlash
+        if (product && typeof firebaseAddToWishlist === 'function') {
+            await firebaseAddToWishlist(product);
+        }
     } else {
         // O'chirish
         wishlist.splice(index, 1);
         if (typeof showNotification === 'function') {
             showNotification("Mahsulot sevimlilardan olib tashlandi");
+        }
+        
+        // Firebase-dan o'chirish
+        if (typeof firebaseRemoveFromWishlist === 'function') {
+            await firebaseRemoveFromWishlist(productId);
         }
     }
     
