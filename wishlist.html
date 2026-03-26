@@ -612,7 +612,7 @@
 
             renderWishlist();
 
-            function renderWishlist() {
+            window.renderWishlist = function renderWishlist() {
                 wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
                 grid.innerHTML = '';
                 

@@ -2608,13 +2608,18 @@ function toggleWishlist(event, productId) {
     
     localStorage.setItem('wishlist', JSON.stringify(wishlist));
     updateWishlistUI();
+    
+    // Wishlist sahifasini yangilash (agar mavjud bo'lsa)
+    if (typeof renderWishlist === 'function') {
+        renderWishlist();
+    }
 }
 
 function updateWishlistUI() {
     // Barcha wishlist tugmalarini yangilash
     const wishlistBtns = document.querySelectorAll('.favorite-btn');
     wishlistBtns.forEach(btn => {
-        const productId = btn.id.replace('wishlist-btn?', '');
+        const productId = btn.id.replace('wishlist-btn-', '');
         const isActive = wishlist.includes(productId.toString());
         
         if (isActive) {
