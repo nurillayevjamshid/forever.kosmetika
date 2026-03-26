@@ -571,12 +571,20 @@ function createProductCard(product) {
 
     if (discount) {
         priceHTML = `
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <div class="current-price" style="text-decoration: line-through; color: var(--text-light); font-size: 0.9rem;">${formatPrice(product.price)} so'm</div>
-                <div class="current-price" style="color: var(--accent-color); font-weight: 700;">${formatPrice(discount.price)} so'm</div>
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+                <div class="current-price" style="text-decoration: line-through; color: var(--text-light); font-size: 0.85rem; opacity: 0.7;">${formatPrice(product.price)} so'm</div>
+                <div class="current-price" style="color: var(--accent-color); font-weight: 800; font-size: 1.1rem;">${formatPrice(discount.price)} so'm</div>
             </div>
         `;
-        badgeHTML = `<div style="position: absolute; top: 8px; right: 8px; background: var(--accent-color); color: white; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; z-index: 2;">-${discount.percent}%</div>`;
+        badgeHTML = `
+            <div style="position: absolute; top: 10px; right: 10px; background: linear-gradient(135deg, #ff3d57 0%, #ff8a80 100%); color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; z-index: 2; display: flex; align-items: center; gap: 4px; box-shadow: 0 4px 10px rgba(255, 61, 87, 0.3);">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                    <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                </svg>
+                -${discount.percent}%
+            </div>
+        `;
     } else {
         priceHTML = `<div class="current-price">${formatPrice(product.price)} so'm</div>`;
     }
@@ -2053,10 +2061,18 @@ function openProductDetailModal(productId) {
     let detailPriceHTML = '';
     
     if (discount) {
-        detailPriceHTML = '<div style="display: flex; align-items: center; gap: 12px;">' +
-            '<span style="text-decoration: line-through; color: var(--text-light); font-size: 0.95rem;">' + formatPrice(product.price) + ' so\'m</span>' +
-            '<span style="color: var(--accent-color); font-weight: 700; font-size: 1.2rem;">' + formatPrice(discount.price) + ' so\'m</span>' +
-            '<span style="background: var(--accent-color); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 700;">-' + discount.percent + '%</span>' +
+        detailPriceHTML = '<div style="display: flex; align-items: center; gap: 15px;">' +
+            '<div style="display: flex; flex-direction: column;">' +
+                '<span style="text-decoration: line-through; color: var(--text-light); font-size: 0.9rem; opacity: 0.7;">' + formatPrice(product.price) + ' so\'m</span>' +
+                '<span style="color: var(--accent-color); font-weight: 800; font-size: 1.4rem;">' + formatPrice(discount.price) + ' so\'m</span>' +
+            '</div>' +
+            '<span style="background: linear-gradient(135deg, #ff3d57 0%, #ff8a80 100%); color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.9rem; font-weight: 800; display: flex; align-items: center; gap: 5px; box-shadow: 0 4px 12px rgba(255, 61, 87, 0.2);">' +
+                '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' +
+                    '<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>' +
+                    '<line x1="7" y1="7" x2="7.01" y2="7"></line>' +
+                '</svg>' +
+                '-' + discount.percent + '%' +
+            '</span>' +
             '</div>';
     } else {
         detailPriceHTML = '<span>' + formatPrice(product.price) + ' so\'m</span>';

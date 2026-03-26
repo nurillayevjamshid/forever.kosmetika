@@ -1058,41 +1058,50 @@
                 </div>
 
                 <!-- Chegirma bo'limi -->
-                <div class="discount-section" style="background: var(--bg-secondary); padding: 15px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px;">
-                    <h3 style="font-size: 1rem; margin-bottom: 15px; color: var(--accent); display: flex; align-items: center; gap: 8px;">
-                        <i class="fas fa-percentage"></i> Chegirma sozlamalari
+                <div class="discount-section" style="background: var(--bg-secondary); padding: 20px; border-radius: 16px; border: 1px solid var(--accent-border-soft); margin-bottom: 25px; box-shadow: var(--shadow-sm);">
+                    <h3 style="font-size: 1.1rem; margin-bottom: 20px; color: var(--accent); display: flex; align-items: center; gap: 10px; font-weight: 700;">
+                        <div style="width: 32px; height: 32px; background: var(--accent-bg-soft); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-percentage" style="font-size: 0.9rem;"></i>
+                        </div>
+                        Chegirma va Vaqtni boshqarish
                     </h3>
                     
-                    <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
                         <div class="form-group">
-                            <label for="productDiscountPrice"><i class="fas fa-tag"></i> Chegirma narxi (so'm)</label>
-                            <input type="number" id="productDiscountPrice" min="0" step="100" placeholder="Masalan: 80000">
+                            <label for="productDiscountPrice" style="font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; display: block;"><i class="fas fa-tag" style="color: var(--accent); margin-right: 5px;"></i> Chegirma narxi (so'm)</label>
+                            <input type="number" id="productDiscountPrice" min="0" step="100" placeholder="Masalan: 80000" style="width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface);">
                         </div>
                         <div class="form-group">
-                            <label for="productDiscountPercent"><i class="fas fa-percent"></i> Yoki foizda (%)</label>
-                            <input type="number" id="productDiscountPercent" min="0" max="100" placeholder="Masalan: 20">
-                        </div>
-                    </div>
-
-                    <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
-                        <div class="form-group">
-                            <label for="discountStartDate"><i class="fas fa-calendar-plus"></i> Boshlanish sanasi</label>
-                            <input type="date" id="discountStartDate">
-                        </div>
-                        <div class="form-group">
-                            <label for="discountStartTime"><i class="fas fa-clock"></i> Boshlanish vaqti</label>
-                            <input type="time" id="discountStartTime">
+                            <label for="productDiscountPercent" style="font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; display: block;"><i class="fas fa-percent" style="color: var(--accent); margin-right: 5px;"></i> Yoki foizda (%)</label>
+                            <input type="number" id="productDiscountPercent" min="0" max="100" placeholder="Masalan: 20" style="width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface);">
                         </div>
                     </div>
 
-                    <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                        <div class="form-group">
-                            <label for="discountEndDate"><i class="fas fa-calendar-minus"></i> Tugash sanasi</label>
-                            <input type="date" id="discountEndDate">
+                    <div style="background: var(--surface-light); padding: 15px; border-radius: 12px; border: 1px dashed var(--border); margin-bottom: 15px;">
+                        <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-hourglass-start" style="color: var(--success);"></i> Boshlanish vaqti
                         </div>
-                        <div class="form-group">
-                            <label for="discountEndTime"><i class="fas fa-clock"></i> Tugash vaqti</label>
-                            <input type="time" id="discountEndTime">
+                        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div class="form-group">
+                                <input type="date" id="discountStartDate" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface);">
+                            </div>
+                            <div class="form-group">
+                                <input type="time" id="discountStartTime" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface);">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="background: var(--surface-light); padding: 15px; border-radius: 12px; border: 1px dashed var(--border);">
+                        <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-hourglass-end" style="color: var(--danger);"></i> Tugash vaqti
+                        </div>
+                        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div class="form-group">
+                                <input type="date" id="discountEndDate" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface);">
+                            </div>
+                            <div class="form-group">
+                                <input type="time" id="discountEndTime" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface);">
+                            </div>
                         </div>
                     </div>
                     <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 10px;">

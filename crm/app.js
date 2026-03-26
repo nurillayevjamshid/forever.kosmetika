@@ -463,11 +463,14 @@ function renderProducts(searchTerm) {
         var badgeHtml = '';
 
         if (discount) {
-            priceHtml = '<div class="product-price-wrap">' +
-                            '<div class="product-price-old" style="text-decoration: line-through; color: var(--text-muted); font-size: 0.85rem;">' + formatMoney(p.price) + '</div>' +
-                            '<div class="product-price-new" style="color: var(--danger); font-weight: 700;">' + formatMoney(discount.price) + '</div>' +
+            priceHtml = '<div class="product-price-wrap" style="display: flex; flex-direction: column; gap: 2px;">' +
+                            '<div class="product-price-old" style="text-decoration: line-through; color: var(--text-muted); font-size: 0.75rem; opacity: 0.8;">' + formatMoney(p.price) + '</div>' +
+                            '<div class="product-price-new" style="color: var(--danger); font-weight: 700; font-size: 0.95rem;">' + formatMoney(discount.price) + '</div>' +
                         '</div>';
-            badgeHtml = '<span class="discount-badge" style="background: var(--danger); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; margin-left: 8px; font-weight: 600;">-' + discount.percent + '%</span>';
+            badgeHtml = '<span class="discount-badge" style="background: linear-gradient(135deg, #ff3d57 0%, #ff8a80 100%); color: white; padding: 3px 8px; border-radius: 12px; font-size: 0.7rem; margin-left: 8px; font-weight: 700; display: inline-flex; align-items: center; gap: 3px; box-shadow: 0 2px 5px rgba(255, 61, 87, 0.2);">' +
+                            '<i class="fas fa-tag" style="font-size: 0.6rem;"></i>' +
+                            '-' + discount.percent + '%' +
+                        '</span>';
         } else {
             priceHtml = '<div class="product-price">' + formatMoney(p.price) + '</div>';
         }
@@ -507,11 +510,14 @@ function renderProducts(searchTerm) {
             var mobileBadgeHtml = '';
 
             if (discount) {
-                mobilePriceHtml = '<div class="pm-price-wrap">' +
-                                    '<span class="pm-price-old" style="text-decoration: line-through; color: var(--text-muted); font-size: 0.75rem; margin-right: 5px;">' + formatMoney(p.price) + '</span>' +
-                                    '<span class="pm-price-new" style="color: var(--danger); font-weight: 700;">' + formatMoney(discount.price) + '</span>' +
+                mobilePriceHtml = '<div class="pm-price-wrap" style="display: flex; align-items: center; gap: 8px;">' +
+                                    '<span class="pm-price-old" style="text-decoration: line-through; color: var(--text-muted); font-size: 0.7rem; opacity: 0.8;">' + formatMoney(p.price) + '</span>' +
+                                    '<span class="pm-price-new" style="color: var(--danger); font-weight: 700; font-size: 0.9rem;">' + formatMoney(discount.price) + '</span>' +
                                   '</div>';
-                mobileBadgeHtml = '<div class="pm-badge" style="position: absolute; top: 5px; right: 5px; background: var(--danger); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: 700; z-index: 1;">-' + discount.percent + '%</div>';
+                mobileBadgeHtml = '<div class="pm-badge" style="position: absolute; top: 8px; right: 8px; background: linear-gradient(135deg, #ff3d57 0%, #ff8a80 100%); color: white; padding: 3px 8px; border-radius: 12px; font-size: 0.65rem; font-weight: 800; z-index: 1; display: flex; align-items: center; gap: 3px; box-shadow: 0 2px 8px rgba(255, 61, 87, 0.3);">' +
+                                    '<i class="fas fa-fire" style="font-size: 0.6rem;"></i>' +
+                                    '-' + discount.percent + '%' +
+                                  '</div>';
             } else {
                 mobilePriceHtml = '<div class="pm-price">' + formatMoney(p.price) + '</div>';
             }
