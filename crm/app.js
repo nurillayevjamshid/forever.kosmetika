@@ -3569,3 +3569,84 @@ document.addEventListener('click', function(e) {
         if (p) openProductDetailModal(p);
     }
 });
+
+// ==========================================
+// === DISCOUNT MANAGEMENT ===
+// ==========================================
+
+(function initDiscountManagement() {
+    var addDiscountBtn = document.getElementById('addDiscountBtn');
+    var discountModal = document.getElementById('discountModal');
+    var discountForm = document.getElementById('discountForm');
+    var discountSection = document.getElementById('discountSection');
+
+    if (!addDiscountBtn || !discountModal || !discountForm || !discountSection) return;
+
+    // Populate categories
+    if (typeof allProductCategories !== 'undefined') {
+        allProductCategories.forEach(function (c) {
+            var opt = document.createElement('option');
+            opt.value = c;
+            opt.textContent = c;
+            discountSection.appendChild(opt);
+        });
+    }
+
+    addDiscountBtn.addEventListener('click', function () {
+        discountForm.reset();
+        openModal('discountModal');
+    });
+
+    discountForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        
+        var percent = parseFloat(document.getElementById('discountPercent').value);
+        var section = document.getElementById('discountSection').value;
+
+        if (isNaN(percent) || percent < 0 || percent > 100) {
+            showToast('Iltimos, to\'g\'ri chegirma foizini kiriting (0-100)', 'error');
+            return;
+        }
+
+        try {
+            showToast('Chegirma qo\'shilmoqda...', 'info');
+            
+            let query = db.collection('products');
+            if (section !== 'all') {
+                query = query.where('category', '==', section);
+            }
+
+            const snapshot = await query.get();
+            
+            if (snapshot.empty) {
+                showToast('Tanlangan bo\'limda mahsulotlar topilmadi', 'info');
+                closeModal('discountModal');
+                return;
+            }
+
+            const batch = db.batch();
+            let count = 0;
+            
+            snapshot.forEach(doc => {
+                const product = doc.data();
+                // We update the product with discount info
+                // Note: The actual price calculation might depend on how the UI displays it
+                batch.update(doc.ref, {
+                    discountPercent: percent,
+                    hasDiscount: percent > 0,
+                    updatedAt: new Date().toISOString()
+                });
+                count++;
+            });
+
+            await batch.commit();
+            
+            showToast(count + ' ta mahsulotga chegirma qo\'shildi!', 'success');
+            closeModal('discountModal');
+            if (typeof renderProducts === 'function') renderProducts();
+        } catch (error) {
+            console.error("Chegirma qo'shishda xatolik:", error);
+            showToast('Xatolik yuz berdi: ' + error.message, 'error');
+        }
+    });
+})();
