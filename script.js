@@ -23,6 +23,7 @@ const defaultProducts = [];
 // Cart state
 
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
+let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
 
 // Viloyatlar va Tumanlar ma'lumotlari
 
@@ -92,6 +93,9 @@ document.addEventListener('DOMContentLoaded', async function () {
     // Update cart count
 
     updateCartCount();
+
+    // Update wishlist icons
+    updateWishlistUI();
 
     // Smooth scroll for links
 
@@ -536,14 +540,14 @@ function createProductCard(product) {
                     </svg>
                 </button>
 
-                <button class="favorite-btn" onclick="event.stopPropagation()">
-
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-
+                <button class="favorite-btn ${wishlist.includes(product.id.toString()) ? 'active' : ''}" 
+                        onclick="toggleWishlist(event, '${product.id}')" 
+                        id="wishlist-btn-${product.id}">
+                    <svg width="20" height="20" viewBox="0 0 24 24" 
+                         fill="${wishlist.includes(product.id.toString()) ? 'currentColor' : 'none'}" 
+                         stroke="currentColor" stroke-width="2">
                         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-
                     </svg>
-
                 </button>
 
             </div>
@@ -912,6 +916,9 @@ function addToCart(productId) {
     // Update cart count
 
     updateCartCount();
+
+    // Update wishlist icons
+    updateWishlistUI();
 
     // Update UI for this product
 
@@ -2443,3 +2450,56 @@ window.showStep = showStep;
 window.changeQuantityPage = changeQuantityPage;
 window.removeFromCartPage = removeFromCartPage;
 window.updateOrderDeliveryTextFromInputs = updateOrderDeliveryTextFromInputs;
+
+// ================================
+// WISHLIST FUNCTIONS
+// ================================
+
+function toggleWishlist(event, productId) {
+    event.stopPropagation();
+    event.preventDefault();
+    
+    const index = wishlist.indexOf(productId.toString());
+    if (index === -1) {
+        // Qo'shish
+        wishlist.push(productId.toString());
+        if (typeof showNotification === 'function') {
+            showNotification("Mahsulot sevimlilarga qo'shildi");
+        }
+    } else {
+        // O'chirish
+        wishlist.splice(index, 1);
+        if (typeof showNotification === 'function') {
+            showNotification("Mahsulot sevimlilardan olib tashlandi");
+        }
+    }
+    
+    localStorage.setItem('wishlist', JSON.stringify(wishlist));
+    updateWishlistUI();
+}
+
+function updateWishlistUI() {
+    // Barcha wishlist tugmalarini yangilash
+    const wishlistBtns = document.querySelectorAll('.favorite-btn');
+    wishlistBtns.forEach(btn => {
+        const productId = btn.id.replace('wishlist-btn-', '');
+        const isActive = wishlist.includes(productId.toString());
+        
+        if (isActive) {
+            btn.classList.add('active');
+            const svg = btn.querySelector('svg');
+            if (svg) svg.setAttribute('fill', 'currentColor');
+        } else {
+            btn.classList.remove('active');
+            const svg = btn.querySelector('svg');
+            if (svg) svg.setAttribute('fill', 'none');
+        }
+    });
+
+    // Headerdagi wishlist count (agar bo'lsa)
+    const wishlistCountEl = document.getElementById('wishlistCount');
+    if (wishlistCountEl) {
+        wishlistCountEl.textContent = wishlist.length;
+        wishlistCountEl.style.display = wishlist.length > 0 ? 'flex' : 'none';
+    }
+}
