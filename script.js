@@ -2503,3 +2503,7 @@ function updateWishlistUI() {
         wishlistCountEl.style.display = wishlist.length > 0 ? 'flex' : 'none';
     }
 }
+
+// Wishlist funksiyalarini global miqyosda e'lon qilish
+window.toggleWishlist = toggleWishlist;
+window.updateWishlistUI = updateWishlistUI;
