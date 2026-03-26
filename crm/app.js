@@ -3725,10 +3725,27 @@ document.addEventListener('click', function(e) {
         
         var percent = parseFloat(document.getElementById('discountPercent').value);
         var section = document.getElementById('discountSection').value;
+        
+        // Vaqt ma'lumotlarini olish
+        var startDate = document.getElementById('bulkDiscountStartDate').value;
+        var startTime = document.getElementById('bulkDiscountStartTime').value;
+        var endDate = document.getElementById('bulkDiscountEndDate').value;
+        var endTime = document.getElementById('bulkDiscountEndTime').value;
 
         if (isNaN(percent) || percent < 0 || percent > 100) {
             showToast('Iltimos, to\'g\'ri chegirma foizini kiriting (0-100)', 'error');
             return;
+        }
+        
+        // Vaqt formatini tayyorlash
+        var discountStart = "";
+        if (startDate) {
+            discountStart = startDate + (startTime ? "T" + startTime : "T00:00");
+        }
+        
+        var discountEnd = "";
+        if (endDate) {
+            discountEnd = endDate + (endTime ? "T" + endTime : "T23:59");
         }
 
         try {
@@ -3752,13 +3769,20 @@ document.addEventListener('click', function(e) {
             
             snapshot.forEach(doc => {
                 const product = doc.data();
-                // We update the product with discount info
-                // Note: The actual price calculation might depend on how the UI displays it
-                batch.update(doc.ref, {
+                
+                // Mahsulotni chegirma ma'lumotlari bilan yangilash
+                var updateData = {
                     discountPercent: percent,
+                    discountPrice: 0, // Foiz ishlatilganda narxni 0 qilamiz
                     hasDiscount: percent > 0,
                     updatedAt: new Date().toISOString()
-                });
+                };
+                
+                // Vaqt ma'lumotlarini qo'shish
+                if (discountStart) updateData.discountStart = discountStart;
+                if (discountEnd) updateData.discountEnd = discountEnd;
+                
+                batch.update(doc.ref, updateData);
                 count++;
             });
 
