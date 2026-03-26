@@ -87,6 +87,19 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     initContactForm();
 
+    // Initialize search
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            if (searchTerm.length > 1) {
+                displayProducts('search:' + searchTerm);
+            } else if (searchTerm.length === 0) {
+                displayProducts('all');
+            }
+        });
+    }
+
     // Initialize custom selects (viloyat/tuman)
     initCustomSelects();
 
@@ -428,15 +441,21 @@ function displayProducts(filter = 'all') {
 
     // Filter products
 
-    const filteredProducts = filter === 'all'
-
-        ? products
-
-        : filter === 'favorites'
-
-        ? products.filter(p => wishlist.includes(p.id.toString()))
-
-        : products.filter(p => {
+    let filteredProducts;
+    
+    if (filter.startsWith('search:')) {
+        const term = filter.replace('search:', '').toLowerCase();
+        filteredProducts = products.filter(p => 
+            (p.name || '').toLowerCase().includes(term) || 
+            (p.description || '').toLowerCase().includes(term) ||
+            (p.category || '').toLowerCase().includes(term)
+        );
+    } else {
+        filteredProducts = filter === 'all'
+            ? products
+            : filter === 'favorites'
+            ? products.filter(p => wishlist.includes(p.id.toString()))
+            : products.filter(p => {
 
             const cat = (p.category || '').toLowerCase();
 
