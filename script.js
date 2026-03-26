@@ -87,6 +87,19 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     initContactForm();
 
+    // Initialize search
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            if (searchTerm.length > 1) {
+                displayProducts('search:' + searchTerm);
+            } else if (searchTerm.length === 0) {
+                displayProducts('all');
+            }
+        });
+    }
+
     // Initialize custom selects (viloyat/tuman)
     initCustomSelects();
 
@@ -428,15 +441,21 @@ function displayProducts(filter = 'all') {
 
     // Filter products
 
-    const filteredProducts = filter === 'all'
-
-        ? products
-
-        : filter === 'favorites'
-
-        ? products.filter(p => wishlist.includes(p.id.toString()))
-
-        : products.filter(p => {
+    let filteredProducts;
+    
+    if (filter && typeof filter === 'string' && filter.startsWith('search:')) {
+        const term = filter.replace('search:', '').toLowerCase();
+        filteredProducts = products.filter(p => 
+            (p.name || '').toLowerCase().includes(term) || 
+            (p.description || '').toLowerCase().includes(term) ||
+            (p.category || '').toLowerCase().includes(term)
+        );
+    } else {
+        filteredProducts = (filter === 'all' || !filter)
+            ? products
+            : filter === 'favorites'
+            ? products.filter(p => wishlist.includes(p.id.toString()))
+            : products.filter(p => {
 
             const cat = (p.category || '').toLowerCase();
 
@@ -465,6 +484,7 @@ function displayProducts(filter = 'all') {
             return cat === f;
 
         });
+    }
 
     // Clear grid
 
@@ -544,26 +564,46 @@ function createProductCard(product) {
 
     const isFavorite = wishlist.includes(product.id.toString());
 
+    // Chegirmani tekshirish
+    const discount = getActiveDiscountForProduct(product);
+    let priceHTML = '';
+    let badgeHTML = '';
+
+    if (discount) {
+        priceHTML = `
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+                <div class="current-price" style="text-decoration: line-through; color: var(--text-light); font-size: 0.85rem; opacity: 0.7;">${formatPrice(product.price)} so'm</div>
+                <div class="current-price" style="color: var(--accent-color); font-weight: 800; font-size: 1.1rem;">${formatPrice(discount.price)} so'm</div>
+            </div>
+        `;
+        badgeHTML = `
+            <div style="position: absolute; top: 10px; left: 10px; background: linear-gradient(135deg, #ff3d57 0%, #ff8a80 100%); color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; z-index: 2; display: flex; align-items: center; gap: 4px; box-shadow: 0 4px 10px rgba(255, 61, 87, 0.3);">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                    <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                </svg>
+                -${discount.percent}%
+            </div>
+        `;
+    } else {
+        priceHTML = `<div class="current-price">${formatPrice(product.price)} so'm</div>`;
+    }
+
     card.innerHTML = `
-
-        <div class="product-click-area" onclick="openProductDetailModal('${product.id}')">
-
+        <div class="product-click-area" onclick="openProductDetailModal('${product.id}')" style="position: relative;">
+            ${badgeHTML}
             <div class="product-image">
-
                 <img src="${initialImage}" alt="${product.name}" data-fallback="${fallback}" onerror="this.src='${fallback}'">
-
-                <button class="image-nav prev" data-pid="${product.id}" data-dir="-1" aria-label="Oldingi rasm" style="display:${showNav ? 'flex' : 'none'}; opacity: ${showNav ? '1' : '0'}; pointer-events: ${showNav ? 'auto' : 'none'};">
+                <button class="image-nav prev" data-pid="${product.id}" data-dir="-1" aria-label="Oldingi rasm" style="display:${showNav ? 'flex' : 'none'};">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="15 18 9 12 15 6"></polyline>
                     </svg>
                 </button>
-                <button class="image-nav next" data-pid="${product.id}" data-dir="1" aria-label="Keyingi rasm" style="display:${showNav ? 'flex' : 'none'}; opacity: ${showNav ? '1' : '0'}; pointer-events: ${showNav ? 'auto' : 'none'};">
+                <button class="image-nav next" data-pid="${product.id}" data-dir="1" aria-label="Keyingi rasm" style="display:${showNav ? 'flex' : 'none'};">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="9 18 15 12 9 6"></polyline>
                     </svg>
                 </button>
-
-
             </div>
 
             <button class="favorite-btn ${wishlist.includes(product.id.toString()) ? 'active' : ''}" 
@@ -576,35 +616,25 @@ function createProductCard(product) {
                 </svg>
             </button>
 
-            <div class="product-info" style="padding: 12px 12px 0; display: flex; flex-direction: column; gap: 4px; flex: 1;">
-
-                <h3 class="product-name" style="font-size: 0.9rem; line-height: 1.3; color: #1a1a2e; font-weight: 500; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.34rem; margin: 0; margin-bottom: 4px;">${product.name}</h3>
-                
-                <div class="current-price" style="font-size: 1.15rem; font-weight: 700; color: #1a1a2e; margin-bottom: 2px;">${formatPrice(product.price)} so'm</div>
-                
+            <div class="product-info">
+                <h3 class="product-name">${product.name}</h3>
+                ${priceHTML}
                 ${product.brand ? `
-                <div class="product-brand" style="font-size: 0.8rem; color: #8b8b9f; font-weight: 500; display: flex; align-items: center; gap: 4px;">
+                <div class="product-brand" style="font-size: 0.8rem; color: var(--text-light); font-weight: 500; display: flex; align-items: center; gap: 4px;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
                         <line x1="7" y1="7" x2="7.01" y2="7"></line>
                     </svg>
                     ${product.brand}
                 </div>` : ''}
-
             </div>
-
         </div>
 
-        <div class="product-footer-container" style="padding: 10px 12px 12px; margin-top: auto;">
-
-            <div class="product-footer" id="footer-${product.id}" style="width: 100%; display: flex; padding: 0; border: none;">
-
+        <div class="product-footer-container">
+            <div class="product-footer" id="footer-${product.id}">
                 ${getProductFooterHTML(product)}
-
             </div>
-
         </div>
-
     `;
 
     return card;
@@ -616,30 +646,16 @@ function getProductFooterHTML(product) {
     const cartItem = cart.find(item => item.id.toString() === product.id.toString());
 
     if (cartItem) {
-
-        // Savatda bor (count controls)
-
         return `
-
-            <div class="qty-counter-uzum" style="width: 100%; display: flex; align-items: center; justify-content: space-between; background: #f5edff; border-radius: 8px; padding: 6px;">
-
-                <button class="qty-btn" style="width: 32px; height: 32px; border: none; background: transparent; font-size: 1.2rem; color: #9c27b0; cursor: pointer; display: flex; align-items: center; justify-content: center;" onclick="event.stopPropagation(); changeQuantity('${product.id}', -1)">−</button>
-
-                <span class="qty-display" style="font-weight: 600; font-size: 1.05rem; color: #000;">${cartItem.quantity}</span>
-
-                <button class="qty-btn" style="width: 32px; height: 32px; border: none; background: transparent; font-size: 1.2rem; color: #9c27b0; cursor: pointer; display: flex; align-items: center; justify-content: center;" onclick="event.stopPropagation(); changeQuantity('${product.id}', 1)">+</button>
-
+            <div class="qty-counter-uzum">
+                <button class="qty-btn" onclick="event.stopPropagation(); changeQuantity('${product.id}', -1)">−</button>
+                <span class="qty-display">${cartItem.quantity}</span>
+                <button class="qty-btn" onclick="event.stopPropagation(); changeQuantity('${product.id}', 1)">+</button>
             </div>
-
         `;
-
     } else {
-
-        // Savatda yo'q (Add button only)
-
         return `
-
-            <button class="add-cart-new-btn" style="width: 100%; height: 44px; background: linear-gradient(135deg, #7B68EE 0%, #6A5ACD 100%); color: white; border: none; border-radius: 8px; font-weight: 500; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: 0.2s; font-family: inherit;" onclick="event.stopPropagation(); addToCart('${product.id}')" onmouseover="this.style.background='linear-gradient(135deg, #8B7FFF 0%, #7B68EE 100%)'" onmouseout="this.style.background='linear-gradient(135deg, #7B68EE 0%, #6A5ACD 100%)'">
+            <button class="add-cart-new-btn" onclick="event.stopPropagation(); addToCart('${product.id}')">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="9" cy="21" r="1"></circle>
                     <circle cx="20" cy="21" r="1"></circle>
@@ -647,9 +663,7 @@ function getProductFooterHTML(product) {
                 </svg>
                 Tanlash
             </button>
-
         `;
-
     }
 
 }
@@ -705,6 +719,48 @@ function getCategoryName(category) {
 
     return names[category] || category;
 
+}
+
+// Chegirma holatini tekshirish funksiyasi (online magazin uchun)
+function getActiveDiscountForProduct(product) {
+    if (!product) return null;
+    
+    const now = new Date();
+    let hasDiscount = false;
+    let discountPrice = 0;
+    let discountPercent = 0;
+
+    // Vaqt oralig'ini tekshirish
+    let isTimeValid = true;
+    if (product.discountStart) {
+        const start = new Date(product.discountStart);
+        if (now < start) isTimeValid = false;
+    }
+    if (product.discountEnd) {
+        const end = new Date(product.discountEnd);
+        if (now > end) isTimeValid = false;
+    }
+
+    if (isTimeValid) {
+        if (product.discountPrice && product.discountPrice > 0) {
+            discountPrice = product.discountPrice;
+            discountPercent = Math.round(((product.price - product.discountPrice) / product.price) * 100);
+            hasDiscount = true;
+        } else if (product.discountPercent && product.discountPercent > 0) {
+            discountPercent = product.discountPercent;
+            discountPrice = product.price - (product.price * product.discountPercent / 100);
+            hasDiscount = true;
+        }
+    }
+
+    if (hasDiscount) {
+        return {
+            price: Math.round(discountPrice),
+            percent: discountPercent,
+            originalPrice: product.price
+        };
+    }
+    return null;
 }
 
 function formatPrice(price) {
@@ -1222,29 +1278,26 @@ function initSmoothScroll() {
 // ================================
 
 function initHeaderScroll() {
-
     const header = document.querySelector('.header');
-
-    let lastScroll = 0;
-
+    const navContainer = document.querySelector('.nav-container');
+    
     window.addEventListener('scroll', () => {
-
-        const currentScroll = window.pageYOffset;
-
-        if (currentScroll > 100) {
-
-            header.classList.add('scrolled');
-
+        if (window.scrollY > 50) {
+            header.style.top = '0';
+            if (navContainer) {
+                navContainer.style.borderRadius = '0';
+                navContainer.style.maxWidth = '100%';
+                navContainer.style.background = 'rgba(255, 255, 255, 0.95)';
+            }
         } else {
-
-            header.classList.remove('scrolled');
-
+            header.style.top = '20px';
+            if (navContainer) {
+                navContainer.style.borderRadius = '100px';
+                navContainer.style.maxWidth = '1200px';
+                navContainer.style.background = 'rgba(255, 255, 255, 0.8)';
+            }
         }
-
-        lastScroll = currentScroll;
-
     });
-
 }
 
 // ================================
@@ -2003,7 +2056,29 @@ function openProductDetailModal(productId) {
 
     document.getElementById('detailName').textContent = product.name;
 
-    document.getElementById('detailPrice').textContent = formatPrice(product.price) + " so'm";
+    // Chegirmani tekshirish va narxni yangilash
+    const discount = getActiveDiscountForProduct(product);
+    let detailPriceHTML = '';
+    
+    if (discount) {
+        detailPriceHTML = '<div style="display: flex; align-items: center; gap: 15px;">' +
+            '<div style="display: flex; flex-direction: column;">' +
+                '<span style="text-decoration: line-through; color: var(--text-light); font-size: 0.9rem; opacity: 0.7;">' + formatPrice(product.price) + ' so\'m</span>' +
+                '<span style="color: var(--accent-color); font-weight: 800; font-size: 1.4rem;">' + formatPrice(discount.price) + ' so\'m</span>' +
+            '</div>' +
+            '<span style="background: linear-gradient(135deg, #ff3d57 0%, #ff8a80 100%); color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.9rem; font-weight: 800; display: flex; align-items: center; gap: 5px; box-shadow: 0 4px 12px rgba(255, 61, 87, 0.2);">' +
+                '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' +
+                    '<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>' +
+                    '<line x1="7" y1="7" x2="7.01" y2="7"></line>' +
+                '</svg>' +
+                '-' + discount.percent + '%' +
+            '</span>' +
+            '</div>';
+    } else {
+        detailPriceHTML = '<span>' + formatPrice(product.price) + ' so\'m</span>';
+    }
+    
+    document.getElementById('detailPrice').innerHTML = detailPriceHTML;
 
     const brandRow = document.getElementById('detailBrandRow');
     const brandEl = document.getElementById('detailBrand');
@@ -2602,16 +2677,23 @@ window.updateOrderDeliveryTextFromInputs = updateOrderDeliveryTextFromInputs;
 // WISHLIST FUNCTIONS
 // ================================
 
-function toggleWishlist(event, productId) {
+async function toggleWishlist(event, productId) {
     event.stopPropagation();
     event.preventDefault();
     
     const index = wishlist.indexOf(productId.toString());
+    const product = products.find(p => p.id.toString() === productId.toString());
+    
     if (index === -1) {
         // Qo'shish
         wishlist.push(productId.toString());
         if (typeof showNotification === 'function') {
             showNotification("Mahsulot sevimlilarga qo'shildi");
+        }
+        
+        // Firebase-ga saqlash
+        if (product && typeof firebaseAddToWishlist === 'function') {
+            await firebaseAddToWishlist(product);
         }
     } else {
         // O'chirish
@@ -2619,17 +2701,27 @@ function toggleWishlist(event, productId) {
         if (typeof showNotification === 'function') {
             showNotification("Mahsulot sevimlilardan olib tashlandi");
         }
+        
+        // Firebase-dan o'chirish
+        if (typeof firebaseRemoveFromWishlist === 'function') {
+            await firebaseRemoveFromWishlist(productId);
+        }
     }
     
     localStorage.setItem('wishlist', JSON.stringify(wishlist));
     updateWishlistUI();
+    
+    // Wishlist sahifasini yangilash (agar mavjud bo'lsa)
+    if (typeof renderWishlist === 'function') {
+        renderWishlist();
+    }
 }
 
 function updateWishlistUI() {
     // Barcha wishlist tugmalarini yangilash
     const wishlistBtns = document.querySelectorAll('.favorite-btn');
     wishlistBtns.forEach(btn => {
-        const productId = btn.id.replace('wishlist-btn?', '');
+        const productId = btn.id.replace('wishlist-btn-', '');
         const isActive = wishlist.includes(productId.toString());
         
         if (isActive) {
@@ -2654,3 +2746,17 @@ function updateWishlistUI() {
 // Wishlist funksiyalarini global miqyosda e'lon qilish
 window.toggleWishlist = toggleWishlist;
 window.updateWishlistUI = updateWishlistUI;
+
+
+// Chegirma vaqtini har minutda tekshirib turish (avtomatik yangilanish uchun)
+// Bu mahsulotlar kartasini yangilaydi agar chegirma vaqti o'tgan bo'lsa
+setInterval(function() {
+    // Agar mahsulotlar kartasi ko'rinib turgan bo'lsa, uni yangilash
+    const productsGrid = document.getElementById('productsGrid');
+    if (productsGrid && productsGrid.children.length > 0) {
+        // Hozirgi filterni saqlash
+        const activeFilter = document.querySelector('.filter-btn.active');
+        const currentFilter = activeFilter ? activeFilter.getAttribute('data-filter') : 'all';
+        displayProducts(currentFilter);
+    }
+}, 60000); // Har 60 soniyada tekshiradi

@@ -511,3 +511,100 @@ window.firebaseSaveCustomer = firebaseSaveCustomer;
 window.firebaseGetCustomers = firebaseGetCustomers;
 window.firebaseDeleteCustomer = firebaseDeleteCustomer;
 window.firebaseSaveProfile = firebaseSaveProfile;
+
+// ================================
+// WISHLIST OPERATIONS (Firebase)
+// ================================
+
+const wishlistCollection = db.collection('wishlist');
+
+// Qurilma uchun unikal ID olish (yoki yaratish)
+function getDeviceId() {
+    let deviceId = localStorage.getItem('forever_device_id');
+    if (!deviceId) {
+        deviceId = 'dev_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+        localStorage.setItem('forever_device_id', deviceId);
+    }
+    return deviceId;
+}
+
+// Mahsulotni Firebase wishlistga qo'shish
+async function firebaseAddToWishlist(product) {
+    try {
+        const deviceId = getDeviceId();
+        const wishlistItem = {
+            deviceId: deviceId,
+            productId: product.id,
+            name: product.name,
+            price: product.price,
+            image: product.imageUrl || product.image || '',
+            category: product.category || '',
+            addedAt: new Date().toISOString()
+        };
+        
+        // Avval tekshiramiz, bormi yo'qmi
+        const existing = await wishlistCollection
+            .where('deviceId', '==', deviceId)
+            .where('productId', '==', product.id)
+            .get();
+            
+        if (existing.empty) {
+            await wishlistCollection.add(wishlistItem);
+            console.log('✅ Mahsulot Firebase wishlistga qo\'shildi');
+            return true;
+        }
+        console.log('ℹ️ Mahsulot allaqachon wishlistda bor');
+        return true;
+    } catch (error) {
+        console.error('❌ Wishlistga qo\'shishda xatolik:', error);
+        return false;
+    }
+}
+
+// Mahsulotni Firebase wishlistdan o'chirish
+async function firebaseRemoveFromWishlist(productId) {
+    try {
+        const deviceId = getDeviceId();
+        const snapshot = await wishlistCollection
+            .where('deviceId', '==', deviceId)
+            .where('productId', '==', productId)
+            .get();
+            
+        const batch = db.batch();
+        snapshot.forEach(doc => {
+            batch.delete(doc.ref);
+        });
+        await batch.commit();
+        console.log('✅ Mahsulot Firebase wishlistdan o\'chirildi');
+        return true;
+    } catch (error) {
+        console.error('❌ Wishlistdan o\'chirishda xatolik:', error);
+        return false;
+    }
+}
+
+// Firebase-dan wishlistni olish
+async function firebaseGetWishlist() {
+    try {
+        const deviceId = getDeviceId();
+        const snapshot = await wishlistCollection
+            .where('deviceId', '==', deviceId)
+            .orderBy('addedAt', 'desc')
+            .get();
+            
+        const wishlist = [];
+        snapshot.forEach(doc => {
+            wishlist.push({ id: doc.id, ...doc.data() });
+        });
+        return wishlist;
+    } catch (error) {
+        console.error('❌ Wishlistni olishda xatolik:', error);
+        return [];
+    }
+}
+
+// Wishlist funksiyalarini global qilish
+window.firebaseAddToWishlist = firebaseAddToWishlist;
+window.firebaseRemoveFromWishlist = firebaseRemoveFromWishlist;
+window.firebaseGetWishlist = firebaseGetWishlist;
+window.getDeviceId = getDeviceId;

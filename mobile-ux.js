@@ -17,7 +17,8 @@ function initStickyBuyButton() {
         e.stopPropagation();
 
         // Agar savat bo'sh bo'lsa - mahsulotlar bo'limiga o'tish
-        if (!cart || cart.length === 0) {
+        const currentCart = typeof cart !== 'undefined' ? cart : [];
+        if (!currentCart || currentCart.length === 0) {
             document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
             return;
         }
@@ -28,11 +29,12 @@ function initStickyBuyButton() {
 
     // Savat holati o'zgarishi bilan tugma matnini yangilash
     const updateStickyButton = () => {
-        if (!cart || cart.length === 0) {
+        const currentCart = typeof cart !== 'undefined' ? cart : [];
+        if (!currentCart || currentCart.length === 0) {
             stickyBuyText.textContent = 'Savat';
             stickyBuyButton.classList.remove('show');
         } else {
-            const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+            const totalItems = currentCart.reduce((sum, item) => sum + (item.quantity || 1), 0);
             stickyBuyText.textContent = `Savat (${totalItems})`;
             stickyBuyButton.classList.add('show');
         }
@@ -121,17 +123,17 @@ function initTouchOptimizations() {
     // Barmoq bilan bosish maydoni kengaytirish
     const buttons = document.querySelectorAll('button, a[role="button"]');
 
-    buttons.forEach(button => {
-        // Minimal touch target size 48x48px
-        const rect = button.getBoundingClientRect();
-        if (rect.width < 48 || rect.height < 48) {
-            button.style.minWidth = '48px';
-            button.style.minHeight = '48px';
-            button.style.display = 'flex';
-            button.style.alignItems = 'center';
-            button.style.justifyContent = 'center';
-        }
-    });
+    // buttons.forEach(button => {
+    //     // Minimal touch target size 48x48px
+    //     const rect = button.getBoundingClientRect();
+    //     if (rect.width < 48 || rect.height < 48) {
+    //         button.style.minWidth = '48px';
+    //         button.style.minHeight = '48px';
+    //         button.style.display = 'flex';
+    //         button.style.alignItems = 'center';
+    //         button.style.justifyContent = 'center';
+    //     }
+    // });
 
     // Hover effektlarini o'chirish (touch devices uchun)
     if (window.matchMedia('(hover: none)').matches) {

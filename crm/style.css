@@ -1038,6 +1038,16 @@ html[data-theme="light"] input[readonly] {
     box-shadow: 0 4px 16px rgba(255, 61, 87, 0.3);
 }
 
+.btn-info {
+    background: var(--gradient-sales);
+    color: #fff;
+}
+
+.btn-info:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(41, 182, 246, 0.3);
+}
+
 .btn-sm {
     padding: 6px 12px;
     font-size: 12px;
