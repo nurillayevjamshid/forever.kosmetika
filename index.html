@@ -23,29 +23,37 @@
     <header class="header" id="siteHeader">
         <nav class="nav-container">
             <div class="logo">
-                <a href="index.html" style="text-decoration: none; display: flex; align-items: center;">
-                    <img src="assets/logo.png" alt="Forever Kosmetika" class="logo-img">
+                <a href="index.html" style="text-decoration: none;">
+                    <span class="logo-text">For.Ever</span>
                 </a>
             </div>
-            <ul class="nav-menu">
-                <li><a href="#home" class="nav-link active">Bosh sahifa</a></li>
-                <li><a href="#products" class="nav-link">Mahsulotlar</a></li>
-                <li><a href="wishlist.html" class="nav-link">Sevimlilar</a></li>
-                <li><a href="#about" class="nav-link">Biz haqimizda</a></li>
-                <li><a href="#contact" class="nav-link">Bog'lanish</a></li>
-                <li>
-                    <a href="profile.html" class="nav-link">Profil</a>
-                </li>
-            </ul>
+            
+            <div class="nav-menu-wrapper">
+                <ul class="nav-menu">
+                    <li><a href="#home" class="nav-link active">Home</a></li>
+                    <li><a href="#products" class="nav-link">Shop</a></li>
+                    <li><a href="#sale" class="nav-link">Sale</a></li>
+                    <li><a href="#consultation" class="nav-link">Consultation</a></li>
+                    <li><a href="#about" class="nav-link">About</a></li>
+                    <li><a href="#contact" class="nav-link">Contact</a></li>
+                </ul>
+            </div>
+
             <div class="header-actions">
-                <a href="wishlist.html" class="cart-btn" title="Sevimlilar">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                <button class="action-btn" title="Qidiruv">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
-                    <span class="cart-count" id="wishlistCount" style="display: none;">0</span>
+                </button>
+                <a href="profile.html" class="action-btn" title="Profil">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
                 </a>
-                <a href="cart.html" class="cart-btn" id="cartBtn" title="Savat">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <a href="cart.html" class="action-btn cart-btn-icon" title="Savat">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4H6z"></path>
                         <path d="M3 6h18"></path>
                         <path d="M16 10a4 4 0 0 1-8 0"></path>
@@ -63,168 +71,20 @@
 
     <!-- Hero Section -->
     <section class="hero" id="home">
-        <div class="hero-bg-shapes" aria-hidden="true">
-            <div class="hero-shape shape-1"></div>
-            <div class="hero-shape shape-2"></div>
-            <div class="hero-shape shape-3"></div>
-            <div class="hero-grain"></div>
-        </div>
-
-        <div class="hero-body">
+        <div class="hero-container">
             <div class="hero-content">
-                <div class="hero-text">
-                    <div class="hero-badge-row">
-                        <span class="hero-badge">
-                            <span class="badge-dot"></span>
-                            Signature Drop 2025
-                        </span>
-                        <span class="hero-badge hero-badge-soft">Luxury skin ritual</span>
-                    </div>
-                    <p class="hero-kicker">For.Ever Signature Collection</p>
-                    <h1 class="hero-title" id="heroProductName">Velour Glow Serum</h1>
-                    <p class="hero-description" id="heroProductDescription">
-                        Yengil tekstura, premium namlik va soft glow effektini birlashtirgan serum. Kundalik parvarish uchun tanlangan yuqori sifatli formula.
-                    </p>
-                    <div class="hero-buttons">
-                        <a href="#products" class="btn btn-primary btn-hero">
-                            Hozir sotib olish
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M5 12h14M12 5l7 7-7 7"></path>
-                            </svg>
-                        </a>
-                    </div>
-                    <div class="hero-subnote">
-                        <span class="hero-subnote-line"></span>
-                        <p>Minimal dizayn, premium formula va e-commerce uchun tayyor luxury showcase.</p>
-                    </div>
-                </div>
-
-                <div class="hero-visual">
-                    <div class="hero-showcase" data-hero-showcase>
-                        <div class="hero-stage-copy">
-                            <span class="hero-stage-chip" id="heroProductChip">Radiance Serum</span>
-                            <p id="heroProductMeta">Glass finish bottle - Satin gold details</p>
-                        </div>
-
-                        <div class="hero-product-stage" data-tilt-target>
-                            <div class="hero-stage-backdrop"></div>
-                            <div class="hero-stage-halo"></div>
-                            <div class="hero-spotlight"></div>
-                            <div class="hero-floating-note hero-floating-note-top" id="heroNoteTop">Clean finish</div>
-                            <div class="hero-floating-note hero-floating-note-bottom" id="heroNoteBottom">Hydration glow</div>
-
-                            <div class="hero-product-card hero-product-card--serum" id="heroProductCard">
-                                <div class="hero-product-shadow"></div>
-                                <div class="hero-product-reflection"></div>
-                                <div class="hero-product">
-                                    <div class="hero-product-top"></div>
-                                    <div class="hero-product-cap"></div>
-                                    <div class="hero-product-neck"></div>
-                                    <div class="hero-product-body">
-                                        <span class="hero-product-brand">For.Ever</span>
-                                        <span class="hero-product-label" id="heroVariantLabel">Velour Glow</span>
-                                        <span class="hero-product-type" id="heroVariantType">Radiance Serum</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="hero-thumbnails" role="tablist" aria-label="Mahsulot variantlari">
-                            <button class="hero-thumb is-active" type="button" aria-selected="true"
-                                data-variant="serum"
-                                data-name="Velour Glow Serum"
-                                data-description="Yengil tekstura, premium namlik va soft glow effektini birlashtirgan serum. Kundalik parvarish uchun tanlangan yuqori sifatli formula."
-                                data-chip="Radiance Serum"
-                                data-meta="Glass finish bottle - Satin gold details"
-                                data-label="Velour Glow"
-                                data-type="Radiance Serum"
-                                data-note-top="Clean finish"
-                                data-note-bottom="Hydration glow">
-                                <span class="hero-thumb-visual hero-thumb-visual--serum" aria-hidden="true"></span>
-                                <span class="hero-thumb-copy">
-                                    <strong>Serum</strong>
-                                    <span>Glow care</span>
-                                </span>
-                            </button>
-
-                            <button class="hero-thumb" type="button" aria-selected="false"
-                                data-variant="perfume"
-                                data-name="Noir Bloom Perfume"
-                                data-description="Mayin floral-amber aksentlari va uzoq saqlanuvchi premium trail bilan kundalik obrazni luxury darajaga olib chiqadi."
-                                data-chip="Maison Perfume"
-                                data-meta="Crystal body - Velvet aroma trail"
-                                data-label="Noir Bloom"
-                                data-type="Maison Perfume"
-                                data-note-top="Long lasting"
-                                data-note-bottom="Soft amber">
-                                <span class="hero-thumb-visual hero-thumb-visual--perfume" aria-hidden="true"></span>
-                                <span class="hero-thumb-copy">
-                                    <strong>Perfume</strong>
-                                    <span>Amber floral</span>
-                                </span>
-                            </button>
-
-                            <button class="hero-thumb" type="button" aria-selected="false"
-                                data-variant="lipstick"
-                                data-name="Silk Matte Lipstick"
-                                data-description="Satin-matte finish, boy pigment va yengil formula bilan bir surishda toza rang va premium texture beradi."
-                                data-chip="Couture Lip Color"
-                                data-meta="Refined case - Rich pigment payoff"
-                                data-label="Silk Matte"
-                                data-type="Couture Lip Color"
-                                data-note-top="One swipe color"
-                                data-note-bottom="Velvet matte">
-                                <span class="hero-thumb-visual hero-thumb-visual--lipstick" aria-hidden="true"></span>
-                                <span class="hero-thumb-copy">
-                                    <strong>Lipstick</strong>
-                                    <span>Velvet matte</span>
-                                </span>
-                            </button>
-                        </div>
-                    </div>
+                <h1 class="hero-title">Because Your Skin Deserves <span class="accent-text">Pure Luxury</span></h1>
+                <p class="hero-subtitle">Gentle care, timeless beauty, crafted for you.</p>
+                <div class="hero-actions">
+                    <a href="#quiz" class="btn btn-outline">Take the Skin Quiz</a>
+                    <a href="#products" class="btn btn-filled">Shop Now</a>
                 </div>
             </div>
-        </div>
-
-        <div class="hero-feature-strip">
-            <div class="hero-feature">
-                <span class="hero-feature-icon" aria-hidden="true">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                        <path d="M12 3 5 6v5c0 5 3.5 8.5 7 10 3.5-1.5 7-5 7-10V6l-7-3Z"></path>
-                        <path d="m9.5 12 1.8 1.8 3.7-4"></path>
-                    </svg>
-                </span>
-                <div class="hero-feature-copy">
-                    <strong>100% original</strong>
-                    <span>Saralangan original kolleksiya</span>
-                </div>
-            </div>
-
-            <div class="hero-feature">
-                <span class="hero-feature-icon" aria-hidden="true">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                        <path d="M3 7h11v7H3z"></path>
-                        <path d="M14 10h3l4 4v0a2 2 0 0 1-2 2h-1"></path>
-                        <path d="M7 17a2 2 0 1 1-4 0"></path>
-                        <path d="M17 17a2 2 0 1 1 4 0"></path>
-                    </svg>
-                </span>
-                <div class="hero-feature-copy">
-                    <strong>Tez yetkazib berish</strong>
-                    <span>Buyurtma tez va ehtiyotkor yetkaziladi</span>
-                </div>
-            </div>
-
-            <div class="hero-feature">
-                <span class="hero-feature-icon" aria-hidden="true">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                        <path d="M12 3c4.2 0 7.5 3.3 7.5 7.4 0 5.7-7.5 10.2-7.5 10.2S4.5 16 4.5 10.4C4.5 6.3 7.8 3 12 3Z"></path>
-                        <path d="M9.5 10.5c.7-.9 1.5-1.4 2.5-1.4s1.8.5 2.5 1.4"></path>
-                    </svg>
-                </span>
-                <div class="hero-feature-copy">
-                    <strong>Premium sifat</strong>
-                    <span>Luxury brend estetikasida tanlangan formula</span>
+            <div class="hero-visual">
+                <div class="visual-bg-blob"></div>
+                <img src="https://images.unsplash.com/photo-1594465919760-441fe5908ab0?q=80&w=1000&auto=format&fit=crop" alt="Premium Cosmetics" class="hero-img">
+                <div class="floating-item item-1">
+                    <img src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=400&auto=format&fit=crop" alt="Cosmetic Component">
                 </div>
             </div>
         </div>
