@@ -121,17 +121,17 @@ function initTouchOptimizations() {
     // Barmoq bilan bosish maydoni kengaytirish
     const buttons = document.querySelectorAll('button, a[role="button"]');
 
-    buttons.forEach(button => {
-        // Minimal touch target size 48x48px
-        const rect = button.getBoundingClientRect();
-        if (rect.width < 48 || rect.height < 48) {
-            button.style.minWidth = '48px';
-            button.style.minHeight = '48px';
-            button.style.display = 'flex';
-            button.style.alignItems = 'center';
-            button.style.justifyContent = 'center';
-        }
-    });
+    // buttons.forEach(button => {
+    //     // Minimal touch target size 48x48px
+    //     const rect = button.getBoundingClientRect();
+    //     if (rect.width < 48 || rect.height < 48) {
+    //         button.style.minWidth = '48px';
+    //         button.style.minHeight = '48px';
+    //         button.style.display = 'flex';
+    //         button.style.alignItems = 'center';
+    //         button.style.justifyContent = 'center';
+    //     }
+    // });
 
     // Hover effektlarini o'chirish (touch devices uchun)
     if (window.matchMedia('(hover: none)').matches) {

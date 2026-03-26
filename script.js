@@ -545,25 +545,19 @@ function createProductCard(product) {
     const isFavorite = wishlist.includes(product.id.toString());
 
     card.innerHTML = `
-
         <div class="product-click-area" onclick="openProductDetailModal('${product.id}')">
-
             <div class="product-image">
-
                 <img src="${initialImage}" alt="${product.name}" data-fallback="${fallback}" onerror="this.src='${fallback}'">
-
-                <button class="image-nav prev" data-pid="${product.id}" data-dir="-1" aria-label="Oldingi rasm" style="display:${showNav ? 'flex' : 'none'}; opacity: ${showNav ? '1' : '0'}; pointer-events: ${showNav ? 'auto' : 'none'};">
+                <button class="image-nav prev" data-pid="${product.id}" data-dir="-1" aria-label="Oldingi rasm" style="display:${showNav ? 'flex' : 'none'};">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="15 18 9 12 15 6"></polyline>
                     </svg>
                 </button>
-                <button class="image-nav next" data-pid="${product.id}" data-dir="1" aria-label="Keyingi rasm" style="display:${showNav ? 'flex' : 'none'}; opacity: ${showNav ? '1' : '0'}; pointer-events: ${showNav ? 'auto' : 'none'};">
+                <button class="image-nav next" data-pid="${product.id}" data-dir="1" aria-label="Keyingi rasm" style="display:${showNav ? 'flex' : 'none'};">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="9 18 15 12 9 6"></polyline>
                     </svg>
                 </button>
-
-
             </div>
 
             <button class="favorite-btn ${wishlist.includes(product.id.toString()) ? 'active' : ''}" 
@@ -576,35 +570,25 @@ function createProductCard(product) {
                 </svg>
             </button>
 
-            <div class="product-info" style="padding: 12px 12px 0; display: flex; flex-direction: column; gap: 4px; flex: 1;">
-
-                <h3 class="product-name" style="font-size: 0.9rem; line-height: 1.3; color: #1a1a2e; font-weight: 500; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.34rem; margin: 0; margin-bottom: 4px;">${product.name}</h3>
-                
-                <div class="current-price" style="font-size: 1.15rem; font-weight: 700; color: #1a1a2e; margin-bottom: 2px;">${formatPrice(product.price)} so'm</div>
-                
+            <div class="product-info">
+                <h3 class="product-name">${product.name}</h3>
+                <div class="current-price">${formatPrice(product.price)} so'm</div>
                 ${product.brand ? `
-                <div class="product-brand" style="font-size: 0.8rem; color: #8b8b9f; font-weight: 500; display: flex; align-items: center; gap: 4px;">
+                <div class="product-brand" style="font-size: 0.8rem; color: var(--text-light); font-weight: 500; display: flex; align-items: center; gap: 4px;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
                         <line x1="7" y1="7" x2="7.01" y2="7"></line>
                     </svg>
                     ${product.brand}
                 </div>` : ''}
-
             </div>
-
         </div>
 
-        <div class="product-footer-container" style="padding: 10px 12px 12px; margin-top: auto;">
-
-            <div class="product-footer" id="footer-${product.id}" style="width: 100%; display: flex; padding: 0; border: none;">
-
+        <div class="product-footer-container">
+            <div class="product-footer" id="footer-${product.id}">
                 ${getProductFooterHTML(product)}
-
             </div>
-
         </div>
-
     `;
 
     return card;
@@ -616,30 +600,16 @@ function getProductFooterHTML(product) {
     const cartItem = cart.find(item => item.id.toString() === product.id.toString());
 
     if (cartItem) {
-
-        // Savatda bor (count controls)
-
         return `
-
-            <div class="qty-counter-uzum" style="width: 100%; display: flex; align-items: center; justify-content: space-between; background: #f5edff; border-radius: 8px; padding: 6px;">
-
-                <button class="qty-btn" style="width: 32px; height: 32px; border: none; background: transparent; font-size: 1.2rem; color: #9c27b0; cursor: pointer; display: flex; align-items: center; justify-content: center;" onclick="event.stopPropagation(); changeQuantity('${product.id}', -1)">−</button>
-
-                <span class="qty-display" style="font-weight: 600; font-size: 1.05rem; color: #000;">${cartItem.quantity}</span>
-
-                <button class="qty-btn" style="width: 32px; height: 32px; border: none; background: transparent; font-size: 1.2rem; color: #9c27b0; cursor: pointer; display: flex; align-items: center; justify-content: center;" onclick="event.stopPropagation(); changeQuantity('${product.id}', 1)">+</button>
-
+            <div class="qty-counter-uzum">
+                <button class="qty-btn" onclick="event.stopPropagation(); changeQuantity('${product.id}', -1)">−</button>
+                <span class="qty-display">${cartItem.quantity}</span>
+                <button class="qty-btn" onclick="event.stopPropagation(); changeQuantity('${product.id}', 1)">+</button>
             </div>
-
         `;
-
     } else {
-
-        // Savatda yo'q (Add button only)
-
         return `
-
-            <button class="add-cart-new-btn" style="width: 100%; height: 44px; background: linear-gradient(135deg, #7B68EE 0%, #6A5ACD 100%); color: white; border: none; border-radius: 8px; font-weight: 500; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: 0.2s; font-family: inherit;" onclick="event.stopPropagation(); addToCart('${product.id}')" onmouseover="this.style.background='linear-gradient(135deg, #8B7FFF 0%, #7B68EE 100%)'" onmouseout="this.style.background='linear-gradient(135deg, #7B68EE 0%, #6A5ACD 100%)'">
+            <button class="add-cart-new-btn" onclick="event.stopPropagation(); addToCart('${product.id}')">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="9" cy="21" r="1"></circle>
                     <circle cx="20" cy="21" r="1"></circle>
@@ -647,9 +617,7 @@ function getProductFooterHTML(product) {
                 </svg>
                 Tanlash
             </button>
-
         `;
-
     }
 
 }
@@ -1222,29 +1190,26 @@ function initSmoothScroll() {
 // ================================
 
 function initHeaderScroll() {
-
     const header = document.querySelector('.header');
-
-    let lastScroll = 0;
-
+    const navContainer = document.querySelector('.nav-container');
+    
     window.addEventListener('scroll', () => {
-
-        const currentScroll = window.pageYOffset;
-
-        if (currentScroll > 100) {
-
-            header.classList.add('scrolled');
-
+        if (window.scrollY > 50) {
+            header.style.top = '0';
+            if (navContainer) {
+                navContainer.style.borderRadius = '0';
+                navContainer.style.maxWidth = '100%';
+                navContainer.style.background = 'rgba(255, 255, 255, 0.95)';
+            }
         } else {
-
-            header.classList.remove('scrolled');
-
+            header.style.top = '20px';
+            if (navContainer) {
+                navContainer.style.borderRadius = '100px';
+                navContainer.style.maxWidth = '1200px';
+                navContainer.style.background = 'rgba(255, 255, 255, 0.8)';
+            }
         }
-
-        lastScroll = currentScroll;
-
     });
-
 }
 
 // ================================
