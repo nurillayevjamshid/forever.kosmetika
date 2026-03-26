@@ -540,17 +540,17 @@ function createProductCard(product) {
                     </svg>
                 </button>
 
-                <button class="favorite-btn ${wishlist.includes(product.id.toString()) ? 'active' : ''}" 
-                        onclick="toggleWishlist(event, '${product.id}')" 
-                        id="wishlist-btn-${product.id}">
-                    <svg width="20" height="20" viewBox="0 0 24 24" 
-                         fill="${wishlist.includes(product.id.toString()) ? 'currentColor' : 'none'}" 
-                         stroke="currentColor" stroke-width="2">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                    </svg>
-                </button>
-
             </div>
+
+            <button class="favorite-btn ${wishlist.includes(product.id.toString()) ? 'active' : ''}" 
+                    onclick="toggleWishlist(event, '${product.id}')" 
+                    id="wishlist-btn-${product.id}">
+                <svg width="20" height="20" viewBox="0 0 24 24" 
+                     fill="${wishlist.includes(product.id.toString()) ? 'currentColor' : 'none'}" 
+                     stroke="currentColor" stroke-width="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+            </button>
 
             <div class="product-info" style="padding: 12px 12px 0; display: flex; flex-direction: column; gap: 4px; flex: 1;">
 
