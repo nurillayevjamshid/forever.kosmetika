@@ -37,6 +37,12 @@
                 </li>
             </ul>
             <div class="header-actions">
+                <button class="favorite-header-btn" id="favoriteHeaderBtn" title="Sevimlilar">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                    <span class="favorite-count">0</span>
+                </button>
                 <a href="cart.html" class="cart-btn" id="cartBtn">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4H6z"></path>
@@ -269,6 +275,12 @@
                 <button class="filter-btn" data-filter="yuz kremi">Yuz kremi</button>
                 <button class="filter-btn" data-filter="parvarish">Teri parvarishi</button>
                 <button class="filter-btn" data-filter="soch">Soch vositalari</button>
+                <button class="filter-btn" data-filter="favorites" id="favoritesFilterBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: middle;">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                    Sevimlilar
+                </button>
             </div>
 
             <!-- Products Grid -->
@@ -551,6 +563,15 @@
                 <rect x="3" y="14" width="7" height="7"></rect>
             </svg>
             <span>Katalog</span>
+        </a>
+        <a href="#" class="nav-item" id="mobileFavoriteBtn">
+            <div class="nav-icon-wrapper">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+                <span class="favorite-count">0</span>
+            </div>
+            <span>Sevimlilar</span>
         </a>
         <a href="cart.html" class="nav-item cart-btn-mobile">
             <div class="nav-icon-wrapper">

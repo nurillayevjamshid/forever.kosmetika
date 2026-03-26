@@ -3933,7 +3933,17 @@ body {
 }
 
 .favorite-btn {
-    display: none !important;
+    display: flex !important;
+}
+
+.favorite-btn.active svg {
+    fill: #ff4d4d !important;
+    stroke: #ff4d4d !important;
+    color: #ff4d4d !important;
+}
+
+.favorite-btn.active {
+    background: #ffffff !important;
 }
 
 .current-price {
@@ -4436,5 +4446,55 @@ html {
     .btn,
     .btn-hero {
         transition: none !important;
+    }
+}
+/* Favorites Styles */
+.favorite-header-btn {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    transition: all 0.3s ease;
+}
+
+.favorite-header-btn:hover {
+    color: #ff4d4d;
+    transform: translateY(-2px);
+}
+
+.favorite-count {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #ff4d4d;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+}
+
+.favorite-btn.active svg {
+    fill: #ff4d4d;
+    stroke: #ff4d4d;
+}
+
+.favorite-btn.active {
+    background: white;
+}
+
+@media (max-width: 768px) {
+    .favorite-header-btn {
+        display: none;
     }
 }

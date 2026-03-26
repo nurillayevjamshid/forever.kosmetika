@@ -1518,7 +1518,7 @@
         }
 
         const storage = createLocalStorageShim();
-        window.storage = storage;
+        // window.storage = storage; // Removed this line to avoid conflict
         // Global o'zgaruvchilar (app.js da ishlatiladi)
         window.db = firebase.firestore();
         window.storage = firebase.storage();

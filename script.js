@@ -23,6 +23,7 @@ const defaultProducts = [];
 // Cart state
 
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
+let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
 
 // Viloyatlar va Tumanlar ma'lumotlari
 
@@ -92,6 +93,28 @@ document.addEventListener('DOMContentLoaded', async function () {
     // Update cart count
 
     updateCartCount();
+
+    // Update favorite count
+    updateFavoriteCount();
+
+    // Initialize favorite filter buttons
+    const favoriteHeaderBtn = document.getElementById('favoriteHeaderBtn');
+    const mobileFavoriteBtn = document.getElementById('mobileFavoriteBtn');
+
+    if (favoriteHeaderBtn) {
+        favoriteHeaderBtn.addEventListener('click', () => {
+            displayProducts('favorites');
+            document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
+        });
+    }
+
+    if (mobileFavoriteBtn) {
+        mobileFavoriteBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            displayProducts('favorites');
+            document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
+        });
+    }
 
     // Smooth scroll for links
 
@@ -418,6 +441,10 @@ function displayProducts(filter = 'all') {
 
         ? products
 
+        : filter === 'favorites'
+
+        ? products.filter(p => favorites.includes(p.id.toString()))
+
         : products.filter(p => {
 
             const cat = (p.category || '').toLowerCase();
@@ -455,12 +482,15 @@ function displayProducts(filter = 'all') {
     // Display products
 
     if (filteredProducts.length === 0) {
+        const emptyMsg = filter === 'favorites' 
+            ? "Sevimlilar ro'yxati bo'sh" 
+            : "Hozircha mahsulotlar yo'q";
 
         productsGrid.innerHTML = `
 
             <div class="loading-state">
 
-                <p style="color: var(--text-secondary);">Hozircha mahsulotlar yo'q</p>
+                <p style="color: var(--text-secondary);">${emptyMsg}</p>
 
             </div>
 
@@ -521,6 +551,8 @@ function createProductCard(product) {
     const initialImage = (state.images[state.index] || state.images[0] || product.imageUrl || product.image || fallback);
     const showNav = state.images.length > 1;
 
+    const isFavorite = favorites.includes(product.id.toString());
+
     card.innerHTML = `
 
         <div class="product-click-area" onclick="openProductDetailModal('${product.id}')">
@@ -540,7 +572,7 @@ function createProductCard(product) {
                     </svg>
                 </button>
 
-                <button class="favorite-btn" onclick="event.stopPropagation()">
+                <button class="favorite-btn ${isFavorite ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorite('${product.id}')">
 
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 
@@ -917,6 +949,28 @@ function addToCart(productId) {
 
     updateCartCount();
 
+    // Update favorite count
+    updateFavoriteCount();
+
+    // Initialize favorite filter buttons
+    const favoriteHeaderBtn = document.getElementById('favoriteHeaderBtn');
+    const mobileFavoriteBtn = document.getElementById('mobileFavoriteBtn');
+
+    if (favoriteHeaderBtn) {
+        favoriteHeaderBtn.addEventListener('click', () => {
+            displayProducts('favorites');
+            document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
+        });
+    }
+
+    if (mobileFavoriteBtn) {
+        mobileFavoriteBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            displayProducts('favorites');
+            document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
+        });
+    }
+
     // Update UI for this product
 
     updateProductUI(productId);
@@ -952,6 +1006,52 @@ function updateCartCount() {
 
     // Mobile UX event
     window.dispatchEvent(new Event('cartUpdated'));
+}
+
+function toggleFavorite(productId) {
+    const id = productId.toString();
+    const index = favorites.indexOf(id);
+    const product = products.find(p => p.id.toString() === id);
+    
+    if (index === -1) {
+        favorites.push(id);
+        if (product) showNotification(`${product.name} sevimlilarga qo'shildi!`);
+    } else {
+        favorites.splice(index, 1);
+        if (product) showNotification(`${product.name} sevimlilardan olib tashlandi!`);
+    }
+    
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+    updateFavoriteCount();
+    
+    // Update the card UI
+    const card = document.getElementById(`product-card-${id}`);
+    if (card) {
+        const favBtn = card.querySelector('.favorite-btn');
+        if (favBtn) {
+            favBtn.classList.toggle('active');
+        }
+    }
+
+    // If we are in favorites view, re-render
+    const activeFilter = document.querySelector('.filter-btn.active');
+    if (activeFilter && activeFilter.getAttribute('data-filter') === 'favorites') {
+        displayProducts('favorites');
+    }
+}
+
+function updateFavoriteCount() {
+    const favoriteCounts = document.querySelectorAll('.favorite-count');
+    const totalFavorites = favorites.length;
+
+    favoriteCounts.forEach(count => {
+        count.textContent = totalFavorites;
+        if (totalFavorites === 0) {
+            count.style.display = 'none';
+        } else {
+            count.style.display = 'flex';
+        }
+    });
 }
 
 // ================================

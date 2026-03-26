@@ -1169,7 +1169,7 @@ document.getElementById('productForm').addEventListener('submit', async function
 
     } catch (error) {
         console.error("Saqlashda xatolik:", error);
-        var errorMsg = error.message || 'Noma'lum xatolik yuz berdi';
+        var errorMsg = error.message || 'Noma\'lum xatolik yuz berdi';
         showToast('Xatolik: ' + errorMsg, 'error');
     } finally {
         if (saveBtn) {
@@ -2974,7 +2974,7 @@ async function uploadBase64ToStorage(base64String, index) {
         };
     } catch (error) {
         console.error('Rasm yuklashda xatolik:', error);
-        showToast('Rasm yuklashda xatolik: ' + (error.message || 'Noma'lum xatolik'), 'error');
+        showToast('Rasm yuklashda xatolik: ' + (error.message || 'Noma\'lum xatolik'), 'error');
         throw error;
     }
 }
@@ -3019,7 +3019,7 @@ async function saveProductData(id, data) {
         return true;
     } catch (err) {
         console.error("Firestore saqlashda xatolik:", err);
-        var errorMsg = err.message || 'Noma'lum xatolik yuz berdi';
+        var errorMsg = err.message || 'Noma\'lum xatolik yuz berdi';
         showToast('Xatolik: ' + errorMsg, 'error');
         throw err;
     }
