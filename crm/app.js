@@ -375,6 +375,56 @@ function refreshDashboard() {
     }
 }
 
+// Chegirma holatini tekshirish funksiyasi
+function getActiveDiscount(p) {
+    if (!p) return null;
+    
+    var now = new Date();
+    var hasDiscount = false;
+    var discountPrice = 0;
+    var discountPercent = 0;
+
+    // Vaqt oralig'ini tekshirish
+    var isTimeValid = true;
+    if (p.discountStart) {
+        var start = new Date(p.discountStart);
+        if (now < start) isTimeValid = false;
+    }
+    if (p.discountEnd) {
+        var end = new Date(p.discountEnd);
+        if (now > end) isTimeValid = false;
+    }
+
+    if (isTimeValid) {
+        if (p.discountPrice && p.discountPrice > 0) {
+            discountPrice = p.discountPrice;
+            discountPercent = Math.round(((p.price - p.discountPrice) / p.price) * 100);
+            hasDiscount = true;
+        } else if (p.discountPercent && p.discountPercent > 0) {
+            discountPercent = p.discountPercent;
+            discountPrice = p.price - (p.price * p.discountPercent / 100);
+            hasDiscount = true;
+        }
+    }
+
+    if (hasDiscount) {
+        return {
+            price: discountPrice,
+            percent: discountPercent,
+            originalPrice: p.price
+        };
+    }
+    return null;
+}
+
+// Chegirma vaqtini har minutda tekshirib turish (avtomatik yangilanish uchun)
+setInterval(function() {
+    var activePage = localStorage.getItem('crm-active-page');
+    if (activePage === 'products') {
+        renderProducts();
+    }
+}, 60000); // Har 60 soniyada tekshiradi
+
 function renderProducts(searchTerm) {
     searchTerm = searchTerm || '';
     var tbody = document.getElementById('productsBody');
@@ -408,18 +458,32 @@ function renderProducts(searchTerm) {
             ? '<img src="' + mainImg + '" class="product-avatar">' 
             : '<div class="product-avatar-placeholder">' + (p.name.charAt(0).toUpperCase()) + '</div>';
         
+        var discount = getActiveDiscount(p);
+        var priceHtml = '';
+        var badgeHtml = '';
+
+        if (discount) {
+            priceHtml = '<div class="product-price-wrap">' +
+                            '<div class="product-price-old" style="text-decoration: line-through; color: var(--text-muted); font-size: 0.85rem;">' + formatMoney(p.price) + '</div>' +
+                            '<div class="product-price-new" style="color: var(--danger); font-weight: 700;">' + formatMoney(discount.price) + '</div>' +
+                        '</div>';
+            badgeHtml = '<span class="discount-badge" style="background: var(--danger); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; margin-left: 8px; font-weight: 600;">-' + discount.percent + '%</span>';
+        } else {
+            priceHtml = '<div class="product-price">' + formatMoney(p.price) + '</div>';
+        }
+
         return '<tr>' +
             '<td>' + (i + 1) + '</td>' +
             '<td class="product-main-col">' +
                 '<div class="product-info-wrap">' +
                     imgHtml +
                     '<div class="product-detail-text">' +
-                        '<div class="product-name">' + escapeHtml(p.name) + '</div>' +
+                        '<div class="product-name">' + escapeHtml(p.name) + badgeHtml + '</div>' +
                         '<div class="product-category">' + escapeHtml(p.category || 'Boshqa') + (p.brand ? ' | ' + escapeHtml(p.brand) : '') + '</div>' +
                     '</div>' +
                 '</div>' +
             '</td>' +
-            '<td><div class="product-price">' + formatMoney(p.price) + '</div><div class="product-label">Sotish narxi</div></td>' +
+            '<td>' + priceHtml + '<div class="product-label">Sotish narxi</div></td>' +
             '<td><div class="product-cost">' + (p.cost ? formatMoney(p.cost) : '\u2014') + '</div><div class="product-label">Tannarxi</div></td>' +
             '<td><span class="status-badge ' + ((p.status || 'active') === 'active' ? 'active' : 'inactive') + '">' + (p.status === 'active' ? 'Active' : 'Nofaol') + '</span></td>' +
             '<td><div class="sale-actions-wrap">' +
@@ -438,13 +502,28 @@ function renderProducts(searchTerm) {
                 ? '<img src="' + escapeHtml(mainImg) + '" alt="' + escapeHtml(p.name) + '">' 
                 : '<div class="pm-img-placeholder"><i class="fas fa-box"></i></div>';
             
-            return '<button class="product-mobile-card" data-id="' + p.id + '">' +
+            var discount = getActiveDiscount(p);
+            var mobilePriceHtml = '';
+            var mobileBadgeHtml = '';
+
+            if (discount) {
+                mobilePriceHtml = '<div class="pm-price-wrap">' +
+                                    '<span class="pm-price-old" style="text-decoration: line-through; color: var(--text-muted); font-size: 0.75rem; margin-right: 5px;">' + formatMoney(p.price) + '</span>' +
+                                    '<span class="pm-price-new" style="color: var(--danger); font-weight: 700;">' + formatMoney(discount.price) + '</span>' +
+                                  '</div>';
+                mobileBadgeHtml = '<div class="pm-badge" style="position: absolute; top: 5px; right: 5px; background: var(--danger); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: 700; z-index: 1;">-' + discount.percent + '%</div>';
+            } else {
+                mobilePriceHtml = '<div class="pm-price">' + formatMoney(p.price) + '</div>';
+            }
+
+            return '<button class="product-mobile-card" data-id="' + p.id + '" style="position: relative;">' +
+                mobileBadgeHtml +
                 '<div class="pm-img-wrap">' + imgHtml + '</div>' +
                 '<div class="pm-name-wrap">' +
                 '<span class="pm-name">' + escapeHtml(p.name) + '</span>' +
                 '<span class="pm-category">' + escapeHtml(p.category || 'Boshqa') + (p.brand ? ' | ' + escapeHtml(p.brand) : '') + '</span>' +
                 '</div>' +
-                '<div class="pm-price">' + formatMoney(p.price) + '</div>' +
+                mobilePriceHtml +
                 '</button>';
         }).join('');
     }
@@ -993,6 +1072,28 @@ function editProduct(id) {
     document.getElementById('productCost').readOnly = true;
     document.getElementById('productDescription').value = p.description || '';
     
+    // Chegirma ma'lumotlarini to'ldirish
+    document.getElementById('productDiscountPrice').value = p.discountPrice || '';
+    document.getElementById('productDiscountPercent').value = p.discountPercent || '';
+    
+    if (p.discountStart) {
+        var startParts = p.discountStart.split('T');
+        document.getElementById('discountStartDate').value = startParts[0];
+        document.getElementById('discountStartTime').value = startParts[1] || '';
+    } else {
+        document.getElementById('discountStartDate').value = '';
+        document.getElementById('discountStartTime').value = '';
+    }
+    
+    if (p.discountEnd) {
+        var endParts = p.discountEnd.split('T');
+        document.getElementById('discountEndDate').value = endParts[0];
+        document.getElementById('discountEndTime').value = endParts[1] || '';
+    } else {
+        document.getElementById('discountEndDate').value = '';
+        document.getElementById('discountEndTime').value = '';
+    }
+    
     initSelectPicker('productCategoryPicker', allProductCategories);
     setSelectValue('productCategoryPicker', p.category, p.category);
     setSelectValue('productStatusPicker', p.status || 'active', (p.status || 'active') === 'active' ? 'Active' : 'Inactive');
@@ -1008,6 +1109,15 @@ document.getElementById('addProductBtn').addEventListener('click', function () {
     document.getElementById('productId').value = '';
     document.getElementById('productBrand').value = '';
     document.getElementById('productCost').readOnly = false;
+    
+    // Chegirma maydonlarini tozalash
+    document.getElementById('productDiscountPrice').value = '';
+    document.getElementById('productDiscountPercent').value = '';
+    document.getElementById('discountStartDate').value = '';
+    document.getElementById('discountStartTime').value = '';
+    document.getElementById('discountEndDate').value = '';
+    document.getElementById('discountEndTime').value = '';
+    
     initSelectPicker('productCategoryPicker', allProductCategories);
     setSelectValue('productCategoryPicker', '', 'Tanlang...');
     setSelectValue('productStatusPicker', 'active', 'Active');
@@ -1100,7 +1210,14 @@ document.getElementById('productForm').addEventListener('submit', async function
             status: document.getElementById('productStatus').value || 'active',
             cost: parseFloat(document.getElementById('productCost').value) || 0,
             description: document.getElementById('productDescription').value.trim(),
-            updatedAt: new Date().toISOString()
+            updatedAt: new Date().toISOString(),
+            // Chegirma ma'lumotlari
+            discountPrice: parseFloat(document.getElementById('productDiscountPrice').value) || null,
+            discountPercent: parseFloat(document.getElementById('productDiscountPercent').value) || null,
+            discountStart: (document.getElementById('discountStartDate').value && document.getElementById('discountStartTime').value) ? 
+                (document.getElementById('discountStartDate').value + 'T' + document.getElementById('discountStartTime').value) : null,
+            discountEnd: (document.getElementById('discountEndDate').value && document.getElementById('discountEndTime').value) ? 
+                (document.getElementById('discountEndDate').value + 'T' + document.getElementById('discountEndTime').value) : null
         };
         
         // Kategoriya validatsiyasi

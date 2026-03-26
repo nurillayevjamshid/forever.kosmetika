@@ -564,8 +564,26 @@ function createProductCard(product) {
 
     const isFavorite = wishlist.includes(product.id.toString());
 
+    // Chegirmani tekshirish
+    const discount = getActiveDiscountForProduct(product);
+    let priceHTML = '';
+    let badgeHTML = '';
+
+    if (discount) {
+        priceHTML = `
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <div class="current-price" style="text-decoration: line-through; color: var(--text-light); font-size: 0.9rem;">${formatPrice(product.price)} so'm</div>
+                <div class="current-price" style="color: var(--accent-color); font-weight: 700;">${formatPrice(discount.price)} so'm</div>
+            </div>
+        `;
+        badgeHTML = `<div style="position: absolute; top: 8px; right: 8px; background: var(--accent-color); color: white; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; z-index: 2;">-${discount.percent}%</div>`;
+    } else {
+        priceHTML = `<div class="current-price">${formatPrice(product.price)} so'm</div>`;
+    }
+
     card.innerHTML = `
-        <div class="product-click-area" onclick="openProductDetailModal('${product.id}')">
+        <div class="product-click-area" onclick="openProductDetailModal('${product.id}')" style="position: relative;">
+            ${badgeHTML}
             <div class="product-image">
                 <img src="${initialImage}" alt="${product.name}" data-fallback="${fallback}" onerror="this.src='${fallback}'">
                 <button class="image-nav prev" data-pid="${product.id}" data-dir="-1" aria-label="Oldingi rasm" style="display:${showNav ? 'flex' : 'none'};">
@@ -592,7 +610,7 @@ function createProductCard(product) {
 
             <div class="product-info">
                 <h3 class="product-name">${product.name}</h3>
-                <div class="current-price">${formatPrice(product.price)} so'm</div>
+                ${priceHTML}
                 ${product.brand ? `
                 <div class="product-brand" style="font-size: 0.8rem; color: var(--text-light); font-weight: 500; display: flex; align-items: center; gap: 4px;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -693,6 +711,48 @@ function getCategoryName(category) {
 
     return names[category] || category;
 
+}
+
+// Chegirma holatini tekshirish funksiyasi (online magazin uchun)
+function getActiveDiscountForProduct(product) {
+    if (!product) return null;
+    
+    const now = new Date();
+    let hasDiscount = false;
+    let discountPrice = 0;
+    let discountPercent = 0;
+
+    // Vaqt oralig'ini tekshirish
+    let isTimeValid = true;
+    if (product.discountStart) {
+        const start = new Date(product.discountStart);
+        if (now < start) isTimeValid = false;
+    }
+    if (product.discountEnd) {
+        const end = new Date(product.discountEnd);
+        if (now > end) isTimeValid = false;
+    }
+
+    if (isTimeValid) {
+        if (product.discountPrice && product.discountPrice > 0) {
+            discountPrice = product.discountPrice;
+            discountPercent = Math.round(((product.price - product.discountPrice) / product.price) * 100);
+            hasDiscount = true;
+        } else if (product.discountPercent && product.discountPercent > 0) {
+            discountPercent = product.discountPercent;
+            discountPrice = product.price - (product.price * product.discountPercent / 100);
+            hasDiscount = true;
+        }
+    }
+
+    if (hasDiscount) {
+        return {
+            price: Math.round(discountPrice),
+            percent: discountPercent,
+            originalPrice: product.price
+        };
+    }
+    return null;
 }
 
 function formatPrice(price) {
@@ -1988,7 +2048,21 @@ function openProductDetailModal(productId) {
 
     document.getElementById('detailName').textContent = product.name;
 
-    document.getElementById('detailPrice').textContent = formatPrice(product.price) + " so'm";
+    // Chegirmani tekshirish va narxni yangilash
+    const discount = getActiveDiscountForProduct(product);
+    let detailPriceHTML = '';
+    
+    if (discount) {
+        detailPriceHTML = '<div style="display: flex; align-items: center; gap: 12px;">' +
+            '<span style="text-decoration: line-through; color: var(--text-light); font-size: 0.95rem;">' + formatPrice(product.price) + ' so\'m</span>' +
+            '<span style="color: var(--accent-color); font-weight: 700; font-size: 1.2rem;">' + formatPrice(discount.price) + ' so\'m</span>' +
+            '<span style="background: var(--accent-color); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 700;">-' + discount.percent + '%</span>' +
+            '</div>';
+    } else {
+        detailPriceHTML = '<span>' + formatPrice(product.price) + ' so\'m</span>';
+    }
+    
+    document.getElementById('detailPrice').innerHTML = detailPriceHTML;
 
     const brandRow = document.getElementById('detailBrandRow');
     const brandEl = document.getElementById('detailBrand');
@@ -2656,3 +2730,17 @@ function updateWishlistUI() {
 // Wishlist funksiyalarini global miqyosda e'lon qilish
 window.toggleWishlist = toggleWishlist;
 window.updateWishlistUI = updateWishlistUI;
+
+
+// Chegirma vaqtini har minutda tekshirib turish (avtomatik yangilanish uchun)
+// Bu mahsulotlar kartasini yangilaydi agar chegirma vaqti o'tgan bo'lsa
+setInterval(function() {
+    // Agar mahsulotlar kartasi ko'rinib turgan bo'lsa, uni yangilash
+    const productsGrid = document.getElementById('productsGrid');
+    if (productsGrid && productsGrid.children.length > 0) {
+        // Hozirgi filterni saqlash
+        const activeFilter = document.querySelector('.filter-btn.active');
+        const currentFilter = activeFilter ? activeFilter.getAttribute('data-filter') : 'all';
+        displayProducts(currentFilter);
+    }
+}, 60000); // Har 60 soniyada tekshiradi
