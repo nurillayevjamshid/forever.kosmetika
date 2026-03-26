@@ -376,6 +376,64 @@ function refreshDashboard() {
     }
 }
 
+// Chegirma holatini tekshirish funksiyasi
+function getActiveDiscount(p) {
+    if (!p) return null;
+    
+    var now = new Date();
+    var hasDiscount = false;
+    var discountPrice = 0;
+    var discountPercent = 0;
+
+    // Vaqt oralig'ini tekshirish
+    var isTimeValid = true;
+    if (p.discountStart) {
+        var start = new Date(p.discountStart);
+        if (now < start) isTimeValid = false;
+    }
+    if (p.discountEnd) {
+        var end = new Date(p.discountEnd);
+        if (now > end) isTimeValid = false;
+    }
+
+    if (isTimeValid) {
+        if (p.discountPrice && p.discountPrice > 0) {
+            discountPrice = p.discountPrice;
+            discountPercent = Math.round(((p.price - p.discountPrice) / p.price) * 100);
+            hasDiscount = true;
+        } else if (p.discountPercent && p.discountPercent > 0) {
+            discountPercent = p.discountPercent;
+            discountPrice = p.price - (p.price * p.discountPercent / 100);
+            hasDiscount = true;
+        }
+    }
+
+    if (hasDiscount) {
+        return {
+            price: discountPrice,
+            percent: discountPercent,
+            originalPrice: p.price
+        };
+    }
+    return null;
+}
+
+// Chegirma vaqtini har minutda tekshirib turish (avtomatik yangilanish uchun)
+setInterval(function() {
+    var activePage = localStorage.getItem('crm-active-page');
+    if (activePage === 'products') {
+        renderProducts();
+    }
+
+    updateDiscountsButtonVisibility();
+    populateProductDiscountDropdown();
+
+    var discountsModal = document.getElementById('discountsModal');
+    if (discountsModal && discountsModal.classList.contains('active')) {
+        renderDiscounts();
+    }
+}, 60000); // Har 60 soniyada tekshiradi
+
 function renderProducts(searchTerm) {
     searchTerm = searchTerm || '';
     var tbody = document.getElementById('productsBody');
@@ -409,18 +467,35 @@ function renderProducts(searchTerm) {
             ? '<img src="' + mainImg + '" class="product-avatar">' 
             : '<div class="product-avatar-placeholder">' + (p.name.charAt(0).toUpperCase()) + '</div>';
         
+        var discount = getActiveDiscount(p);
+        var priceHtml = '';
+        var badgeHtml = '';
+
+        if (discount) {
+            priceHtml = '<div class="product-price-wrap" style="display: flex; flex-direction: column; gap: 2px;">' +
+                            '<div class="product-price-old" style="text-decoration: line-through; color: var(--text-muted); font-size: 0.75rem; opacity: 0.8;">' + formatMoney(p.price) + '</div>' +
+                            '<div class="product-price-new" style="color: var(--danger); font-weight: 700; font-size: 0.95rem;">' + formatMoney(discount.price) + '</div>' +
+                        '</div>';
+            badgeHtml = '<span class="discount-badge" style="background: linear-gradient(135deg, #ff3d57 0%, #ff8a80 100%); color: white; padding: 3px 8px; border-radius: 12px; font-size: 0.7rem; margin-left: 8px; font-weight: 700; display: inline-flex; align-items: center; gap: 3px; box-shadow: 0 2px 5px rgba(255, 61, 87, 0.2);">' +
+                            '<i class="fas fa-tag" style="font-size: 0.6rem;"></i>' +
+                            '-' + discount.percent + '%' +
+                        '</span>';
+        } else {
+            priceHtml = '<div class="product-price">' + formatMoney(p.price) + '</div>';
+        }
+
         return '<tr>' +
             '<td>' + (i + 1) + '</td>' +
             '<td class="product-main-col">' +
                 '<div class="product-info-wrap">' +
                     imgHtml +
                     '<div class="product-detail-text">' +
-                        '<div class="product-name">' + escapeHtml(p.name) + '</div>' +
+                        '<div class="product-name">' + escapeHtml(p.name) + badgeHtml + '</div>' +
                         '<div class="product-category">' + escapeHtml(p.category || 'Boshqa') + (p.brand ? ' | ' + escapeHtml(p.brand) : '') + '</div>' +
                     '</div>' +
                 '</div>' +
             '</td>' +
-            '<td><div class="product-price">' + formatMoney(p.price) + '</div><div class="product-label">Sotish narxi</div></td>' +
+            '<td>' + priceHtml + '<div class="product-label">Sotish narxi</div></td>' +
             '<td><div class="product-cost">' + (p.cost ? formatMoney(p.cost) : '\u2014') + '</div><div class="product-label">Tannarxi</div></td>' +
             '<td><span class="status-badge ' + ((p.status || 'active') === 'active' ? 'active' : 'inactive') + '">' + (p.status === 'active' ? 'Active' : 'Nofaol') + '</span></td>' +
             '<td><div class="sale-actions-wrap">' +
@@ -439,13 +514,31 @@ function renderProducts(searchTerm) {
                 ? '<img src="' + escapeHtml(mainImg) + '" alt="' + escapeHtml(p.name) + '">' 
                 : '<div class="pm-img-placeholder"><i class="fas fa-box"></i></div>';
             
-            return '<button class="product-mobile-card" data-id="' + p.id + '">' +
+            var discount = getActiveDiscount(p);
+            var mobilePriceHtml = '';
+            var mobileBadgeHtml = '';
+
+            if (discount) {
+                mobilePriceHtml = '<div class="pm-price-wrap" style="display: flex; align-items: center; gap: 8px;">' +
+                                    '<span class="pm-price-old" style="text-decoration: line-through; color: var(--text-muted); font-size: 0.7rem; opacity: 0.8;">' + formatMoney(p.price) + '</span>' +
+                                    '<span class="pm-price-new" style="color: var(--danger); font-weight: 700; font-size: 0.9rem;">' + formatMoney(discount.price) + '</span>' +
+                                  '</div>';
+                mobileBadgeHtml = '<div class="pm-badge" style="position: absolute; top: 8px; right: 8px; background: linear-gradient(135deg, #ff3d57 0%, #ff8a80 100%); color: white; padding: 3px 8px; border-radius: 12px; font-size: 0.65rem; font-weight: 800; z-index: 1; display: flex; align-items: center; gap: 3px; box-shadow: 0 2px 8px rgba(255, 61, 87, 0.3);">' +
+                                    '<i class="fas fa-fire" style="font-size: 0.6rem;"></i>' +
+                                    '-' + discount.percent + '%' +
+                                  '</div>';
+            } else {
+                mobilePriceHtml = '<div class="pm-price">' + formatMoney(p.price) + '</div>';
+            }
+
+            return '<button class="product-mobile-card" data-id="' + p.id + '" style="position: relative;">' +
+                mobileBadgeHtml +
                 '<div class="pm-img-wrap">' + imgHtml + '</div>' +
                 '<div class="pm-name-wrap">' +
                 '<span class="pm-name">' + escapeHtml(p.name) + '</span>' +
                 '<span class="pm-category">' + escapeHtml(p.category || 'Boshqa') + (p.brand ? ' | ' + escapeHtml(p.brand) : '') + '</span>' +
                 '</div>' +
-                '<div class="pm-price">' + formatMoney(p.price) + '</div>' +
+                mobilePriceHtml +
                 '</button>';
         }).join('');
     }
@@ -986,22 +1079,51 @@ db.collection("discounts").onSnapshot(
         snapshot.forEach(function (doc) { discountsArr.push(Object.assign({ id: doc.id }, doc.data())); });
         updateDiscountsButtonVisibility();
         populateProductDiscountDropdown();
+        var discountsModal = document.getElementById('discountsModal');
+        if (discountsModal && discountsModal.classList.contains('active')) {
+            renderDiscounts();
+        }
     },
     function (error) {
         console.error('Discounts listener xatolik:', error);
     }
 );
 
+function parseDiscountBoundary(value, isEndOfDay) {
+    if (!value) return null;
+
+    var normalizedValue = value;
+    if (typeof value === 'string' && value.length === 10) {
+        normalizedValue = value + (isEndOfDay ? 'T23:59:59' : 'T00:00:00');
+    }
+
+    var parsedDate = new Date(normalizedValue);
+    return isNaN(parsedDate.getTime()) ? null : parsedDate;
+}
+
+function isDiscountCurrentlyActive(discount) {
+    if (!discount || discount.status !== 'active') return false;
+
+    var now = new Date();
+    var startDate = parseDiscountBoundary(discount.startDate, false);
+    var endDate = parseDiscountBoundary(discount.endDate, true);
+
+    if (startDate && startDate > now) return false;
+    if (endDate && endDate < now) return false;
+
+    return true;
+}
+
 // Function to update discounts button visibility
 function updateDiscountsButtonVisibility() {
     var discountsBtn = document.getElementById('discountsBtn');
     if (!discountsBtn) return;
-    
-    var activeDiscounts = discountsArr.filter(function(d) {
-        return d.status === 'active' && new Date(d.endDate) >= new Date();
+
+    var hasActiveDiscount = discountsArr.some(function(discount) {
+        return isDiscountCurrentlyActive(discount);
     });
-    
-    discountsBtn.style.display = activeDiscounts.length > 0 ? 'inline-flex' : 'none';
+
+    discountsBtn.style.display = hasActiveDiscount ? 'inline-flex' : 'none';
 }
 
 // Function to populate product discount dropdown
@@ -1012,8 +1134,8 @@ function populateProductDiscountDropdown() {
     var dropdown = picker.querySelector('.select-dropdown');
     if (!dropdown) return;
     
-    var activeDiscounts = discountsArr.filter(function(d) {
-        return d.status === 'active' && new Date(d.endDate) >= new Date();
+    var activeDiscounts = discountsArr.filter(function(discount) {
+        return isDiscountCurrentlyActive(discount);
     });
     
     var optionsHtml = '<button type="button" class="select-option selected" data-value="">' +
@@ -1048,6 +1170,28 @@ function editProduct(id) {
     document.getElementById('productCost').readOnly = true;
     document.getElementById('productDescription').value = p.description || '';
     
+    // Chegirma ma'lumotlarini to'ldirish
+    document.getElementById('productDiscountPrice').value = p.discountPrice || '';
+    document.getElementById('productDiscountPercent').value = p.discountPercent || '';
+    
+    if (p.discountStart) {
+        var startParts = p.discountStart.split('T');
+        document.getElementById('discountStartDate').value = startParts[0];
+        document.getElementById('discountStartTime').value = startParts[1] || '';
+    } else {
+        document.getElementById('discountStartDate').value = '';
+        document.getElementById('discountStartTime').value = '';
+    }
+    
+    if (p.discountEnd) {
+        var endParts = p.discountEnd.split('T');
+        document.getElementById('discountEndDate').value = endParts[0];
+        document.getElementById('discountEndTime').value = endParts[1] || '';
+    } else {
+        document.getElementById('discountEndDate').value = '';
+        document.getElementById('discountEndTime').value = '';
+    }
+    
     initSelectPicker('productCategoryPicker', allProductCategories);
     setSelectValue('productCategoryPicker', p.category, p.category);
     setSelectValue('productStatusPicker', p.status || 'active', (p.status || 'active') === 'active' ? 'Active' : 'Inactive');
@@ -1064,6 +1208,15 @@ document.getElementById('addProductBtn').addEventListener('click', function () {
     document.getElementById('productId').value = '';
     document.getElementById('productBrand').value = '';
     document.getElementById('productCost').readOnly = false;
+    
+    // Chegirma maydonlarini tozalash
+    document.getElementById('productDiscountPrice').value = '';
+    document.getElementById('productDiscountPercent').value = '';
+    document.getElementById('discountStartDate').value = '';
+    document.getElementById('discountStartTime').value = '';
+    document.getElementById('discountEndDate').value = '';
+    document.getElementById('discountEndTime').value = '';
+    
     initSelectPicker('productCategoryPicker', allProductCategories);
     setSelectValue('productCategoryPicker', '', 'Tanlang...');
     setSelectValue('productStatusPicker', 'active', 'Active');
@@ -1158,7 +1311,14 @@ document.getElementById('productForm').addEventListener('submit', async function
             cost: parseFloat(document.getElementById('productCost').value) || 0,
             discountId: document.getElementById('productDiscount').value || '',
             description: document.getElementById('productDescription').value.trim(),
-            updatedAt: new Date().toISOString()
+            updatedAt: new Date().toISOString(),
+            // Chegirma ma'lumotlari
+            discountPrice: parseFloat(document.getElementById('productDiscountPrice').value) || null,
+            discountPercent: parseFloat(document.getElementById('productDiscountPercent').value) || null,
+            discountStart: (document.getElementById('discountStartDate').value && document.getElementById('discountStartTime').value) ? 
+                (document.getElementById('discountStartDate').value + 'T' + document.getElementById('discountStartTime').value) : null,
+            discountEnd: (document.getElementById('discountEndDate').value && document.getElementById('discountEndTime').value) ? 
+                (document.getElementById('discountEndDate').value + 'T' + document.getElementById('discountEndTime').value) : null
         };
         
         // Kategoriya validatsiyasi
@@ -3642,23 +3802,23 @@ function openDiscountsModal() {
 function renderDiscounts() {
     var discountsList = document.getElementById('discountsList');
     var discountsEmpty = document.getElementById('discountsEmpty');
-    
+
     if (!discountsList) return;
-    
+
     if (discountsArr.length === 0) {
         discountsList.innerHTML = '';
         if (discountsEmpty) discountsEmpty.style.display = 'block';
         return;
     }
-    
+
     if (discountsEmpty) discountsEmpty.style.display = 'none';
-    
+
     discountsList.innerHTML = discountsArr.map(function(d) {
-        var isActive = d.status === 'active' && new Date(d.endDate) >= new Date();
+        var isActive = isDiscountCurrentlyActive(d);
         var statusClass = isActive ? 'active' : 'inactive';
         var statusText = isActive ? 'Faol' : 'Nofaol';
         var typeText = d.type === 'percentage' ? d.value + '%' : formatMoney(d.value);
-        
+
         return '<div class="discount-item" style="border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:12px; background:var(--bg-secondary);">' +
             '<div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:12px;">' +
                 '<div>' +
@@ -3681,57 +3841,64 @@ function renderDiscounts() {
     }).join('');
 }
 
-// Add discount button event
-document.getElementById('addDiscountBtn').addEventListener('click', function() {
-    document.getElementById('discountForm').reset();
-    document.getElementById('discountId').value = '';
-    document.getElementById('discountFormModalTitle').innerHTML = '<i class="fas fa-percentage"></i> Yangi chegirma';
-    setSelectValue('discountTypePicker', 'percentage', 'Foizda');
-    setSelectValue('discountStatusPicker', 'active', 'Faol');
-    openModal('discountFormModal');
-});
+(function initDiscountRecordManagement() {
+    var addDiscountRecordBtn = document.getElementById('addDiscountRecordBtn');
+    var discountRecordForm = document.getElementById('discountRecordForm');
 
-// Discount form submit
-document.getElementById('discountForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    var id = document.getElementById('discountId').value;
-    var saveBtn = document.getElementById('saveDiscountBtn');
-    
-    if (saveBtn) {
-        saveBtn.disabled = true;
-        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saqlanmoqda...';
+    if (addDiscountRecordBtn) {
+        addDiscountRecordBtn.addEventListener('click', function() {
+            discountRecordForm.reset();
+            document.getElementById('discountRecordId').value = '';
+            document.getElementById('discountFormModalTitle').innerHTML = '<i class="fas fa-percentage"></i> Yangi chegirma';
+            setSelectValue('discountRecordTypePicker', 'percentage', 'Foizda');
+            setSelectValue('discountRecordStatusPicker', 'active', 'Faol');
+            openModal('discountFormModal');
+        });
     }
-    
-    try {
-        var data = {
-            name: document.getElementById('discountName').value.trim(),
-            type: document.getElementById('discountType').value,
-            value: parseFloat(document.getElementById('discountValue').value) || 0,
-            startDate: document.getElementById('discountStartDate').value,
-            endDate: document.getElementById('discountEndDate').value,
-            status: document.getElementById('discountStatus').value,
-            description: document.getElementById('discountDescription').value.trim(),
-            createdAt: new Date().toISOString()
-        };
-        
-        if (id) {
-            await discountsCollection.doc(id).update(data);
-            showToast('Chegirma yangilandi!');
-        } else {
-            await discountsCollection.add(data);
-            showToast("Yangi chegirma qo'shildi!");
-        }
-        
-        closeModal('discountFormModal');
-    } catch (error) {
-        showToast('Xatolik: ' + error.message, 'error');
-    } finally {
+
+    if (!discountRecordForm) return;
+
+    discountRecordForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        var id = document.getElementById('discountRecordId').value;
+        var saveBtn = document.getElementById('saveDiscountBtn');
+
         if (saveBtn) {
-            saveBtn.disabled = false;
-            saveBtn.innerHTML = 'Saqlash';
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saqlanmoqda...';
         }
-    }
-});
+
+        try {
+            var data = {
+                name: document.getElementById('discountRecordName').value.trim(),
+                type: document.getElementById('discountRecordType').value,
+                value: parseFloat(document.getElementById('discountRecordValue').value) || 0,
+                startDate: document.getElementById('discountRecordStartDate').value,
+                endDate: document.getElementById('discountRecordEndDate').value,
+                status: document.getElementById('discountRecordStatus').value,
+                description: document.getElementById('discountRecordDescription').value.trim(),
+                createdAt: new Date().toISOString()
+            };
+
+            if (id) {
+                await discountsCollection.doc(id).update(data);
+                showToast('Chegirma yangilandi!');
+            } else {
+                await discountsCollection.add(data);
+                showToast("Yangi chegirma qo'shildi!");
+            }
+
+            closeModal('discountFormModal');
+        } catch (error) {
+            showToast('Xatolik: ' + error.message, 'error');
+        } finally {
+            if (saveBtn) {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = 'Saqlash';
+            }
+        }
+    });
+})();
 
 // Discount edit and delete event delegation
 document.addEventListener('click', function(e) {
@@ -3740,19 +3907,19 @@ document.addEventListener('click', function(e) {
         var id = editBtn.getAttribute('data-id');
         var discount = discountsArr.find(function(d) { return d.id === id; });
         if (discount) {
-            document.getElementById('discountId').value = discount.id;
-            document.getElementById('discountName').value = discount.name;
-            document.getElementById('discountValue').value = discount.value;
-            document.getElementById('discountStartDate').value = discount.startDate;
-            document.getElementById('discountEndDate').value = discount.endDate;
-            document.getElementById('discountDescription').value = discount.description || '';
-            setSelectValue('discountTypePicker', discount.type, discount.type === 'percentage' ? 'Foizda' : 'Fix summa (so\'m)');
-            setSelectValue('discountStatusPicker', discount.status, discount.status === 'active' ? 'Faol' : 'Nofaol');
+            document.getElementById('discountRecordId').value = discount.id;
+            document.getElementById('discountRecordName').value = discount.name;
+            document.getElementById('discountRecordValue').value = discount.value;
+            document.getElementById('discountRecordStartDate').value = discount.startDate;
+            document.getElementById('discountRecordEndDate').value = discount.endDate;
+            document.getElementById('discountRecordDescription').value = discount.description || '';
+            setSelectValue('discountRecordTypePicker', discount.type, discount.type === 'percentage' ? 'Foizda' : 'Fix summa (so\'m)');
+            setSelectValue('discountRecordStatusPicker', discount.status, discount.status === 'active' ? 'Faol' : 'Nofaol');
             document.getElementById('discountFormModalTitle').innerHTML = '<i class="fas fa-percentage"></i> Chegirmani tahrirlash';
             openModal('discountFormModal');
         }
     }
-    
+
     var deleteBtn = e.target.closest('.discount-delete-btn');
     if (deleteBtn) {
         var id = deleteBtn.getAttribute('data-id');
@@ -3762,3 +3929,102 @@ document.addEventListener('click', function(e) {
         openModal('deleteModal');
     }
 });
+
+(function initBulkDiscountManagement() {
+    var addDiscountBtn = document.getElementById('addDiscountBtn');
+    var discountModal = document.getElementById('discountModal');
+    var bulkDiscountForm = document.getElementById('bulkDiscountForm');
+    var discountSection = document.getElementById('discountSection');
+
+    if (!addDiscountBtn || !discountModal || !bulkDiscountForm || !discountSection) return;
+
+    // Populate categories
+    if (typeof allProductCategories !== 'undefined' && discountSection.options.length === 1) {
+        allProductCategories.forEach(function(c) {
+            var opt = document.createElement('option');
+            opt.value = c;
+            opt.textContent = c;
+            discountSection.appendChild(opt);
+        });
+    }
+
+    addDiscountBtn.addEventListener('click', function() {
+        bulkDiscountForm.reset();
+        openModal('discountModal');
+    });
+
+    bulkDiscountForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        var percent = parseFloat(document.getElementById('discountPercent').value);
+        var section = document.getElementById('discountSection').value;
+
+        // Vaqt ma'lumotlarini olish
+        var startDate = document.getElementById('bulkDiscountStartDate').value;
+        var startTime = document.getElementById('bulkDiscountStartTime').value;
+        var endDate = document.getElementById('bulkDiscountEndDate').value;
+        var endTime = document.getElementById('bulkDiscountEndTime').value;
+
+        if (isNaN(percent) || percent < 0 || percent > 100) {
+            showToast('Iltimos, to\'g\'ri chegirma foizini kiriting (0-100)', 'error');
+            return;
+        }
+
+        // Vaqt formatini tayyorlash
+        var discountStart = "";
+        if (startDate) {
+            discountStart = startDate + (startTime ? "T" + startTime : "T00:00");
+        }
+
+        var discountEnd = "";
+        if (endDate) {
+            discountEnd = endDate + (endTime ? "T" + endTime : "T23:59");
+        }
+
+        try {
+            showToast('Chegirma qo\'shilmoqda...', 'info');
+
+            var query = db.collection('products');
+            if (section !== 'all') {
+                query = query.where('category', '==', section);
+            }
+
+            var snapshot = await query.get();
+
+            if (snapshot.empty) {
+                showToast('Tanlangan bo\'limda mahsulotlar topilmadi', 'info');
+                closeModal('discountModal');
+                return;
+            }
+
+            var batch = db.batch();
+            var count = 0;
+
+            snapshot.forEach(function(doc) {
+                // Mahsulotni chegirma ma'lumotlari bilan yangilash
+                var updateData = {
+                    discountPercent: percent,
+                    discountPrice: 0, // Foiz ishlatilganda narxni 0 qilamiz
+                    hasDiscount: percent > 0,
+                    updatedAt: new Date().toISOString()
+                };
+
+                // Vaqt ma'lumotlarini qo'shish
+                if (discountStart) updateData.discountStart = discountStart;
+                if (discountEnd) updateData.discountEnd = discountEnd;
+
+                batch.update(doc.ref, updateData);
+                count++;
+            });
+
+            await batch.commit();
+
+            showToast(count + ' ta mahsulotga chegirma qo\'shildi!', 'success');
+            closeModal('discountModal');
+            if (typeof renderProducts === 'function') renderProducts();
+        } catch (error) {
+            console.error("Chegirma qo'shishda xatolik:", error);
+            showToast('Xatolik yuz berdi: ' + error.message, 'error');
+        }
+    });
+})();
