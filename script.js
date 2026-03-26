@@ -23,7 +23,7 @@ const defaultProducts = [];
 // Cart state
 
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
-let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
 
 // Viloyatlar va Tumanlar ma'lumotlari
 
@@ -94,20 +94,11 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     updateCartCount();
 
-    // Update favorite count
-    updateFavoriteCount();
+    // Update wishlist icons
+    updateWishlistUI();
 
     // Initialize favorite filter buttons
-    const favoriteHeaderBtn = document.getElementById('favoriteHeaderBtn');
     const mobileFavoriteBtn = document.getElementById('mobileFavoriteBtn');
-
-    if (favoriteHeaderBtn) {
-        favoriteHeaderBtn.addEventListener('click', () => {
-            displayProducts('favorites');
-            document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
-        });
-    }
-
     if (mobileFavoriteBtn) {
         mobileFavoriteBtn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -443,7 +434,7 @@ function displayProducts(filter = 'all') {
 
         : filter === 'favorites'
 
-        ? products.filter(p => favorites.includes(p.id.toString()))
+        ? products.filter(p => wishlist.includes(p.id.toString()))
 
         : products.filter(p => {
 
@@ -551,7 +542,7 @@ function createProductCard(product) {
     const initialImage = (state.images[state.index] || state.images[0] || product.imageUrl || product.image || fallback);
     const showNav = state.images.length > 1;
 
-    const isFavorite = favorites.includes(product.id.toString());
+    const isFavorite = wishlist.includes(product.id.toString());
 
     card.innerHTML = `
 
@@ -572,17 +563,18 @@ function createProductCard(product) {
                     </svg>
                 </button>
 
-                <button class="favorite-btn ${isFavorite ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorite('${product.id}')">
-
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-
-                    </svg>
-
-                </button>
 
             </div>
+
+            <button class="favorite-btn ${wishlist.includes(product.id.toString()) ? 'active' : ''}" 
+                    onclick="toggleWishlist(event, '${product.id}')" 
+                    id="wishlist-btn-${product.id}">
+                <svg width="20" height="20" viewBox="0 0 24 24" 
+                     fill="${wishlist.includes(product.id.toString()) ? 'currentColor' : 'none'}" 
+                     stroke="currentColor" stroke-width="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+            </button>
 
             <div class="product-info" style="padding: 12px 12px 0; display: flex; flex-direction: column; gap: 4px; flex: 1;">
 
@@ -949,27 +941,8 @@ function addToCart(productId) {
 
     updateCartCount();
 
-    // Update favorite count
-    updateFavoriteCount();
-
-    // Initialize favorite filter buttons
-    const favoriteHeaderBtn = document.getElementById('favoriteHeaderBtn');
-    const mobileFavoriteBtn = document.getElementById('mobileFavoriteBtn');
-
-    if (favoriteHeaderBtn) {
-        favoriteHeaderBtn.addEventListener('click', () => {
-            displayProducts('favorites');
-            document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
-        });
-    }
-
-    if (mobileFavoriteBtn) {
-        mobileFavoriteBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            displayProducts('favorites');
-            document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
-        });
-    }
+    // Update wishlist icons
+    updateWishlistUI();
 
     // Update UI for this product
 
@@ -2624,3 +2597,60 @@ window.showStep = showStep;
 window.changeQuantityPage = changeQuantityPage;
 window.removeFromCartPage = removeFromCartPage;
 window.updateOrderDeliveryTextFromInputs = updateOrderDeliveryTextFromInputs;
+
+// ================================
+// WISHLIST FUNCTIONS
+// ================================
+
+function toggleWishlist(event, productId) {
+    event.stopPropagation();
+    event.preventDefault();
+    
+    const index = wishlist.indexOf(productId.toString());
+    if (index === -1) {
+        // Qo'shish
+        wishlist.push(productId.toString());
+        if (typeof showNotification === 'function') {
+            showNotification("Mahsulot sevimlilarga qo'shildi");
+        }
+    } else {
+        // O'chirish
+        wishlist.splice(index, 1);
+        if (typeof showNotification === 'function') {
+            showNotification("Mahsulot sevimlilardan olib tashlandi");
+        }
+    }
+    
+    localStorage.setItem('wishlist', JSON.stringify(wishlist));
+    updateWishlistUI();
+}
+
+function updateWishlistUI() {
+    // Barcha wishlist tugmalarini yangilash
+    const wishlistBtns = document.querySelectorAll('.favorite-btn');
+    wishlistBtns.forEach(btn => {
+        const productId = btn.id.replace('wishlist-btn-', '');
+        const isActive = wishlist.includes(productId.toString());
+        
+        if (isActive) {
+            btn.classList.add('active');
+            const svg = btn.querySelector('svg');
+            if (svg) svg.setAttribute('fill', 'currentColor');
+        } else {
+            btn.classList.remove('active');
+            const svg = btn.querySelector('svg');
+            if (svg) svg.setAttribute('fill', 'none');
+        }
+    });
+
+    // Headerdagi wishlist count (agar bo'lsa)
+    const wishlistCountEl = document.getElementById('wishlistCount');
+    if (wishlistCountEl) {
+        wishlistCountEl.textContent = wishlist.length;
+        wishlistCountEl.style.display = wishlist.length > 0 ? 'flex' : 'none';
+    }
+}
+
+// Wishlist funksiyalarini global miqyosda e'lon qilish
+window.toggleWishlist = toggleWishlist;
+window.updateWishlistUI = updateWishlistUI;

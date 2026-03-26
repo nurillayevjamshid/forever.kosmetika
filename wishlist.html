@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sevimlilar - For.Ever Cosmetics</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" href="favicon-32x32.png" type="image/png" sizes="32x32">
+    <link rel="apple-touch-icon" href="favicon-192x192.png">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        .wishlist-page {
+            padding-top: 120px;
+            padding-bottom: 60px;
+            min-height: 100vh;
+            background: #f8f9fe;
+        }
+
+        .wishlist-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .wishlist-header {
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        .wishlist-header h1 {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .wishlist-header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .wishlist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        /* Wishlist Card Enhancements */
+        .wishlist-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .wishlist-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .wishlist-card .remove-wishlist {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ff4d4d;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .wishlist-card .remove-wishlist:hover {
+            background: #ff4d4d;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .wishlist-img-wrapper {
+            position: relative;
+            padding-top: 100%;
+            overflow: hidden;
+            background: #f0f0f0;
+        }
+
+        .wishlist-img-wrapper img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .wishlist-card:hover .wishlist-img-wrapper img {
+            transform: scale(1.1);
+        }
+
+        .wishlist-info {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .wishlist-info h3 {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .wishlist-info .category {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .wishlist-price {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            margin-top: auto;
+        }
+
+        .wishlist-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-add-cart {
+            flex: 1;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-add-cart:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        /* Empty State */
+        .empty-wishlist {
+            text-align: center;
+            padding: 80px 20px;
+            background: white;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-sm);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .empty-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .empty-wishlist h2 {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+
+        .empty-wishlist p {
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .wishlist-header h1 {
+                font-size: 2.2rem;
+            }
+            .wishlist-grid {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav-container">
+            <div class="logo">
+                <a href="index.html" style="text-decoration: none; display: flex; align-items: center;">
+                    <img src="assets/logo.png" alt="Forever Kosmetika" class="logo-img">
+                </a>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html#home" class="nav-link">Bosh sahifa</a></li>
+                <li><a href="index.html#products" class="nav-link">Mahsulotlar</a></li>
+                <li><a href="wishlist.html" class="nav-link active">Sevimlilar</a></li>
+                <li><a href="profile.html" class="nav-link">Profil</a></li>
+            </ul>
+            <div class="header-actions">
+                <a href="cart.html" class="cart-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4H6z"></path>
+                        <path d="M3 6h18"></path>
+                        <path d="M16 10a4 4 0 0 1-8 0"></path>
+                    </svg>
+                    <span class="cart-count">0</span>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="wishlist-page">
+        <div class="wishlist-container">
+            <div class="wishlist-header">
+                <h1>Sevimlilar</h1>
+                <p id="wishlistCountText">Sizga yoqqan mahsulotlar to'plami</p>
+            </div>
+
+            <div id="wishlistGrid" class="wishlist-grid">
+                <!-- Wishlist items will be loaded here -->
+            </div>
+
+            <div id="emptyWishlist" class="empty-wishlist" style="display: none;">
+                <span class="empty-icon">💖</span>
+                <h2>Sevimlilar ro'yxati bo'sh</h2>
+                <p>Hali hech qanday mahsulotni sevimlilarga qo'shmadingiz. O'zingizga yoqqan mahsulotlarni shu yerda saqlashingiz mumkin.</p>
+                <a href="index.html#products" class="btn btn-primary">Xaridni boshlash</a>
+            </div>
+        </div>
+    </main>
+
+    <script src="firebase-config.js"></script>
+    <script src="firebase-db.js"></script>
+    <script src="script_helpers.js"></script>
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Wishlist sahifasini yuklash
+            initWishlistPage();
+        });
+
+        async function initWishlistPage() {
+            const grid = document.getElementById('wishlistGrid');
+            const emptyState = document.getElementById('emptyWishlist');
+            const countText = document.getElementById('wishlistCountText');
+            
+            // Wishlist ma'lumotlarini olish
+            let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+            
+            // Agar mahsulotlar hali yuklanmagan bo'lsa, kutish
+            if (typeof products === 'undefined' || products.length === 0) {
+                await loadProducts();
+            }
+
+            renderWishlist();
+
+            function renderWishlist() {
+                wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+                grid.innerHTML = '';
+                
+                if (wishlist.length === 0) {
+                    grid.style.display = 'none';
+                    emptyState.style.display = 'block';
+                    countText.textContent = "Sizda hozircha sevimlilar yo'q";
+                    return;
+                }
+
+                grid.style.display = 'grid';
+                emptyState.style.display = 'none';
+                countText.textContent = `${wishlist.length} ta mahsulot saqlangan`;
+
+                wishlist.forEach(productId => {
+                    const product = products.find(p => p.id.toString() === productId.toString());
+                    if (product) {
+                        const card = createWishlistCard(product);
+                        grid.appendChild(card);
+                    }
+                });
+            }
+
+            function createWishlistCard(product) {
+                const card = document.createElement('div');
+                card.className = 'wishlist-card';
+                
+                const fallback = typeof getProductFallbackImage === 'function' ? getProductFallbackImage(product) : 'assets/logo.png';
+                const imageUrl = product.imageUrl || product.image || fallback;
+
+                card.innerHTML = `
+                    <button class="remove-wishlist" onclick="removeFromWishlistPage('${product.id}')" title="O'chirish">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                    <div class="wishlist-img-wrapper" onclick="window.location.href='index.html?product=${product.id}'" style="cursor:pointer">
+                        <img src="${imageUrl}" alt="${product.name}" onerror="this.src='${fallback}'">
+                    </div>
+                    <div class="wishlist-info">
+                        <span class="category">${product.category || 'Kosmetika'}</span>
+                        <h3>${product.name}</h3>
+                        <div class="wishlist-price">${formatPrice(product.price)} so'm</div>
+                        <div class="wishlist-actions">
+                            <button class="btn-add-cart" onclick="addToCartFromWishlist('${product.id}')">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4H6z"></path>
+                                    <path d="M3 6h18"></path>
+                                    <path d="M16 10a4 4 0 0 1-8 0"></path>
+                                </svg>
+                                Savatga qo'shish
+                            </button>
+                        </div>
+                    </div>
+                `;
+                return card;
+            }
+
+            // Global funksiyalar
+            window.removeFromWishlistPage = function(productId) {
+                let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+                wishlist = wishlist.filter(id => id.toString() !== productId.toString());
+                localStorage.setItem('wishlist', JSON.stringify(wishlist));
+                
+                // UI ni yangilash
+                renderWishlist();
+                
+                // Asosiy sahifadagi yurakchalarni yangilash uchun (agar kerak bo'lsa)
+                if (typeof updateWishlistUI === 'function') updateWishlistUI();
+                
+                if (typeof showNotification === 'function') {
+                    showNotification("Mahsulot sevimlilardan olib tashlandi");
+                }
+            };
+
+            window.addToCartFromWishlist = function(productId) {
+                if (typeof addToCart === 'function') {
+                    addToCart(productId);
+                    if (typeof showNotification === 'function') {
+                        showNotification("Mahsulot savatga qo'shildi!");
+                    }
+                }
+            };
+        }
+    </script>
+</body>
+
+</html>
