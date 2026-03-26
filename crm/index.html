@@ -1050,6 +1050,19 @@
                     <input type="number" id="productCost" min="0" step="100" placeholder="Sotib olish narxi">
                 </div>
                 <div class="form-group">
+                    <label for="productDiscount"><i class="fas fa-percentage"></i> Chegirma</label>
+                    <div class="select-picker" id="productDiscountPicker">
+                        <input type="hidden" id="productDiscount" value="">
+                        <button type="button" class="select-trigger">
+                            <span class="select-trigger-label">Chegirma tanlanmagan</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="select-dropdown">
+                            <!-- Dynamic discounts will be populated here -->
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
                     <label for="productDescription"><i class="fas fa-info-circle"></i> Tavsif</label>
                     <textarea id="productDescription" rows="2" placeholder="Mahsulot haqida..."></textarea>
                 </div>
@@ -1077,6 +1090,9 @@
                     </div>
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-info" id="discountsBtn" style="display:none;" onclick="openDiscountsModal()">
+                        <i class="fas fa-percentage"></i> Chegirmalar
+                    </button>
                     <button type="button" class="btn btn-secondary" data-modal="productModal">Bekor qilish</button>
                     <button type="submit" class="btn btn-primary" id="saveProductBtn">Saqlash</button>
                 </div>
@@ -1084,6 +1100,110 @@
         </div>
     </div>
 
+    <!-- Discounts Modal -->
+    <div class="modal-overlay" id="discountsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2><i class="fas fa-percentage"></i> Chegirmalar boshqaruvi</h2>
+                <button class="modal-close" data-modal="discountsModal"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="page-actions" style="margin-bottom: 20px;">
+                    <button class="btn btn-primary" id="addDiscountBtn">
+                        <i class="fas fa-plus"></i> Yangi chegirma
+                    </button>
+                </div>
+                <div class="discounts-list" id="discountsList">
+                    <!-- Dynamic discounts list -->
+                </div>
+                <div class="empty-state" id="discountsEmpty" style="display:none;">
+                    <i class="fas fa-percentage"></i>
+                    <p>Hali chegirmalar mavjud emas</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Discount Form Modal -->
+    <div class="modal-overlay" id="discountFormModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="discountFormModalTitle"><i class="fas fa-percentage"></i> Yangi chegirma</h2>
+                <button class="modal-close" data-modal="discountFormModal"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="discountForm" class="modal-body">
+                <input type="hidden" id="discountId">
+                <div class="form-group">
+                    <label for="discountName"><i class="fas fa-tag"></i> Chegirma nomi</label>
+                    <input type="text" id="discountName" placeholder="Masalan: Bahor chegirmasi" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="discountType"><i class="fas fa-cog"></i> Chegirma turi</label>
+                        <div class="select-picker" id="discountTypePicker">
+                            <input type="hidden" id="discountType" required value="percentage">
+                            <button type="button" class="select-trigger">
+                                <span class="select-trigger-label">Foizda</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="select-dropdown">
+                                <button type="button" class="select-option selected" data-value="percentage">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Foizda (%)</span>
+                                </button>
+                                <button type="button" class="select-option" data-value="fixed">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Fix summa (so'm)</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="discountValue"><i class="fas fa-calculator"></i> Chegirma miqdori</label>
+                        <input type="number" id="discountValue" min="0" step="1" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="discountStartDate"><i class="fas fa-calendar"></i> Boshlanish sanasi</label>
+                        <input type="date" id="discountStartDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="discountEndDate"><i class="fas fa-calendar"></i> Tugash sanasi</label>
+                        <input type="date" id="discountEndDate" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="discountStatus"><i class="fas fa-toggle-on"></i> Holati</label>
+                    <div class="select-picker" id="discountStatusPicker">
+                        <input type="hidden" id="discountStatus" required value="active">
+                        <button type="button" class="select-trigger">
+                            <span class="select-trigger-label">Faol</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="select-dropdown">
+                            <button type="button" class="select-option selected" data-value="active">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Faol</span>
+                            </button>
+                            <button type="button" class="select-option" data-value="inactive">
+                                <i class="fas fa-times-circle"></i>
+                                <span>Nofaol</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="discountDescription"><i class="fas fa-info-circle"></i> Tavsif</label>
+                    <textarea id="discountDescription" rows="2" placeholder="Chegirma haqida qo'shimcha ma'lumot..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-modal="discountFormModal">Bekor qilish</button>
+                    <button type="submit" class="btn btn-primary" id="saveDiscountBtn">Saqlash</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
 
     <!-- User Form Modal -->

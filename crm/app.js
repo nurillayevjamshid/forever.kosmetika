@@ -29,6 +29,7 @@ var customersCollection = db.collection('customers');
 var salesCollection = db.collection('sales');
 var financesCollection = db.collection('finances');
 var usersCollection = db.collection('users');
+var discountsCollection = db.collection('discounts');
 
 // ==========================================
 // AUTHENTICATION CHECK
@@ -925,6 +926,7 @@ var productsArr = [];
 var salesArr = [];
 var financesArr = [];
 var usersArr = [];
+var discountsArr = [];
 
 // Filter holatlari
 var salesFilter = { region: 'all' };
@@ -977,6 +979,59 @@ db.collection("finances").onSnapshot(
     }
 );
 
+// Discounts real-time listener
+db.collection("discounts").onSnapshot(
+    function (snapshot) {
+        discountsArr = [];
+        snapshot.forEach(function (doc) { discountsArr.push(Object.assign({ id: doc.id }, doc.data())); });
+        updateDiscountsButtonVisibility();
+        populateProductDiscountDropdown();
+    },
+    function (error) {
+        console.error('Discounts listener xatolik:', error);
+    }
+);
+
+// Function to update discounts button visibility
+function updateDiscountsButtonVisibility() {
+    var discountsBtn = document.getElementById('discountsBtn');
+    if (!discountsBtn) return;
+    
+    var activeDiscounts = discountsArr.filter(function(d) {
+        return d.status === 'active' && new Date(d.endDate) >= new Date();
+    });
+    
+    discountsBtn.style.display = activeDiscounts.length > 0 ? 'inline-flex' : 'none';
+}
+
+// Function to populate product discount dropdown
+function populateProductDiscountDropdown() {
+    var picker = document.getElementById('productDiscountPicker');
+    if (!picker) return;
+    
+    var dropdown = picker.querySelector('.select-dropdown');
+    if (!dropdown) return;
+    
+    var activeDiscounts = discountsArr.filter(function(d) {
+        return d.status === 'active' && new Date(d.endDate) >= new Date();
+    });
+    
+    var optionsHtml = '<button type="button" class="select-option selected" data-value="">' +
+        '<i class="fas fa-check-circle"></i>' +
+        '<span>Chegirma tanlanmagan</span>' +
+        '</button>';
+    
+    activeDiscounts.forEach(function(discount) {
+        var typeText = discount.type === 'percentage' ? discount.value + '%' : formatMoney(discount.value);
+        optionsHtml += '<button type="button" class="select-option" data-value="' + discount.id + '">' +
+            '<i class="fas fa-check-circle"></i>' +
+            '<span>' + escapeHtml(discount.name) + ' (' + typeText + ')</span>' +
+            '</button>';
+    });
+    
+    dropdown.innerHTML = optionsHtml;
+}
+
 // ==========================================
 // === PRODUCTS CRUD ===
 // ==========================================
@@ -996,6 +1051,7 @@ function editProduct(id) {
     initSelectPicker('productCategoryPicker', allProductCategories);
     setSelectValue('productCategoryPicker', p.category, p.category);
     setSelectValue('productStatusPicker', p.status || 'active', (p.status || 'active') === 'active' ? 'Active' : 'Inactive');
+    setSelectValue('productDiscountPicker', p.discountId || '', 'Chegirma tanlanmagan');
     document.getElementById('productModalTitle').innerHTML = '<i class="fas fa-box-open"></i> Mahsulotni tahrirlash';
     // Mavjud rasmlarni ko\'rsatish
     resetImageUpload();
@@ -1011,6 +1067,7 @@ document.getElementById('addProductBtn').addEventListener('click', function () {
     initSelectPicker('productCategoryPicker', allProductCategories);
     setSelectValue('productCategoryPicker', '', 'Tanlang...');
     setSelectValue('productStatusPicker', 'active', 'Active');
+    setSelectValue('productDiscountPicker', '', 'Chegirma tanlanmagan');
     document.getElementById('productModalTitle').innerHTML = '<i class="fas fa-box-open"></i> Yangi Mahsulot';
     resetImageUpload();
     openModal('productModal');
@@ -1099,6 +1156,7 @@ document.getElementById('productForm').addEventListener('submit', async function
             price: parseFloat(document.getElementById('productPrice').value) || 0,
             status: document.getElementById('productStatus').value || 'active',
             cost: parseFloat(document.getElementById('productCost').value) || 0,
+            discountId: document.getElementById('productDiscount').value || '',
             description: document.getElementById('productDescription').value.trim(),
             updatedAt: new Date().toISOString()
         };
@@ -3567,5 +3625,140 @@ document.addEventListener('click', function(e) {
         var pid = viewBtn.getAttribute('data-id');
         var p = productsArr.find(function(x) { return x.id === pid; });
         if (p) openProductDetailModal(p);
+    }
+});
+
+// ==========================================
+// === DISCOUNTS MANAGEMENT ===
+// ==========================================
+
+// Open discounts modal
+function openDiscountsModal() {
+    renderDiscounts();
+    openModal('discountsModal');
+}
+
+// Render discounts list
+function renderDiscounts() {
+    var discountsList = document.getElementById('discountsList');
+    var discountsEmpty = document.getElementById('discountsEmpty');
+    
+    if (!discountsList) return;
+    
+    if (discountsArr.length === 0) {
+        discountsList.innerHTML = '';
+        if (discountsEmpty) discountsEmpty.style.display = 'block';
+        return;
+    }
+    
+    if (discountsEmpty) discountsEmpty.style.display = 'none';
+    
+    discountsList.innerHTML = discountsArr.map(function(d) {
+        var isActive = d.status === 'active' && new Date(d.endDate) >= new Date();
+        var statusClass = isActive ? 'active' : 'inactive';
+        var statusText = isActive ? 'Faol' : 'Nofaol';
+        var typeText = d.type === 'percentage' ? d.value + '%' : formatMoney(d.value);
+        
+        return '<div class="discount-item" style="border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:12px; background:var(--bg-secondary);">' +
+            '<div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:12px;">' +
+                '<div>' +
+                    '<h4 style="margin:0; font-size:1.1rem; color:var(--text)">' + escapeHtml(d.name) + '</h4>' +
+                    '<div style="display:flex; gap:8px; margin-top:4px;">' +
+                        '<span class="status-badge ' + statusClass + '">' + statusText + '</span>' +
+                        '<span style="color:var(--text-muted); font-size:0.85rem;">' + typeText + '</span>' +
+                    '</div>' +
+                '</div>' +
+                '<div style="display:flex; gap:8px;">' +
+                    '<button class="btn-icon edit discount-edit-btn" data-id="' + d.id + '" title="Tahrirlash"><i class="fas fa-pen"></i></button>' +
+                    '<button class="btn-icon delete discount-delete-btn" data-id="' + d.id + '" data-name="' + escapeHtml(d.name) + '" title="O\'chirish"><i class="fas fa-trash"></i></button>' +
+                '</div>' +
+            '</div>' +
+            '<div style="font-size:0.9rem; color:var(--text-secondary);">' +
+                '<div><i class="fas fa-calendar"></i> ' + formatDate(d.startDate) + ' - ' + formatDate(d.endDate) + '</div>' +
+                (d.description ? '<div style="margin-top:4px;"><i class="fas fa-info-circle"></i> ' + escapeHtml(d.description) + '</div>' : '') +
+            '</div>' +
+        '</div>';
+    }).join('');
+}
+
+// Add discount button event
+document.getElementById('addDiscountBtn').addEventListener('click', function() {
+    document.getElementById('discountForm').reset();
+    document.getElementById('discountId').value = '';
+    document.getElementById('discountFormModalTitle').innerHTML = '<i class="fas fa-percentage"></i> Yangi chegirma';
+    setSelectValue('discountTypePicker', 'percentage', 'Foizda');
+    setSelectValue('discountStatusPicker', 'active', 'Faol');
+    openModal('discountFormModal');
+});
+
+// Discount form submit
+document.getElementById('discountForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    var id = document.getElementById('discountId').value;
+    var saveBtn = document.getElementById('saveDiscountBtn');
+    
+    if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saqlanmoqda...';
+    }
+    
+    try {
+        var data = {
+            name: document.getElementById('discountName').value.trim(),
+            type: document.getElementById('discountType').value,
+            value: parseFloat(document.getElementById('discountValue').value) || 0,
+            startDate: document.getElementById('discountStartDate').value,
+            endDate: document.getElementById('discountEndDate').value,
+            status: document.getElementById('discountStatus').value,
+            description: document.getElementById('discountDescription').value.trim(),
+            createdAt: new Date().toISOString()
+        };
+        
+        if (id) {
+            await discountsCollection.doc(id).update(data);
+            showToast('Chegirma yangilandi!');
+        } else {
+            await discountsCollection.add(data);
+            showToast("Yangi chegirma qo'shildi!");
+        }
+        
+        closeModal('discountFormModal');
+    } catch (error) {
+        showToast('Xatolik: ' + error.message, 'error');
+    } finally {
+        if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = 'Saqlash';
+        }
+    }
+});
+
+// Discount edit and delete event delegation
+document.addEventListener('click', function(e) {
+    var editBtn = e.target.closest('.discount-edit-btn');
+    if (editBtn) {
+        var id = editBtn.getAttribute('data-id');
+        var discount = discountsArr.find(function(d) { return d.id === id; });
+        if (discount) {
+            document.getElementById('discountId').value = discount.id;
+            document.getElementById('discountName').value = discount.name;
+            document.getElementById('discountValue').value = discount.value;
+            document.getElementById('discountStartDate').value = discount.startDate;
+            document.getElementById('discountEndDate').value = discount.endDate;
+            document.getElementById('discountDescription').value = discount.description || '';
+            setSelectValue('discountTypePicker', discount.type, discount.type === 'percentage' ? 'Foizda' : 'Fix summa (so\'m)');
+            setSelectValue('discountStatusPicker', discount.status, discount.status === 'active' ? 'Faol' : 'Nofaol');
+            document.getElementById('discountFormModalTitle').innerHTML = '<i class="fas fa-percentage"></i> Chegirmani tahrirlash';
+            openModal('discountFormModal');
+        }
+    }
+    
+    var deleteBtn = e.target.closest('.discount-delete-btn');
+    if (deleteBtn) {
+        var id = deleteBtn.getAttribute('data-id');
+        var name = deleteBtn.getAttribute('data-name');
+        deleteTarget = { id: id, name: name, coll: 'discounts' };
+        document.getElementById('deleteMessage').textContent = name + ' chegirmasini o\'chirmoqchimisiz?';
+        openModal('deleteModal');
     }
 });
