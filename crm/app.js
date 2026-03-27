@@ -29,6 +29,7 @@ var customersCollection = db.collection('customers');
 var salesCollection = db.collection('sales');
 var financesCollection = db.collection('finances');
 var usersCollection = db.collection('users');
+var discountsCollection = db.collection('discounts');
 
 // ==========================================
 // AUTHENTICATION CHECK
@@ -422,6 +423,14 @@ setInterval(function() {
     var activePage = localStorage.getItem('crm-active-page');
     if (activePage === 'products') {
         renderProducts();
+    }
+
+    updateDiscountsButtonVisibility();
+    populateProductDiscountDropdown();
+
+    var discountsModal = document.getElementById('discountsModal');
+    if (discountsModal && discountsModal.classList.contains('active')) {
+        renderDiscounts();
     }
 }, 60000); // Har 60 soniyada tekshiradi
 
@@ -1010,6 +1019,7 @@ var productsArr = [];
 var salesArr = [];
 var financesArr = [];
 var usersArr = [];
+var discountsArr = [];
 
 // Filter holatlari
 var salesFilter = { region: 'all' };
@@ -1062,6 +1072,88 @@ db.collection("finances").onSnapshot(
     }
 );
 
+// Discounts real-time listener
+db.collection("discounts").onSnapshot(
+    function (snapshot) {
+        discountsArr = [];
+        snapshot.forEach(function (doc) { discountsArr.push(Object.assign({ id: doc.id }, doc.data())); });
+        updateDiscountsButtonVisibility();
+        populateProductDiscountDropdown();
+        var discountsModal = document.getElementById('discountsModal');
+        if (discountsModal && discountsModal.classList.contains('active')) {
+            renderDiscounts();
+        }
+    },
+    function (error) {
+        console.error('Discounts listener xatolik:', error);
+    }
+);
+
+function parseDiscountBoundary(value, isEndOfDay) {
+    if (!value) return null;
+
+    var normalizedValue = value;
+    if (typeof value === 'string' && value.length === 10) {
+        normalizedValue = value + (isEndOfDay ? 'T23:59:59' : 'T00:00:00');
+    }
+
+    var parsedDate = new Date(normalizedValue);
+    return isNaN(parsedDate.getTime()) ? null : parsedDate;
+}
+
+function isDiscountCurrentlyActive(discount) {
+    if (!discount || discount.status !== 'active') return false;
+
+    var now = new Date();
+    var startDate = parseDiscountBoundary(discount.startDate, false);
+    var endDate = parseDiscountBoundary(discount.endDate, true);
+
+    if (startDate && startDate > now) return false;
+    if (endDate && endDate < now) return false;
+
+    return true;
+}
+
+// Function to update discounts button visibility
+function updateDiscountsButtonVisibility() {
+    var discountsBtn = document.getElementById('discountsBtn');
+    if (!discountsBtn) return;
+
+    var hasActiveDiscount = discountsArr.some(function(discount) {
+        return isDiscountCurrentlyActive(discount);
+    });
+
+    discountsBtn.style.display = hasActiveDiscount ? 'inline-flex' : 'none';
+}
+
+// Function to populate product discount dropdown
+function populateProductDiscountDropdown() {
+    var picker = document.getElementById('productDiscountPicker');
+    if (!picker) return;
+    
+    var dropdown = picker.querySelector('.select-dropdown');
+    if (!dropdown) return;
+    
+    var activeDiscounts = discountsArr.filter(function(discount) {
+        return isDiscountCurrentlyActive(discount);
+    });
+    
+    var optionsHtml = '<button type="button" class="select-option selected" data-value="">' +
+        '<i class="fas fa-check-circle"></i>' +
+        '<span>Chegirma tanlanmagan</span>' +
+        '</button>';
+    
+    activeDiscounts.forEach(function(discount) {
+        var typeText = discount.type === 'percentage' ? discount.value + '%' : formatMoney(discount.value);
+        optionsHtml += '<button type="button" class="select-option" data-value="' + discount.id + '">' +
+            '<i class="fas fa-check-circle"></i>' +
+            '<span>' + escapeHtml(discount.name) + ' (' + typeText + ')</span>' +
+            '</button>';
+    });
+    
+    dropdown.innerHTML = optionsHtml;
+}
+
 // ==========================================
 // === PRODUCTS CRUD ===
 // ==========================================
@@ -1103,6 +1195,7 @@ function editProduct(id) {
     initSelectPicker('productCategoryPicker', allProductCategories);
     setSelectValue('productCategoryPicker', p.category, p.category);
     setSelectValue('productStatusPicker', p.status || 'active', (p.status || 'active') === 'active' ? 'Active' : 'Inactive');
+    setSelectValue('productDiscountPicker', p.discountId || '', 'Chegirma tanlanmagan');
     document.getElementById('productModalTitle').innerHTML = '<i class="fas fa-box-open"></i> Mahsulotni tahrirlash';
     // Mavjud rasmlarni ko\'rsatish
     resetImageUpload();
@@ -1127,6 +1220,7 @@ document.getElementById('addProductBtn').addEventListener('click', function () {
     initSelectPicker('productCategoryPicker', allProductCategories);
     setSelectValue('productCategoryPicker', '', 'Tanlang...');
     setSelectValue('productStatusPicker', 'active', 'Active');
+    setSelectValue('productDiscountPicker', '', 'Chegirma tanlanmagan');
     document.getElementById('productModalTitle').innerHTML = '<i class="fas fa-box-open"></i> Yangi Mahsulot';
     resetImageUpload();
     openModal('productModal');
@@ -1215,6 +1309,7 @@ document.getElementById('productForm').addEventListener('submit', async function
             price: parseFloat(document.getElementById('productPrice').value) || 0,
             status: document.getElementById('productStatus').value || 'active',
             cost: parseFloat(document.getElementById('productCost').value) || 0,
+            discountId: document.getElementById('productDiscount').value || '',
             description: document.getElementById('productDescription').value.trim(),
             updatedAt: new Date().toISOString(),
             // Chegirma ma'lumotlari
@@ -3694,20 +3789,158 @@ document.addEventListener('click', function(e) {
 });
 
 // ==========================================
-// === DISCOUNT MANAGEMENT ===
+// === DISCOUNTS MANAGEMENT ===
 // ==========================================
 
-(function initDiscountManagement() {
+// Open discounts modal
+function openDiscountsModal() {
+    renderDiscounts();
+    openModal('discountsModal');
+}
+
+// Render discounts list
+function renderDiscounts() {
+    var discountsList = document.getElementById('discountsList');
+    var discountsEmpty = document.getElementById('discountsEmpty');
+
+    if (!discountsList) return;
+
+    if (discountsArr.length === 0) {
+        discountsList.innerHTML = '';
+        if (discountsEmpty) discountsEmpty.style.display = 'block';
+        return;
+    }
+
+    if (discountsEmpty) discountsEmpty.style.display = 'none';
+
+    discountsList.innerHTML = discountsArr.map(function(d) {
+        var isActive = isDiscountCurrentlyActive(d);
+        var statusClass = isActive ? 'active' : 'inactive';
+        var statusText = isActive ? 'Faol' : 'Nofaol';
+        var typeText = d.type === 'percentage' ? d.value + '%' : formatMoney(d.value);
+
+        return '<div class="discount-item" style="border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:12px; background:var(--bg-secondary);">' +
+            '<div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:12px;">' +
+                '<div>' +
+                    '<h4 style="margin:0; font-size:1.1rem; color:var(--text)">' + escapeHtml(d.name) + '</h4>' +
+                    '<div style="display:flex; gap:8px; margin-top:4px;">' +
+                        '<span class="status-badge ' + statusClass + '">' + statusText + '</span>' +
+                        '<span style="color:var(--text-muted); font-size:0.85rem;">' + typeText + '</span>' +
+                    '</div>' +
+                '</div>' +
+                '<div style="display:flex; gap:8px;">' +
+                    '<button class="btn-icon edit discount-edit-btn" data-id="' + d.id + '" title="Tahrirlash"><i class="fas fa-pen"></i></button>' +
+                    '<button class="btn-icon delete discount-delete-btn" data-id="' + d.id + '" data-name="' + escapeHtml(d.name) + '" title="O\'chirish"><i class="fas fa-trash"></i></button>' +
+                '</div>' +
+            '</div>' +
+            '<div style="font-size:0.9rem; color:var(--text-secondary);">' +
+                '<div><i class="fas fa-calendar"></i> ' + formatDate(d.startDate) + ' - ' + formatDate(d.endDate) + '</div>' +
+                (d.description ? '<div style="margin-top:4px;"><i class="fas fa-info-circle"></i> ' + escapeHtml(d.description) + '</div>' : '') +
+            '</div>' +
+        '</div>';
+    }).join('');
+}
+
+(function initDiscountRecordManagement() {
+    var addDiscountRecordBtn = document.getElementById('addDiscountRecordBtn');
+    var discountRecordForm = document.getElementById('discountRecordForm');
+
+    if (addDiscountRecordBtn) {
+        addDiscountRecordBtn.addEventListener('click', function() {
+            discountRecordForm.reset();
+            document.getElementById('discountRecordId').value = '';
+            document.getElementById('discountFormModalTitle').innerHTML = '<i class="fas fa-percentage"></i> Yangi chegirma';
+            setSelectValue('discountRecordTypePicker', 'percentage', 'Foizda');
+            setSelectValue('discountRecordStatusPicker', 'active', 'Faol');
+            openModal('discountFormModal');
+        });
+    }
+
+    if (!discountRecordForm) return;
+
+    discountRecordForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        var id = document.getElementById('discountRecordId').value;
+        var saveBtn = document.getElementById('saveDiscountBtn');
+
+        if (saveBtn) {
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saqlanmoqda...';
+        }
+
+        try {
+            var data = {
+                name: document.getElementById('discountRecordName').value.trim(),
+                type: document.getElementById('discountRecordType').value,
+                value: parseFloat(document.getElementById('discountRecordValue').value) || 0,
+                startDate: document.getElementById('discountRecordStartDate').value,
+                endDate: document.getElementById('discountRecordEndDate').value,
+                status: document.getElementById('discountRecordStatus').value,
+                description: document.getElementById('discountRecordDescription').value.trim(),
+                createdAt: new Date().toISOString()
+            };
+
+            if (id) {
+                await discountsCollection.doc(id).update(data);
+                showToast('Chegirma yangilandi!');
+            } else {
+                await discountsCollection.add(data);
+                showToast("Yangi chegirma qo'shildi!");
+            }
+
+            closeModal('discountFormModal');
+        } catch (error) {
+            showToast('Xatolik: ' + error.message, 'error');
+        } finally {
+            if (saveBtn) {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = 'Saqlash';
+            }
+        }
+    });
+})();
+
+// Discount edit and delete event delegation
+document.addEventListener('click', function(e) {
+    var editBtn = e.target.closest('.discount-edit-btn');
+    if (editBtn) {
+        var id = editBtn.getAttribute('data-id');
+        var discount = discountsArr.find(function(d) { return d.id === id; });
+        if (discount) {
+            document.getElementById('discountRecordId').value = discount.id;
+            document.getElementById('discountRecordName').value = discount.name;
+            document.getElementById('discountRecordValue').value = discount.value;
+            document.getElementById('discountRecordStartDate').value = discount.startDate;
+            document.getElementById('discountRecordEndDate').value = discount.endDate;
+            document.getElementById('discountRecordDescription').value = discount.description || '';
+            setSelectValue('discountRecordTypePicker', discount.type, discount.type === 'percentage' ? 'Foizda' : 'Fix summa (so\'m)');
+            setSelectValue('discountRecordStatusPicker', discount.status, discount.status === 'active' ? 'Faol' : 'Nofaol');
+            document.getElementById('discountFormModalTitle').innerHTML = '<i class="fas fa-percentage"></i> Chegirmani tahrirlash';
+            openModal('discountFormModal');
+        }
+    }
+
+    var deleteBtn = e.target.closest('.discount-delete-btn');
+    if (deleteBtn) {
+        var id = deleteBtn.getAttribute('data-id');
+        var name = deleteBtn.getAttribute('data-name');
+        deleteTarget = { id: id, name: name, coll: 'discounts' };
+        document.getElementById('deleteMessage').textContent = name + ' chegirmasini o\'chirmoqchimisiz?';
+        openModal('deleteModal');
+    }
+});
+
+(function initBulkDiscountManagement() {
     var addDiscountBtn = document.getElementById('addDiscountBtn');
     var discountModal = document.getElementById('discountModal');
-    var discountForm = document.getElementById('discountForm');
+    var bulkDiscountForm = document.getElementById('bulkDiscountForm');
     var discountSection = document.getElementById('discountSection');
 
-    if (!addDiscountBtn || !discountModal || !discountForm || !discountSection) return;
+    if (!addDiscountBtn || !discountModal || !bulkDiscountForm || !discountSection) return;
 
     // Populate categories
-    if (typeof allProductCategories !== 'undefined') {
-        allProductCategories.forEach(function (c) {
+    if (typeof allProductCategories !== 'undefined' && discountSection.options.length === 1) {
+        allProductCategories.forEach(function(c) {
             var opt = document.createElement('option');
             opt.value = c;
             opt.textContent = c;
@@ -3715,17 +3948,17 @@ document.addEventListener('click', function(e) {
         });
     }
 
-    addDiscountBtn.addEventListener('click', function () {
-        discountForm.reset();
+    addDiscountBtn.addEventListener('click', function() {
+        bulkDiscountForm.reset();
         openModal('discountModal');
     });
 
-    discountForm.addEventListener('submit', async function (e) {
+    bulkDiscountForm.addEventListener('submit', async function(e) {
         e.preventDefault();
-        
+
         var percent = parseFloat(document.getElementById('discountPercent').value);
         var section = document.getElementById('discountSection').value;
-        
+
         // Vaqt ma'lumotlarini olish
         var startDate = document.getElementById('bulkDiscountStartDate').value;
         var startTime = document.getElementById('bulkDiscountStartTime').value;
@@ -3736,13 +3969,13 @@ document.addEventListener('click', function(e) {
             showToast('Iltimos, to\'g\'ri chegirma foizini kiriting (0-100)', 'error');
             return;
         }
-        
+
         // Vaqt formatini tayyorlash
         var discountStart = "";
         if (startDate) {
             discountStart = startDate + (startTime ? "T" + startTime : "T00:00");
         }
-        
+
         var discountEnd = "";
         if (endDate) {
             discountEnd = endDate + (endTime ? "T" + endTime : "T23:59");
@@ -3750,26 +3983,24 @@ document.addEventListener('click', function(e) {
 
         try {
             showToast('Chegirma qo\'shilmoqda...', 'info');
-            
-            let query = db.collection('products');
+
+            var query = db.collection('products');
             if (section !== 'all') {
                 query = query.where('category', '==', section);
             }
 
-            const snapshot = await query.get();
-            
+            var snapshot = await query.get();
+
             if (snapshot.empty) {
                 showToast('Tanlangan bo\'limda mahsulotlar topilmadi', 'info');
                 closeModal('discountModal');
                 return;
             }
 
-            const batch = db.batch();
-            let count = 0;
-            
-            snapshot.forEach(doc => {
-                const product = doc.data();
-                
+            var batch = db.batch();
+            var count = 0;
+
+            snapshot.forEach(function(doc) {
                 // Mahsulotni chegirma ma'lumotlari bilan yangilash
                 var updateData = {
                     discountPercent: percent,
@@ -3777,17 +4008,17 @@ document.addEventListener('click', function(e) {
                     hasDiscount: percent > 0,
                     updatedAt: new Date().toISOString()
                 };
-                
+
                 // Vaqt ma'lumotlarini qo'shish
                 if (discountStart) updateData.discountStart = discountStart;
                 if (discountEnd) updateData.discountEnd = discountEnd;
-                
+
                 batch.update(doc.ref, updateData);
                 count++;
             });
 
             await batch.commit();
-            
+
             showToast(count + ' ta mahsulotga chegirma qo\'shildi!', 'success');
             closeModal('discountModal');
             if (typeof renderProducts === 'function') renderProducts();

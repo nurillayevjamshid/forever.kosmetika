@@ -190,3 +190,4 @@ Bu loyiha **For.Ever Cosmetics** uchun maxsus tayyorlangan.
 **Muvaffaqiyatlar tilaymiz! 🚀**
 
 © 2026 For.Ever Cosmetics. Barcha huquqlar himoyalangan.
+test 
