@@ -572,13 +572,14 @@ function createProductCard(product) {
     if (discount) {
         priceHTML = `
             <div style="display: flex; flex-direction: column; gap: 0px; margin-bottom: 2px;">
-                <div class="current-price" style="display: flex; align-items: center; gap: 4px; text-decoration: line-through; color: var(--text-light); font-size: 0.8rem; opacity: 0.6;">
+                <div class="current-price" style="display: flex; align-items: center; gap: 4px; color: var(--text-light); font-size: 0.8rem; opacity: 0.8;">
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M9 5H2v7l6.29 6.29c.94.94 2.48.94 3.42 0l3.58-3.58c.94-.94.94-2.48 0-3.42L9 5Z"></path>
                         <path d="M6 9h.01"></path>
                         <path d="M15 5h7v7l-6.29 6.29c-.94.94-2.48.94-3.42 0"></path>
                     </svg>
-                    ${formatPrice(product.price)} so'm
+                    <span style="text-decoration: line-through;">${formatPrice(product.price)} so'm</span>
+                    <span style="font-size: 0.7em; background: #eee; padding: 1px 5px; border-radius: 4px; color: #777; font-weight: 500;">asl narxi</span>
                 </div>
                 <div class="current-price" style="display: flex; align-items: center; gap: 4px; color: var(--accent-color); font-weight: 800; font-size: 1.15rem;">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
@@ -588,6 +589,7 @@ function createProductCard(product) {
                         <path d="M14 14h.01"></path>
                     </svg>
                     ${formatPrice(discount.price)} so'm
+                    <span style="font-size: 0.6em; background: rgba(255, 61, 87, 0.1); color: #ff3d57; padding: 2px 6px; border-radius: 4px; margin-left: 2px; font-weight: 700; text-transform: uppercase;">chegirmada</span>
                 </div>
             </div>
         `;
@@ -2076,23 +2078,25 @@ function openProductDetailModal(productId) {
     
     if (discount) {
         detailPriceHTML = '<div style="display: flex; align-items: center; gap: 15px;">' +
-            '<div style="display: flex; flex-direction: column; gap: 0px;">' +
-                '<span style="display: flex; align-items: center; gap: 5px; text-decoration: line-through; color: var(--text-light); font-size: 0.85rem; opacity: 0.6;">' + 
+            '<div style="display: flex; flex-direction: column; gap: 4px;">' +
+                '<span style="display: flex; align-items: center; gap: 5px; color: var(--text-light); font-size: 0.85rem; opacity: 0.8;">' + 
                     '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
                         '<path d="M9 5H2v7l6.29 6.29c.94.94 2.48.94 3.42 0l3.58-3.58c.94-.94.94-2.48 0-3.42L9 5Z"></path>' +
                         '<path d="M6 9h.01"></path>' +
                         '<path d="M15 5h7v7l-6.29 6.29c-.94.94-2.48.94-3.42 0"></path>' +
                     '</svg>' +
-                    formatPrice(product.price) + ' so\'m' + 
+                    '<span style="text-decoration: line-through;">' + formatPrice(product.price) + ' so\'m</span>' + 
+                    '<span style="font-size: 0.75em; background: #eee; padding: 1px 6px; border-radius: 4px; color: #777; font-weight: 500; margin-left: 2px;">asl narxi</span>' +
                 '</span>' +
-                '<span style="display: flex; align-items: center; gap: 5px; color: var(--accent-color); font-weight: 800; font-size: 1.5rem;">' + 
-                    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' +
+                '<span style="display: flex; align-items: center; gap: 8px; color: var(--accent-color); font-weight: 800; font-size: 1.6rem;">' + 
+                    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' +
                         '<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>' +
                         '<path d="m14 11-3 3"></path>' +
                         '<path d="M11 11h.01"></path>' +
                         '<path d="M14 14h.01"></path>' +
                     '</svg>' +
                     formatPrice(discount.price) + ' so\'m' + 
+                    '<span style="font-size: 0.55em; background: rgba(255, 61, 87, 0.1); color: #ff3d57; padding: 2px 8px; border-radius: 5px; margin-left: 5px; font-weight: 700; text-transform: uppercase; vertical-align: middle;">chegirmada</span>' +
                 '</span>' +
             '</div>' +
             '<span style="background: linear-gradient(135deg, #ff3d57 0%, #ff8a80 100%); color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.9rem; font-weight: 800; display: flex; align-items: center; gap: 5px; box-shadow: 0 4px 12px rgba(255, 61, 87, 0.2);">' +

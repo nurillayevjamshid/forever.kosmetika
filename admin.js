@@ -164,6 +164,26 @@ function loadProductsTable(filter = 'all', searchTerm = '') {
 }
 
 function createTableRow(product) {
+    const discount = typeof getActiveDiscountForProduct === 'function' ? getActiveDiscountForProduct(product) : null;
+    let priceHTML = '';
+
+    if (discount) {
+        priceHTML = `
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+                <div style="font-size: 0.75rem; color: #999; display: flex; align-items: center; gap: 4px;">
+                    <span style="text-decoration: line-through;">${formatPrice(product.price)} so'm</span>
+                    <span style="font-size: 0.7rem; background: #eee; padding: 1px 4px; border-radius: 3px; color: #777;">asl narxi</span>
+                </div>
+                <div style="color: #ff3d57; font-weight: 700; display: flex; align-items: center; gap: 4px;">
+                    <span>${formatPrice(discount.price)} so'm</span>
+                    <span style="font-size: 0.65rem; background: rgba(255, 61, 87, 0.1); color: #ff3d57; padding: 1px 4px; border-radius: 3px; text-transform: uppercase; font-weight: 800;">chegirmada</span>
+                </div>
+            </div>
+        `;
+    } else {
+        priceHTML = `<div class="price-cell">${formatPrice(product.price)} so'm</div>`;
+    }
+
     return `
         <div class="table-row">
             <div>
@@ -177,7 +197,9 @@ function createTableRow(product) {
             <div>
                 <span class="category-badge">${getCategoryName(product.category)}</span>
             </div>
-            <div class="price-cell">${formatPrice(product.price)} so'm</div>
+            <div class="price-cell-container">
+                ${priceHTML}
+            </div>
             <div>${product.badge || '-'}</div>
             <div class="actions-cell">
                 <button class="action-btn edit" data-id="${product.id}" title="Tahrirlash">
