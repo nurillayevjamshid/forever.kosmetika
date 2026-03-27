@@ -634,14 +634,13 @@ function createProductCard(product) {
             <div class="product-info">
                 <h3 class="product-name">${product.name}</h3>
                 ${priceHTML}
-                ${product.brand ? `
-                <div class="product-brand" style="font-size: 0.8rem; color: var(--text-light); font-weight: 500; display: flex; align-items: center; gap: 4px;">
+                <div class="product-brand" style="font-size: 0.8rem; color: var(--text-light); font-weight: 500; display: flex; align-items: center; gap: 4px; margin-top: 6px; min-height: 1.2rem;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
                         <line x1="7" y1="7" x2="7.01" y2="7"></line>
                     </svg>
-                    ${product.brand}
-                </div>` : ''}
+                    ${product.brand ? product.brand : '<span style="width: 40px; height: 1.5px; background: #eef2f6; display: inline-block; border-radius: 10px; opacity: 0.8;"></span>'}
+                </div>
             </div>
         </div>
 
