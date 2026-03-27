@@ -571,9 +571,19 @@ function createProductCard(product) {
 
     if (discount) {
         priceHTML = `
-            <div style="display: flex; flex-direction: column; gap: 2px;">
-                <div class="current-price" style="text-decoration: line-through; color: var(--text-light); font-size: 0.85rem; opacity: 0.7;">${formatPrice(product.price)} so'm</div>
-                <div class="current-price" style="color: var(--accent-color); font-weight: 800; font-size: 1.1rem;">${formatPrice(discount.price)} so'm</div>
+            <div style="display: flex; flex-direction: column; gap: 0px; margin-bottom: 2px;">
+                <div class="current-price" style="display: flex; align-items: center; gap: 4px; text-decoration: line-through; color: var(--text-light); font-size: 0.8rem; opacity: 0.6;">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                    </svg>
+                    ${formatPrice(product.price)} so'm
+                </div>
+                <div class="current-price" style="display: flex; align-items: center; gap: 4px; color: var(--accent-color); font-weight: 800; font-size: 1.15rem;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                    ${formatPrice(discount.price)} so'm
+                </div>
             </div>
         `;
         badgeHTML = `
@@ -2062,9 +2072,19 @@ function openProductDetailModal(productId) {
     
     if (discount) {
         detailPriceHTML = '<div style="display: flex; align-items: center; gap: 15px;">' +
-            '<div style="display: flex; flex-direction: column;">' +
-                '<span style="text-decoration: line-through; color: var(--text-light); font-size: 0.9rem; opacity: 0.7;">' + formatPrice(product.price) + ' so\'m</span>' +
-                '<span style="color: var(--accent-color); font-weight: 800; font-size: 1.4rem;">' + formatPrice(discount.price) + ' so\'m</span>' +
+            '<div style="display: flex; flex-direction: column; gap: 0px;">' +
+                '<span style="display: flex; align-items: center; gap: 5px; text-decoration: line-through; color: var(--text-light); font-size: 0.85rem; opacity: 0.6;">' + 
+                    '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+                        '<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>' +
+                    '</svg>' +
+                    formatPrice(product.price) + ' so\'m' + 
+                '</span>' +
+                '<span style="display: flex; align-items: center; gap: 5px; color: var(--accent-color); font-weight: 800; font-size: 1.5rem;">' + 
+                    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' +
+                        '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>' +
+                    '</svg>' +
+                    formatPrice(discount.price) + ' so\'m' + 
+                '</span>' +
             '</div>' +
             '<span style="background: linear-gradient(135deg, #ff3d57 0%, #ff8a80 100%); color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.9rem; font-weight: 800; display: flex; align-items: center; gap: 5px; box-shadow: 0 4px 12px rgba(255, 61, 87, 0.2);">' +
                 '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' +
