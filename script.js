@@ -664,7 +664,7 @@ function getProductFooterHTML(product) {
     if (cartItem) {
         return `
             <div class="qty-counter-uzum">
-                <button class="qty-btn" onclick="event.stopPropagation(); changeQuantity('${product.id}', -1)">−</button>
+                <button class="qty-btn" onclick="event.stopPropagation(); changeQuantity('${product.id}', -1)">-</button>
                 <span class="qty-display">${cartItem.quantity}</span>
                 <button class="qty-btn" onclick="event.stopPropagation(); changeQuantity('${product.id}', 1)">+</button>
             </div>
@@ -2552,7 +2552,7 @@ function renderCartItems() {
                     <div class="cart-item-price">${formatPrice(item.price)} so'm</div>
                     <div class="cart-item-controls">
                         <div class="qty-counter">
-                            <button class="qty-btn" onclick="changeQuantityPage('${item.id}', -1)">−</button>
+                            <button class="qty-btn" onclick="changeQuantityPage('${item.id}', -1)">-</button>
                             <span class="qty-display">${item.quantity}</span>
                             <button class="qty-btn" onclick="changeQuantityPage('${item.id}', 1)">+</button>
                         </div>
