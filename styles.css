@@ -1158,9 +1158,28 @@ body {
     
     .nav-container {
         padding: 8px 20px;
+        justify-content: center;
+        position: relative;
     }
     
-    .nav-menu-wrapper, .header-actions {
+    .logo {
+        margin: 0 auto;
+    }
+    
+    .nav-menu-wrapper {
+        display: none;
+    }
+    
+    .header-actions {
+        display: flex;
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        gap: 10px;
+    }
+    
+    .action-btn:not(.cart-btn-icon) {
         display: none;
     }
     
