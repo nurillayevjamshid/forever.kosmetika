@@ -571,7 +571,7 @@ function createProductCard(product) {
 
     if (discount) {
         priceHTML = `
-            <div style="display: flex; flex-direction: column; gap: 0px; margin-bottom: 2px;">
+            <div style="display: flex; flex-direction: column; gap: 1.5px; margin-bottom: 2px;">
                 <div class="current-price" style="display: flex; align-items: center; gap: 4px; color: var(--text-light); font-size: 0.8rem; opacity: 0.8;">
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M9 5H2v7l6.29 6.29c.94.94 2.48.94 3.42 0l3.58-3.58c.94-.94.94-2.48 0-3.42L9 5Z"></path>
@@ -2078,7 +2078,7 @@ function openProductDetailModal(productId) {
     
     if (discount) {
         detailPriceHTML = '<div style="display: flex; align-items: center; gap: 15px;">' +
-            '<div style="display: flex; flex-direction: column; gap: 4px;">' +
+            '<div style="display: flex; flex-direction: column; gap: 1.5px;">' +
                 '<span style="display: flex; align-items: center; gap: 5px; color: var(--text-light); font-size: 0.85rem; opacity: 0.8;">' + 
                     '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
                         '<path d="M9 5H2v7l6.29 6.29c.94.94 2.48.94 3.42 0l3.58-3.58c.94-.94.94-2.48 0-3.42L9 5Z"></path>' +
