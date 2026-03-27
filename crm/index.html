@@ -1575,7 +1575,7 @@
 
         // Global o'zgaruvchilar (app.js da ishlatiladi)
         window.db = firebase.firestore();
-        window.storage = firebase.storage();
+        window.storage = createLocalStorageShim();
         window.auth = firebase.auth();
     </script>
 
@@ -1636,7 +1636,7 @@
         </div>
     </div>
 
-    <script src="app.js?v=20260325-2"></script>
+    <script src="app.js?v=20260325-3"></script>
 </body>
 
 </html>

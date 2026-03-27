@@ -12,7 +12,7 @@ if (typeof window.db === 'undefined') {
     window.db = firebase.firestore();
 }
 if (typeof window.storage === 'undefined') {
-    window.storage = firebase.storage();
+    window.storage = typeof createLocalStorageShim === 'function' ? createLocalStorageShim() : null;
 }
 if (typeof window.auth === 'undefined') {
     window.auth = firebase.auth();
