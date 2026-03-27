@@ -1870,19 +1870,22 @@ function openSaleDetailModal(sale) {
             statusWrapEl.innerHTML = buildSaleStatusSelectHtml(status, sale.id);
         }
 
-        // Products list
         if (productsListEl) {
-            productsListEl.innerHTML = items.map(function (it) {
+            productsListEl.innerHTML = items.map(function (it, index) {
                 var p = productsArr.find(function (px) { return px.id === it.productId; });
                 var pname = p ? p.name : 'Mahsulot';
                 var countLabel = it.quantity + ' ta';
+                var isLast = index === items.length - 1;
                 return '' +
-                    '<li>' +
-                    '<button type="button" class="sale-detail-product-row btn-product-full" data-sale-id="' + sale.id + '" data-product-id="' + (it.productId || '') + '">' +
+                    '<li class="integrated-product-row' + (isLast ? ' last' : '') + ' sale-detail-product-row btn-product-full" data-sale-id="' + sale.id + '" data-product-id="' + (it.productId || '') + '">' +
+                    '<div class="p-info">' +
+                    '<div class="p-bullet"></div>' +
                     '<span class="p-name">' + escapeHtml(pname) + '</span>' +
-                    '<span class="p-qty">' + countLabel + '</span>' +
-                    '<span class="p-price">' + (it.price ? formatMoney(it.price * it.quantity) : '') + '</span>' +
-                    '</button>' +
+                    '</div>' +
+                    '<div class="p-meta">' +
+                    '<span class="p-qty-badge">' + countLabel + '</span>' +
+                    '<span class="p-price-integrated">' + (it.price ? formatMoney(it.price * it.quantity) : '') + '</span>' +
+                    '</div>' +
                     '</li>';
             }).join('');
         }
