@@ -169,7 +169,7 @@ function createTableRow(product) {
 
     if (discount) {
         priceHTML = `
-            <div style="display: flex; flex-direction: column; gap: 2px;">
+            <div style="display: flex; flex-direction: column; gap: 1.5px;">
                 <div style="font-size: 0.75rem; color: #999; display: flex; align-items: center; gap: 4px;">
                     <span style="text-decoration: line-through;">${formatPrice(product.price)} so'm</span>
                     <span style="font-size: 0.7rem; background: #eee; padding: 1px 4px; border-radius: 3px; color: #777;">asl narxi</span>

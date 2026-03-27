@@ -472,7 +472,7 @@ function renderProducts(searchTerm) {
         var badgeHtml = '';
 
         if (discount) {
-            priceHtml = '<div class="product-price-wrap" style="display: flex; flex-direction: column; gap: 2px;">' +
+            priceHtml = '<div class="product-price-wrap" style="display: flex; flex-direction: column; gap: 1.5px;">' +
                             '<div class="product-price-old" style="text-decoration: line-through; color: var(--text-muted); font-size: 0.75rem; opacity: 0.8;">' + formatMoney(p.price) + '</div>' +
                             '<div class="product-price-new" style="color: var(--danger); font-weight: 700; font-size: 0.95rem;">' + formatMoney(discount.price) + '</div>' +
                         '</div>';
