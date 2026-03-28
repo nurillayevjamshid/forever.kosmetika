@@ -7,6 +7,10 @@ Version: [Semantic Versioning](https://semver.org/) — MAJOR.MINOR.PATCH.
 
 ## [Unreleased]
 
+### Added
+- **Search dropdown (avtomatik takliflar)**: Qidiruv maydoniga 2+ harf yozganda pastga mahsulotlar dropdown chiqadi — rasm, nom, kategoriya va narx bilan. Mahsulotni bosganda index.html da o'sha mahsulotga scroll qilinadi (highlight bilan). Boshqa sahifalardan bosganda index.html ga o'tadi.
+- **Hash-based product navigation**: `index.html#product-card-{id}` URL orqali to'g'ridan-to'g'ri mahsulotga o'tish mumkin (search dropdown dan click qilganda).
+
 ### Fixed
 - **Search funksiyasi butun saytda ishlashi ta'minlandi**: `script.js` dagi search handler yangilandi — index.html da darhol filtrlash, boshqa sahifalarda Enter/bosish orqali `index.html?search=...` ga yo'naltirish. `index.html` URL parametrdan qidiruv so'zini o'qib avtomatik filtrlaydi.
 - **profile.html search qo'shildi**: profile.html `script.js` yuklamasligi sababli inline search handler qo'shildi.

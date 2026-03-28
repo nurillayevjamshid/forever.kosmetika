@@ -87,51 +87,172 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     initContactForm();
 
-    // Initialize search
+    // Initialize search with dropdown
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
         const isIndexPage = window.location.pathname.endsWith('index.html') || window.location.pathname.endsWith('/') || window.location.pathname === '';
+        const searchWrapper = searchInput.closest('.search-wrapper');
 
-        // URL'dan search paramni o'qish
-        const urlParams = new URLSearchParams(window.location.search);
-        const urlSearch = urlParams.get('search');
-        if (urlSearch && isIndexPage) {
-            searchInput.value = urlSearch;
-            setTimeout(() => {
-                if (typeof displayProducts === 'function') {
-                    displayProducts('search:' + urlSearch.toLowerCase());
-                }
-            }, 500);
+        // Dropdown yaratish
+        let dropdown = searchWrapper?.querySelector('.search-dropdown');
+        if (!dropdown && searchWrapper) {
+            dropdown = document.createElement('div');
+            dropdown.className = 'search-dropdown';
+            searchWrapper.appendChild(dropdown);
         }
 
+        let searchTimeout = null;
+        let lastSearchTerm = '';
+
+        function renderSearchResults(results, term) {
+            if (!dropdown) return;
+            if (results.length === 0 && term.length > 1) {
+                dropdown.innerHTML = `
+                    <div class="search-no-results">
+                        <span class="search-no-results-icon">🔍</span>
+                        "${term}" bo'yicha mahsulot topilmadi
+                    </div>
+                `;
+                dropdown.classList.add('active');
+                return;
+            }
+            if (results.length === 0) {
+                dropdown.classList.remove('active');
+                return;
+            }
+
+            const fallback = 'assets/logo.png';
+            let html = `<div class="search-dropdown-header">${results.length} ta mahsulot topildi</div>`;
+            results.slice(0, 8).forEach(p => {
+                const img = p.imageUrl || p.image || fallback;
+                const price = formatPrice(p.price);
+                const targetUrl = isIndexPage ? `#product-card-${p.id}` : `index.html#product-card-${p.id}`;
+                html += `
+                    <a href="${targetUrl}" class="search-result-item" data-product-id="${p.id}" onclick="handleSearchResultClick(event, '${p.id}')">
+                        <img src="${img}" alt="${p.name}" class="search-result-img" onerror="this.src='${fallback}'">
+                        <div class="search-result-info">
+                            <div class="search-result-name">${p.name}</div>
+                            <div class="search-result-category">${p.category || ''}</div>
+                        </div>
+                        <div class="search-result-price">${price} so'm</div>
+                        <svg class="search-result-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 18l6-6-6-6"/>
+                        </svg>
+                    </a>
+                `;
+            });
+            dropdown.innerHTML = html;
+            dropdown.classList.add('active');
+        }
+
+        function searchProducts(term) {
+            if (!term || term.length < 2) {
+                if (dropdown) dropdown.classList.remove('active');
+                return;
+            }
+
+            const lowerTerm = term.toLowerCase();
+            let results = [];
+
+            if (typeof products !== 'undefined' && products.length > 0) {
+                results = products.filter(p =>
+                    (p.name || '').toLowerCase().includes(lowerTerm) ||
+                    (p.category || '').toLowerCase().includes(lowerTerm) ||
+                    (p.description || '').toLowerCase().includes(lowerTerm) ||
+                    (p.brand || '').toLowerCase().includes(lowerTerm)
+                );
+            }
+
+            renderSearchResults(results, term);
+        }
+
+        // Search result click handler
+        window.handleSearchResultClick = function(e, productId) {
+            e.preventDefault();
+            if (dropdown) dropdown.classList.remove('active');
+            searchInput.value = '';
+
+            if (isIndexPage) {
+                const card = document.getElementById(`product-card-${productId}`);
+                if (card) {
+                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    card.style.transition = 'box-shadow 0.3s, transform 0.3s';
+                    card.style.boxShadow = '0 0 0 3px rgba(226, 158, 125, 0.5)';
+                    card.style.transform = 'scale(1.02)';
+                    setTimeout(() => {
+                        card.style.boxShadow = '';
+                        card.style.transform = '';
+                    }, 2000);
+                }
+            } else {
+                window.location.href = 'index.html#product-card-' + productId;
+            }
+        };
+
+        // Input event — real-time search
         searchInput.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
+            const searchTerm = e.target.value.trim();
+
             if (isIndexPage && typeof displayProducts === 'function') {
                 if (searchTerm.length > 1) {
-                    displayProducts('search:' + searchTerm);
+                    displayProducts('search:' + searchTerm.toLowerCase());
                 } else if (searchTerm.length === 0) {
                     displayProducts('all');
                 }
             }
+
+            // Dropdown search with debounce
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                searchProducts(searchTerm);
+            }, 200);
         });
 
-        searchInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                const term = searchInput.value.trim();
-                if (term.length > 0) {
-                    window.location.href = 'index.html?search=' + encodeURIComponent(term);
-                }
+        // Focus — agar matn bor bo'lsa dropdown ochish
+        searchInput.addEventListener('focus', () => {
+            const term = searchInput.value.trim();
+            if (term.length >= 2) {
+                searchProducts(term);
             }
         });
 
-        // Search icon bosilganda
-        const searchTrigger = searchInput.closest('.search-wrapper')?.querySelector('.search-trigger');
+        // Tashqariga bosilganda yopish
+        document.addEventListener('click', (e) => {
+            if (searchWrapper && !searchWrapper.contains(e.target)) {
+                if (dropdown) dropdown.classList.remove('active');
+            }
+        });
+
+        // Enter — page ga yo'naltirish
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (dropdown) dropdown.classList.remove('active');
+                const term = searchInput.value.trim();
+                if (term.length > 0) {
+                    if (isIndexPage && typeof displayProducts === 'function') {
+                        displayProducts('search:' + term.toLowerCase());
+                    } else {
+                        window.location.href = 'index.html?search=' + encodeURIComponent(term);
+                    }
+                }
+            }
+            if (e.key === 'Escape') {
+                if (dropdown) dropdown.classList.remove('active');
+                searchInput.blur();
+            }
+        });
+
+        // Search icon click
+        const searchTrigger = searchWrapper?.querySelector('.search-trigger');
         if (searchTrigger) {
             searchTrigger.addEventListener('click', () => {
                 const term = searchInput.value.trim();
-                if (term.length > 0 && !isIndexPage) {
-                    window.location.href = 'index.html?search=' + encodeURIComponent(term);
+                if (term.length > 0) {
+                    if (dropdown) dropdown.classList.remove('active');
+                    if (!isIndexPage) {
+                        window.location.href = 'index.html?search=' + encodeURIComponent(term);
+                    }
                 }
             });
         }
@@ -223,6 +344,28 @@ document.addEventListener('DOMContentLoaded', async function () {
             loadProducts();
         }
     });
+
+    // URL hash orqali mahsulotga scroll qilish
+    function scrollToHashProduct() {
+        const hash = window.location.hash;
+        if (hash && hash.startsWith('#product-card-')) {
+            setTimeout(() => {
+                const card = document.querySelector(hash);
+                if (card) {
+                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    card.style.transition = 'box-shadow 0.3s, transform 0.3s';
+                    card.style.boxShadow = '0 0 0 3px rgba(226, 158, 125, 0.5)';
+                    card.style.transform = 'scale(1.02)';
+                    setTimeout(() => {
+                        card.style.boxShadow = '';
+                        card.style.transform = '';
+                    }, 2500);
+                }
+            }, 800);
+        }
+    }
+    scrollToHashProduct();
+    window.addEventListener('hashchange', scrollToHashProduct);
 
 });
 
