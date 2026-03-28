@@ -2077,6 +2077,19 @@ body {
     position: relative;
 }
 
+/* Hide native select — only custom trigger visible */
+.native-select {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
 .custom-select-trigger {
     width: 100%;
     height: 56px;

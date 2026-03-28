@@ -22,6 +22,7 @@ Version: [Semantic Versioning](https://semver.org/) — MAJOR.MINOR.PATCH.
 - Checkout page container va padding optimizatsiya qilindi.
 - Item qty badge gradient fon bilan yanada premium ko'rinishga keltirildi.
 - Custom select dropdown premium qayta ishlab chiqildi: har bir viloyat va tuman oldidan location icon, ochilganda smooth animatsiya, selected holatda gradient fon, hover'da siljish effekt, custom scrollbar, trigger'da caret animatsiyasi.
+- Native `<select>` elementlari yashirildi — faqat custom style trigger ko'rinadi.
 
 ---
 
