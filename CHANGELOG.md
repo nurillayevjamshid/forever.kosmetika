@@ -16,6 +16,7 @@ Version: [Semantic Versioning](https://semver.org/) — MAJOR.MINOR.PATCH.
 - **profile.html search qo'shildi**: profile.html `script.js` yuklamasligi sababli inline search handler qo'shildi.
 
 ### Changed
+- **Cart va Profil icon joylari almashtirildi**: Endi navbar tartibi — Search, Sevimlilar, Savat, Profil.
 - **Navbar yangilandi**: "Do'kon" → "Mahsulotlar" qilib o'zgartirildi; "Chegirma" va "Maslahat" nav linklari olib tashlandi.
 - **Search input qo'shildi**: Barcha sahifalarda qidiruv ikonkasining chapiga qidiruv input maydoni qo'shildi — fokuslanganda kengayadigan, estetik pill-shape dizayn.
 - **Heart (Sevimlilar) ikonkasi qo'shildi**: Search va Profil o'rtasiga wishlist/heart ikonkasi qo'shildi.
