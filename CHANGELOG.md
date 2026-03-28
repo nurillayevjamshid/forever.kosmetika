@@ -8,6 +8,17 @@ Version: [Semantic Versioning](https://semver.org/) — MAJOR.MINOR.PATCH.
 ## [Unreleased]
 
 ### Added
+- **Heart pop animatsiya**: Mahsulot kartasidagi heart (sevimlilar) tugmasi bosilganda pop animatsiya va floating emoji particlelar (❤️✨💕💗) chiqadi.
+- **Wishlist card animatsiyalari**: Sevimlilar sahifasida kartalar staggered slide-in animatsiya bilan chiqadi.
+- **Wishlist remove animatsiya**: Mahsulot sevimlilardan o'chirilganda smooth scale+fade out animatsiya.
+
+### Fixed
+- **Wishlist card class notog'ri edi**: `wishlist.html` dagi JS `product-card` class berayotgan edi, CSS esa `wishlist-card` uchun yozilgan. Endi to'g'ri class ishlatilmoqda.
+
+### Changed
+- **Wishlist sahifasi estetik yangilandi**: Sarlavha yoniga 💕 emoji, empty state icon uchun floating animatsiya, card hover effekt gradient overlay.
+
+### Added
 - **Search dropdown (avtomatik takliflar)**: Qidiruv maydoniga 2+ harf yozganda pastga mahsulotlar dropdown chiqadi — rasm, nom, kategoriya va narx bilan. Mahsulotni bosganda index.html da o'sha mahsulotga scroll qilinadi (highlight bilan). Boshqa sahifalardan bosganda index.html ga o'tadi.
 - **Hash-based product navigation**: `index.html#product-card-{id}` URL orqali to'g'ridan-to'g'ri mahsulotga o'tish mumkin (search dropdown dan click qilganda).
 

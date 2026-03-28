@@ -261,7 +261,21 @@
         }
 
         .btn-add-cart:active {
-            transform: translateY(0);
+            transform: translateY(0) scale(0.97);
+        }
+
+        @keyframes heartFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .empty-icon {
+            animation: heartFloat 2s ease-in-out infinite;
+        }
+
+        .wishlist-card .btn-add-cart.added {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            pointer-events: none;
         }
 
         .empty-wishlist {
@@ -332,6 +346,53 @@
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes cardSlideIn {
+            from { opacity: 0; transform: translateY(40px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes cardRemove {
+            0% { opacity: 1; transform: scale(1) rotate(0deg); }
+            50% { opacity: 0.5; transform: scale(0.9) rotate(-2deg); }
+            100% { opacity: 0; transform: scale(0.7) rotate(-5deg); max-height: 0; margin: 0; padding: 0; }
+        }
+
+        .wishlist-card {
+            animation: cardSlideIn 0.5s ease-out backwards;
+        }
+
+        .wishlist-card.removing {
+            animation: cardRemove 0.4s ease-in forwards;
+            overflow: hidden;
+        }
+
+        .wishlist-card .wishlist-img-wrapper::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40%;
+            background: linear-gradient(to top, rgba(0,0,0,0.05), transparent);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .wishlist-card:hover .wishlist-img-wrapper::after {
+            opacity: 1;
+        }
+
+        .remove-wishlist {
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .wishlist-header h1::after {
+            content: '💕';
+            margin-left: 12px;
+            font-size: 0.7em;
         }
 
         @media (max-width: 768px) {
@@ -491,8 +552,9 @@
                     grid.innerHTML = '';
                     let totalPrice = 0;
 
-                    firebaseWishlist.forEach(item => {
+                    firebaseWishlist.forEach((item, i) => {
                         const card = createWishlistCard(item);
+                        card.style.animationDelay = (i * 0.08) + 's';
                         grid.appendChild(card);
                         totalPrice += Number(item.price) || 0;
                     });
@@ -511,7 +573,7 @@
 
             function createWishlistCard(item) {
                 const card = document.createElement('div');
-                card.className = 'product-card';
+                card.className = 'wishlist-card';
                 
                 const fallback = 'assets/logo.png';
                 const imageUrl = item.image || fallback;
@@ -544,6 +606,14 @@
             }
 
             window.removeFromWishlistPage = async function(productId) {
+                // Remove animatsiya
+                const btn = event.currentTarget;
+                const card = btn.closest('.wishlist-card');
+                if (card) {
+                    card.classList.add('removing');
+                    await new Promise(r => setTimeout(r, 400));
+                }
+
                 if (typeof firebaseRemoveFromWishlist === 'function') {
                     await firebaseRemoveFromWishlist(productId);
                     let localWishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
@@ -551,7 +621,6 @@
                     localStorage.setItem('wishlist', JSON.stringify(localWishlist));
                     if (typeof updateWishlistUI === 'function') updateWishlistUI();
                 } else {
-                    // Fallback: localStorage
                     let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
                     wishlist = wishlist.filter(id => id.toString() !== productId.toString());
                     localStorage.setItem('wishlist', JSON.stringify(wishlist));

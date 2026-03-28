@@ -2988,7 +2988,28 @@ async function toggleWishlist(event, productId) {
     
     localStorage.setItem('wishlist', JSON.stringify(wishlist));
     updateWishlistUI();
-    
+
+    // Heart pop animatsiya
+    const btn = event.currentTarget;
+    btn.classList.remove('pop');
+    void btn.offsetWidth; // reflow
+    btn.classList.add('pop');
+    setTimeout(() => btn.classList.remove('pop'), 600);
+
+    // Qo'shilganda floating particle
+    if (index === -1) {
+        for (let i = 0; i < 4; i++) {
+            const particle = document.createElement('span');
+            particle.className = 'heart-particle';
+            particle.textContent = ['❤️', '✨', '💕', '💗'][i];
+            particle.style.left = (btn.offsetWidth / 2 - 6 + (Math.random() - 0.5) * 20) + 'px';
+            particle.style.top = '0px';
+            particle.style.animationDelay = (i * 0.08) + 's';
+            btn.appendChild(particle);
+            setTimeout(() => particle.remove(), 800);
+        }
+    }
+
     // Wishlist sahifasini yangilash (agar mavjud bo'lsa)
     if (typeof renderWishlist === 'function') {
         renderWishlist();
