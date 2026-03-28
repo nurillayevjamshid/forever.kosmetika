@@ -19,22 +19,52 @@
 
 <body class="bg-secondary">
     <!-- Header -->
-    <header class="header">
+    <header class="header" id="siteHeader">
         <nav class="nav-container">
             <div class="logo">
-                <a href="index.html" style="text-decoration: none; display: flex; align-items: center;">
-                    <img src="assets/logo.png" alt="Forever Kosmetika" class="logo-img">
+                <a href="index.html" style="text-decoration: none;">
+                    <span class="logo-text">For.Ever</span>
                 </a>
             </div>
-            <ul class="nav-menu">
-                <li><a href="index.html#home" class="nav-link">Bosh sahifa</a></li>
-                <li><a href="index.html#products" class="nav-link">Mahsulotlar</a></li>
-                <li><a href="index.html#about" class="nav-link">Biz haqimizda</a></li>
-                <li><a href="index.html#contact" class="nav-link">Bog'lanish</a></li>
-                <li>
-                    <a href="profile.html" class="nav-link active">Profil</a>
-                </li>
-            </ul>
+            
+            <div class="nav-menu-wrapper">
+                <ul class="nav-menu">
+                    <li><a href="index.html#home" class="nav-link">Bosh sahifa</a></li>
+                    <li><a href="index.html#products" class="nav-link">Do'kon</a></li>
+                    <li><a href="index.html#sale" class="nav-link">Chegirma</a></li>
+                    <li><a href="index.html#consultation" class="nav-link">Maslahat</a></li>
+                    <li><a href="index.html#about" class="nav-link">Biz haqimizda</a></li>
+                    <li><a href="index.html#contact" class="nav-link">Bog'lanish</a></li>
+                </ul>
+            </div>
+
+            <div class="header-actions">
+                <button class="action-btn" title="Qidiruv">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </button>
+                <a href="profile.html" class="action-btn active" title="Profil">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                </a>
+                <a href="cart.html" class="action-btn cart-btn-icon" title="Savat">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4H6z"></path>
+                        <path d="M3 6h18"></path>
+                        <path d="M16 10a4 4 0 0 1-8 0"></path>
+                    </svg>
+                    <span class="cart-count">0</span>
+                </a>
+                <button class="menu-toggle" id="menuToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
         </nav>
     </header>
 

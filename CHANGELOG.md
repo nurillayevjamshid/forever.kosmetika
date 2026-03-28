@@ -7,6 +7,11 @@ Version: [Semantic Versioning](https://semver.org/) — MAJOR.MINOR.PATCH.
 
 ## [Unreleased]
 
+### Changed
+- **Barcha sahifalardagi navbar o'zbekchaga o'tkazildi**: `index.html`, `cart.html`, `profile.html`, `wishlist.html` dagi barcha navigatsiya linklari o'zbek tiliga tarjima qilindi — "Home" → "Bosh sahifa", "Shop" → "Do'kon", "Sale" → "Chegirma", "Consultation" → "Maslahat", "About" → "Biz haqimizda", "Contact" → "Bog'lanish".
+- **Barcha navbarlar standartlashtirildi**: `profile.html` va `wishlist.html` dagi navbar `index.html` va `cart.html` dagi bilan bir xil tuzilishga keltirildi — logo matn (For.Ever), to'liq navigatsiya menyusi (6 ta link), header action tugmalari (qidiruv, profil, savat, mobil menyu).
+- **wishlist.html merge conflictlar bartaraf etildi**: Git merge conflict markerlari (`<<<<<<<`, `=======`, `>>>>>>>`) tozalandi, so'nggi versiya asosida qayta yozildi.
+
 ### Fixed
 - **Custom select (viloyat/tuman) bug fix**: Viloyat tanlagandan so'ng tuman tanlash ishlamayotgan muammo bartaraf etildi. Tumanni bir marta tanlagandan so'ng qayta o'zgartirib bo'lmayotgan muammo ham tuzatildi.
 - Inline `onchange` handlerlar (`handleViloyatChange(true)`, `updateOrderDeliveryTextFromInputs()`) olib tashlandi — endi `initRegionSelectListeners()` orqali JavaScript event listenerlar bilan ishlaydi.
