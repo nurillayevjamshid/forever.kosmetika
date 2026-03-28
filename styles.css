@@ -656,6 +656,56 @@ body {
     box-shadow: 0 4px 12px rgba(226, 158, 125, 0.2);
 }
 
+/* ─── Loading & Empty States ──────────────────── */
+.loading-state, .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-light);
+    font-size: 1rem;
+    grid-column: 1 / -1;
+}
+
+.loading-state .spinner {
+    display: inline-block;
+    width: 36px;
+    height: 36px;
+    border: 3px solid rgba(226, 158, 125, 0.2);
+    border-top-color: #E29E7D;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    margin-bottom: 16px;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-state p, .empty-state p {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    margin: 0;
+}
+
+.empty-state .empty-icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 12px;
+}
+
+/* CSS-based staggered card animation */
+.product-card {
+    opacity: 0;
+    transform: translateY(24px);
+    animation: cardFadeIn 0.45s ease forwards;
+}
+@keyframes cardFadeIn {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Lazy image placeholder ──────────────────── */
+.product-image img {
+    background: linear-gradient(135deg, #f5f0ec 0%, #ece5df 100%);
+    min-height: 200px;
+}
+
 /* Heart pop animation */
 @keyframes heartPop {
     0% { transform: scale(1); }

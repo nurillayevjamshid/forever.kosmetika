@@ -26,6 +26,7 @@ Version: [Semantic Versioning](https://semver.org/) — MAJOR.MINOR.PATCH.
 ### Fixed
 - **Wishlist localStorage ga yozilmayapti**: toggleWishlist async edi, event handler sync kutardi — endi modul orqali sinxron ishlaydi.
 - **wishlist.html da render bo'lmayapti**: Wishlist.renderGrid() metodi orqali to'g'ridan-to'g'ri localStorage'dan o'qib render qiladi.
+- **Mahsulotlar sahifasi sekin ishlaydi**: displayProducts() qayta yozildi — DocumentFragment (bitta DOM op), CSS staggered animation (setTimeout o'rniga), lazy loading (`loading="lazy"`), empty state alohida. loadProducts() ga loading spinner qo'shildi. filter/search logikasi _filterProducts() ga ajratildi.
 
 ### Fixed
 - **Search funksiyasi butun saytda ishlashi ta'minlandi**: `script.js` dagi search handler yangilandi — index.html da darhol filtrlash, boshqa sahifalarda Enter/bosish orqali `index.html?search=...` ga yo'naltirish. `index.html` URL parametrdan qidiruv so'zini o'qib avtomatik filtrlaydi.
