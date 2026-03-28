@@ -19,8 +19,13 @@ Version: [Semantic Versioning](https://semver.org/) — MAJOR.MINOR.PATCH.
 - **Wishlist sahifasi estetik yangilandi**: Sarlavha yoniga 💕 emoji, empty state icon uchun floating animatsiya, card hover effekt gradient overlay.
 
 ### Added
+- **Wishlist Module (`wishlist-module.js`)**: Professional, modular wishlist tizimi. `WishlistStorage` key: `wishlistItems` — to'liq product data (name, image, price, oldPrice, id, category) saqlanadi. Duplicate himoyasi, avtomatik migration eski `wishlist` key'dan. API: `Wishlist.toggle()`, `.add()`, `.remove()`, `.getAll()`, `.count()`, `.isIn()`, `.getIds()`, `.renderGrid()`, `.clear()`.
 - **Search dropdown (avtomatik takliflar)**: Qidiruv maydoniga 2+ harf yozganda pastga mahsulotlar dropdown chiqadi — rasm, nom, kategoriya va narx bilan. Mahsulotni bosganda index.html da o'sha mahsulotga scroll qilinadi (highlight bilan). Boshqa sahifalardan bosganda index.html ga o'tadi.
 - **Hash-based product navigation**: `index.html#product-card-{id}` URL orqali to'g'ridan-to'g'ri mahsulotga o'tish mumkin (search dropdown dan click qilganda).
+
+### Fixed
+- **Wishlist localStorage ga yozilmayapti**: toggleWishlist async edi, event handler sync kutardi — endi modul orqali sinxron ishlaydi.
+- **wishlist.html da render bo'lmayapti**: Wishlist.renderGrid() metodi orqali to'g'ridan-to'g'ri localStorage'dan o'qib render qiladi.
 
 ### Fixed
 - **Search funksiyasi butun saytda ishlashi ta'minlandi**: `script.js` dagi search handler yangilandi — index.html da darhol filtrlash, boshqa sahifalarda Enter/bosish orqali `index.html?search=...` ga yo'naltirish. `index.html` URL parametrdan qidiruv so'zini o'qib avtomatik filtrlaydi.
