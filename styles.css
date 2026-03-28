@@ -1467,12 +1467,16 @@ body {
 }
 
 .item-qty-badge {
-    background: var(--bg-beige);
-    padding: 3px 10px;
+    background: linear-gradient(135deg, #F5EFEB, #EDE6DF);
+    padding: 3px 12px;
     border-radius: 100px;
-    font-size: 0.85rem;
-    font-weight: 600;
+    font-size: 0.82rem;
+    font-weight: 700;
     color: var(--primary-color);
+    letter-spacing: 0.3px;
+    min-width: 32px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
 
 .summary-breakdown-premium {
@@ -1868,9 +1872,19 @@ body {
 }
 
 /* Premium Checkout Step Styling */
+.checkout-page {
+    padding: 40px 0 80px;
+}
+
+.checkout-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
 .checkout-header h1 {
     font-family: var(--font-display);
-    font-size: 2.6rem;
+    font-size: 2.4rem;
     color: var(--text-primary);
     margin: 0;
     letter-spacing: -0.5px;
@@ -2047,6 +2061,39 @@ body {
     background: white;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 4px rgba(61, 43, 31, 0.06);
+}
+
+/* Fix: Field labels in order form must NOT use floating label positioning */
+.order-section-card .field-label,
+.order-section-card .form-group label.field-label {
+    position: relative;
+    left: auto;
+    top: auto;
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+    background: transparent;
+    padding: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+/* Override: Order form inputs should NOT float — labels sit above */
+.order-section-card .form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.order-section-card .form-group input,
+.order-section-card .form-group select,
+.order-section-card .phone-input-wrapper,
+.order-section-card .custom-select-trigger {
+    width: 100%;
 }
 
 /* Premium Prepayment Notice */
