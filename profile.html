@@ -198,6 +198,29 @@
                 el.style.display = 'flex';
             }
         });
+
+        // Search qidiruv — index.html ga yo'naltirish
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const term = searchInput.value.trim();
+                    if (term.length > 0) {
+                        window.location.href = 'index.html?search=' + encodeURIComponent(term);
+                    }
+                }
+            });
+            const searchBtn = searchInput.closest('.search-wrapper')?.querySelector('.search-trigger');
+            if (searchBtn) {
+                searchBtn.addEventListener('click', () => {
+                    const term = searchInput.value.trim();
+                    if (term.length > 0) {
+                        window.location.href = 'index.html?search=' + encodeURIComponent(term);
+                    }
+                });
+            }
+        }
     </script>
 </body>
 

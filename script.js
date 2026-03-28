@@ -90,14 +90,51 @@ document.addEventListener('DOMContentLoaded', async function () {
     // Initialize search
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
+        const isIndexPage = window.location.pathname.endsWith('index.html') || window.location.pathname.endsWith('/') || window.location.pathname === '';
+
+        // URL'dan search paramni o'qish
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlSearch = urlParams.get('search');
+        if (urlSearch && isIndexPage) {
+            searchInput.value = urlSearch;
+            setTimeout(() => {
+                if (typeof displayProducts === 'function') {
+                    displayProducts('search:' + urlSearch.toLowerCase());
+                }
+            }, 500);
+        }
+
         searchInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
-            if (searchTerm.length > 1) {
-                displayProducts('search:' + searchTerm);
-            } else if (searchTerm.length === 0) {
-                displayProducts('all');
+            if (isIndexPage && typeof displayProducts === 'function') {
+                if (searchTerm.length > 1) {
+                    displayProducts('search:' + searchTerm);
+                } else if (searchTerm.length === 0) {
+                    displayProducts('all');
+                }
             }
         });
+
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const term = searchInput.value.trim();
+                if (term.length > 0) {
+                    window.location.href = 'index.html?search=' + encodeURIComponent(term);
+                }
+            }
+        });
+
+        // Search icon bosilganda
+        const searchTrigger = searchInput.closest('.search-wrapper')?.querySelector('.search-trigger');
+        if (searchTrigger) {
+            searchTrigger.addEventListener('click', () => {
+                const term = searchInput.value.trim();
+                if (term.length > 0 && !isIndexPage) {
+                    window.location.href = 'index.html?search=' + encodeURIComponent(term);
+                }
+            });
+        }
     }
 
     // Initialize custom selects (viloyat/tuman)

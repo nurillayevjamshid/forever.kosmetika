@@ -7,6 +7,10 @@ Version: [Semantic Versioning](https://semver.org/) — MAJOR.MINOR.PATCH.
 
 ## [Unreleased]
 
+### Fixed
+- **Search funksiyasi butun saytda ishlashi ta'minlandi**: `script.js` dagi search handler yangilandi — index.html da darhol filtrlash, boshqa sahifalarda Enter/bosish orqali `index.html?search=...` ga yo'naltirish. `index.html` URL parametrdan qidiruv so'zini o'qib avtomatik filtrlaydi.
+- **profile.html search qo'shildi**: profile.html `script.js` yuklamasligi sababli inline search handler qo'shildi.
+
 ### Changed
 - **Navbar yangilandi**: "Do'kon" → "Mahsulotlar" qilib o'zgartirildi; "Chegirma" va "Maslahat" nav linklari olib tashlandi.
 - **Search input qo'shildi**: Barcha sahifalarda qidiruv ikonkasining chapiga qidiruv input maydoni qo'shildi — fokuslanganda kengayadigan, estetik pill-shape dizayn.
