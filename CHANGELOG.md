@@ -13,6 +13,12 @@ Version: [Semantic Versioning](https://semver.org/) — MAJOR.MINOR.PATCH.
 - **Wishlist remove animatsiya**: Mahsulot sevimlilardan o'chirilganda smooth scale+fade out animatsiya.
 
 ### Fixed
+- **Firebase Storage bucket noto'g'ri edi**: `foreverkosmetika.firebasestorage.app` → `foreverkosmetika.appspot.com` — barcha fayllarda tuzatildi (firebase-config.js, crm/login.html, crm/index.html). Bu sababli Firestore backend'ga ulanib bo'lmasdi.
+- **Firebase offline persistence qo'shildi**: `db.enablePersistence()` orqali Firestore ma'lumotlari IndexedDB ga keshlanadi. Offline bo'lganda ham oldin yuklangan ma'lumotlar ko'rinadi.
+- **LoadProducts offline fallback**: Firebase ishlamasa avtomatik localStorage keshdan mahsulotlarni yuklaydi. Real-time listener ham keshni yangilaydi.
+- **Mahsulot CRUD operatsiyalari keshni yangilaydi**: `firebaseAddProduct`, `firebaseUpdateProduct`, `firebaseDeleteProduct` — har biri localStorage keshni ham sinxronlaydi. Offline rejimda ham ma'lumotlar yo'qolmaydi.
+
+### Fixed
 - **Wishlist card class notog'ri edi**: `wishlist.html` dagi JS `product-card` class berayotgan edi, CSS esa `wishlist-card` uchun yozilgan. Endi to'g'ri class ishlatilmoqda.
 
 ### Changed

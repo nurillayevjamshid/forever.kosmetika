@@ -292,23 +292,16 @@ document.addEventListener('DOMContentLoaded', async function () {
     initHeroShowcase();
 
     // Firebase real-time listener (agar Firebase ulangan bo'lsa)
-
     if (isFirebaseReady && typeof firebaseListenProducts === 'function') {
-
         firebaseListenProducts((updatedProducts) => {
-
             products = updatedProducts;
-
+            // LocalStorage ga zaxira saqlash
+            try { localStorage.setItem('products', JSON.stringify(products)); } catch(e) {}
             // Hozirgi filterni saqlash
-
             const activeFilter = document.querySelector('.filter-btn.active');
-
             const currentFilter = activeFilter ? activeFilter.getAttribute('data-filter') : 'all';
-
             displayProducts(currentFilter);
-
         });
-
     }
 
     // Product image slider navigation on cards
@@ -562,14 +555,37 @@ async function loadProducts() {
         try {
             const loadedProducts = await firebaseGetProducts();
             products = loadedProducts;
-            console.log(`✅ ${products.length} ta mahsulot yuklandi`);
+            console.log(`✅ ${products.length} ta mahsulot yuklandi (Firebase)`);
+            // LocalStorage ga zaxira saqlash
+            try { localStorage.setItem('products', JSON.stringify(products)); } catch(e) {}
         } catch (error) {
             console.error('Firebase xatolik:', error);
-            products = [];
+            // Offline/timeout bo'lsa localStorage dan yuklash
+            const cached = localStorage.getItem('products');
+            if (cached) {
+                try {
+                    products = JSON.parse(cached);
+                    console.log(`📦 ${products.length} ta mahsulot local keshdan yuklandi`);
+                } catch (e) {
+                    products = [];
+                }
+            } else {
+                products = [];
+            }
         }
     } else {
-        console.log('⚠️ Firebase ulanmagan');
-        products = [];
+        console.log('⚠️ Firebase ulanmagan, localStorage dan yuklanmoqda');
+        const cached = localStorage.getItem('products');
+        if (cached) {
+            try {
+                products = JSON.parse(cached);
+                console.log(`📦 ${products.length} ta mahsulot local keshdan yuklandi`);
+            } catch (e) {
+                products = [];
+            }
+        } else {
+            products = [];
+        }
     }
 
     // Mahsulotlarni ko'rsatish
