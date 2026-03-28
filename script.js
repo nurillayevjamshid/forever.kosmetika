@@ -192,6 +192,9 @@ document.addEventListener('DOMContentLoaded', async function () {
 // ================================
 // CUSTOM SELECTS (VILOYAT/TUMAN)
 // ================================
+// Custom select document-level handlers — faqat bir marta o'rnatiladi
+let _customSelectDocHandlersAttached = false;
+
 function initCustomSelects() {
     const wrappers = document.querySelectorAll('.custom-select');
     if (!wrappers.length) return;
@@ -199,28 +202,58 @@ function initCustomSelects() {
     wrappers.forEach(wrapper => {
         const select = wrapper.querySelector('select');
         const trigger = wrapper.querySelector('.custom-select-trigger');
-        const panel = wrapper.querySelector('.custom-select-panel');
-        if (!select || !trigger || !panel) return;
+        if (!select || !trigger) return;
 
         buildCustomSelectOptions(select);
         syncCustomSelectState(select);
+    });
 
-        trigger.addEventListener('click', () => {
-            if (select.disabled) return;
-            const isOpen = wrapper.classList.contains('is-open');
-            closeAllCustomSelects();
-            if (!isOpen) {
-                wrapper.classList.add('is-open');
-                trigger.setAttribute('aria-expanded', 'true');
+    // Document-level click handler — faqat bir marta o'rnatiladi
+    if (!_customSelectDocHandlersAttached) {
+        _customSelectDocHandlersAttached = true;
+
+        // Trigger clicklar uchun event delegation
+        document.addEventListener('click', (event) => {
+            const trigger = event.target.closest('.custom-select-trigger');
+            if (trigger) {
+                const wrapper = trigger.closest('.custom-select');
+                if (!wrapper) return;
+                const select = wrapper.querySelector('select');
+                if (!select || select.disabled) return;
+                const isOpen = wrapper.classList.contains('is-open');
+                closeAllCustomSelects();
+                if (!isOpen) {
+                    wrapper.classList.add('is-open');
+                    trigger.setAttribute('aria-expanded', 'true');
+                }
+                event.stopPropagation();
+                return;
+            }
+
+            // Option clicklar uchun event delegation
+            const optionBtn = event.target.closest('.custom-select-option');
+            if (optionBtn) {
+                const wrapper = optionBtn.closest('.custom-select');
+                if (!wrapper) return;
+                const select = wrapper.querySelector('select');
+                if (!select) return;
+                const value = optionBtn.dataset.value;
+                if (value !== undefined) {
+                    select.value = value;
+                    select.dispatchEvent(new Event('change', { bubbles: true }));
+                    syncCustomSelectState(select);
+                }
+                closeAllCustomSelects();
+                event.stopPropagation();
+                return;
+            }
+
+            // Tashqariga bosilganda barcha selectlarni yopish
+            if (!event.target.closest('.custom-select')) {
+                closeAllCustomSelects();
             }
         });
-    });
-
-    document.addEventListener('click', (event) => {
-        if (!event.target.closest('.custom-select')) {
-            closeAllCustomSelects();
-        }
-    });
+    }
 }
 
 function closeAllCustomSelects() {
@@ -272,12 +305,7 @@ function buildCustomSelectOptions(selectEl) {
             ${iconHtml}
             <span class="option-text">${opt.textContent}</span>
         `;
-        optionBtn.addEventListener('click', () => {
-            selectEl.value = opt.value;
-            selectEl.dispatchEvent(new Event('change', { bubbles: true }));
-            syncCustomSelectState(selectEl);
-            closeAllCustomSelects();
-        });
+        // Event delegation orqali ishlaydi — alohida listener kerak emas
         panel.appendChild(optionBtn);
     });
 }
@@ -1657,50 +1685,71 @@ function openOrderModal() {
 }
 
 function handleViloyatChange(isPage = false) {
-
     const suffix = isPage ? 'Page' : '';
-
-    const viloyat = document.getElementById('orderViloyat' + suffix).value;
-
+    const viloyatSelect = document.getElementById('orderViloyat' + suffix);
     const tumanSelect = document.getElementById('orderTuman' + suffix);
+    if (!viloyatSelect || !tumanSelect) return;
+
+    const viloyat = viloyatSelect.value;
 
     // Clear current tumanlar
-
     tumanSelect.innerHTML = '<option value="" disabled selected>Tumanni tanlang</option>';
 
     if (viloyat && tumanlarData[viloyat]) {
-
         tumanSelect.disabled = false;
-
         tumanlarData[viloyat].forEach(tuman => {
-
             const option = document.createElement('option');
-
             option.value = tuman;
-
             option.textContent = tuman;
-
             tumanSelect.appendChild(option);
-
         });
-
     } else {
-
         tumanSelect.disabled = true;
-
     }
 
-    // Sync custom select UI
+    // Sync custom select UI — tuman
     buildCustomSelectOptions(tumanSelect);
     syncCustomSelectState(tumanSelect);
-    const viloyatSelect = document.getElementById('orderViloyat' + suffix);
-    if (viloyatSelect) {
-        syncCustomSelectState(viloyatSelect);
-    }
 
-    // Cart/order page: viloyat o'zgarganda dostavka matnini yangilash
+    // Sync custom select UI — viloyat
+    syncCustomSelectState(viloyatSelect);
+
+    // Dostavka matnini yangilash
     if (isPage && typeof updateOrderDeliveryTextFromInputs === 'function') {
         updateOrderDeliveryTextFromInputs();
+    }
+}
+
+// Viloyat/Tuman selectlar uchun event listenerlarni o'rnatish (inline onchange o'rniga)
+function initRegionSelectListeners() {
+    const viloyatPage = document.getElementById('orderViloyatPage');
+    const tumanPage = document.getElementById('orderTumanPage');
+    const viloyatModal = document.getElementById('orderViloyat');
+    const tumanModal = document.getElementById('orderTuman');
+
+    if (viloyatPage) {
+        viloyatPage.removeEventListener('change', viloyatPage._regionHandler);
+        viloyatPage._regionHandler = () => handleViloyatChange(true);
+        viloyatPage.addEventListener('change', viloyatPage._regionHandler);
+    }
+    if (tumanPage) {
+        tumanPage.removeEventListener('change', tumanPage._regionHandler);
+        tumanPage._regionHandler = () => {
+            if (typeof updateOrderDeliveryTextFromInputs === 'function') {
+                updateOrderDeliveryTextFromInputs();
+            }
+        };
+        tumanPage.addEventListener('change', tumanPage._regionHandler);
+    }
+    if (viloyatModal) {
+        viloyatModal.removeEventListener('change', viloyatModal._regionHandler);
+        viloyatModal._regionHandler = () => handleViloyatChange(false);
+        viloyatModal.addEventListener('change', viloyatModal._regionHandler);
+    }
+    if (tumanModal) {
+        tumanModal.removeEventListener('change', tumanModal._regionHandler);
+        tumanModal._regionHandler = () => {};
+        tumanModal.addEventListener('change', tumanModal._regionHandler);
     }
 }
 
@@ -2436,7 +2485,7 @@ function renderCartPage() {
                                         Viloyat
                                     </label>
                                     <div class="custom-select" data-placeholder="Viloyatni tanlang">
-                                        <select id="orderViloyatPage" class="native-select" required onchange="handleViloyatChange(true)">
+                                        <select id="orderViloyatPage" class="native-select" required>
                                             ${viloyatOptions}
                                         </select>
                                         <button type="button" class="custom-select-trigger" aria-expanded="false">
@@ -2452,7 +2501,7 @@ function renderCartPage() {
                                         Tuman
                                     </label>
                                     <div class="custom-select" data-placeholder="Tumanni tanlang">
-                                        <select id="orderTumanPage" class="native-select" required disabled onchange="updateOrderDeliveryTextFromInputs()">
+                                        <select id="orderTumanPage" class="native-select" required disabled>
                                             <option value="" disabled selected>Tumanni tanlang</option>
                                         </select>
                                         <button type="button" class="custom-select-trigger" aria-expanded="false" disabled>
@@ -2554,6 +2603,7 @@ function renderCartPage() {
 
     // Custom selectlarni qayta ishga tushirish
     initCustomSelects();
+    initRegionSelectListeners();
 }
 
 function renderCartItems() {

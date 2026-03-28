@@ -7,6 +7,13 @@ Version: [Semantic Versioning](https://semver.org/) — MAJOR.MINOR.PATCH.
 
 ## [Unreleased]
 
+### Fixed
+- **Custom select (viloyat/tuman) bug fix**: Viloyat tanlagandan so'ng tuman tanlash ishlamayotgan muammo bartaraf etildi. Tumanni bir marta tanlagandan so'ng qayta o'zgartirib bo'lmayotgan muammo ham tuzatildi.
+- Inline `onchange` handlerlar (`handleViloyatChange(true)`, `updateOrderDeliveryTextFromInputs()`) olib tashlandi — endi `initRegionSelectListeners()` orqali JavaScript event listenerlar bilan ishlaydi.
+- `initCustomSelects()` har chaqirilganda yangi document click listener qo'shishi (memory leak) to'xtatildi — endi faqat bir marta o'rnatiladi (`_customSelectDocHandlersAttached` flag orqali).
+- Custom select trigger va option clicklari uchun event delegation joriy etildi — DOM qayta yaratilganda ham ishonchli ishlaydi.
+- `handleViloyatChange()` funksiyasiga null-check qo'shildi va `syncCustomSelectState()` trigger `disabled` holatini to'g'ri sinxronlaydi.
+
 ### Added
 - CHANGELOG.md fayli yaratildi — loyiha o'zgarishlarini kuzatish uchun.
 
