@@ -23,7 +23,8 @@ const defaultProducts = [];
 // Cart state
 
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
-let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+// Wishlist modulidan olish (wishlist-module.js loaded bo'lishi kerak)
+let wishlist = (typeof Wishlist !== 'undefined') ? Wishlist.getIds() : (JSON.parse(localStorage.getItem('wishlistItems')) || []).map(w => w.id || w);
 
 // Viloyatlar va Tumanlar ma'lumotlari
 
@@ -660,6 +661,8 @@ function initNavigation() {
 // ================================
 
 function displayProducts(filter = 'all') {
+    // Wishlist ni moduldan sinxronlash
+    wishlist = Wishlist.getIds();
 
     const productsGrid = document.getElementById('productsGrid');
 
@@ -2953,96 +2956,56 @@ window.updateOrderDeliveryTextFromInputs = updateOrderDeliveryTextFromInputs;
 
 // ================================
 // WISHLIST FUNCTIONS
+// Wishlist module (wishlist-module.js) orqali ishlaydi
 // ================================
 
 async function toggleWishlist(event, productId) {
-    event.stopPropagation();
-    event.preventDefault();
-    
-    const index = wishlist.indexOf(productId.toString());
-    const product = products.find(p => p.id.toString() === productId.toString());
-    
-    if (index === -1) {
-        // Qo'shish
-        wishlist.push(productId.toString());
-        if (typeof showNotification === 'function') {
-            showNotification("Mahsulot sevimlilarga qo'shildi");
-        }
-        
-        // Firebase-ga saqlash
-        if (product && typeof firebaseAddToWishlist === 'function') {
-            await firebaseAddToWishlist(product);
-        }
-    } else {
-        // O'chirish
-        wishlist.splice(index, 1);
-        if (typeof showNotification === 'function') {
-            showNotification("Mahsulot sevimlilardan olib tashlandi");
-        }
-        
-        // Firebase-dan o'chirish
-        if (typeof firebaseRemoveFromWishlist === 'function') {
-            await firebaseRemoveFromWishlist(productId);
-        }
-    }
-    
-    localStorage.setItem('wishlist', JSON.stringify(wishlist));
-    updateWishlistUI();
+    if (event) { event.stopPropagation(); event.preventDefault(); }
+
+    const added = Wishlist.toggle(productId);
+
+    // wishlist massivini sync qilish (boshqa joylar ishlatishi uchun)
+    wishlist = Wishlist.getIds();
 
     // Heart pop animatsiya
-    const btn = event.currentTarget;
-    btn.classList.remove('pop');
-    void btn.offsetWidth; // reflow
-    btn.classList.add('pop');
-    setTimeout(() => btn.classList.remove('pop'), 600);
+    const btn = event && event.currentTarget;
+    if (btn) {
+        btn.classList.remove('pop');
+        void btn.offsetWidth;
+        btn.classList.add('pop');
+        setTimeout(() => btn.classList.remove('pop'), 600);
 
-    // Qo'shilganda floating particle
-    if (index === -1) {
-        for (let i = 0; i < 4; i++) {
-            const particle = document.createElement('span');
-            particle.className = 'heart-particle';
-            particle.textContent = ['❤️', '✨', '💕', '💗'][i];
-            particle.style.left = (btn.offsetWidth / 2 - 6 + (Math.random() - 0.5) * 20) + 'px';
-            particle.style.top = '0px';
-            particle.style.animationDelay = (i * 0.08) + 's';
-            btn.appendChild(particle);
-            setTimeout(() => particle.remove(), 800);
+        if (added) {
+            for (let i = 0; i < 4; i++) {
+                const particle = document.createElement('span');
+                particle.className = 'heart-particle';
+                particle.textContent = ['❤️', '✨', '💕', '💗'][i];
+                particle.style.left = (btn.offsetWidth / 2 - 6 + (Math.random() - 0.5) * 20) + 'px';
+                particle.style.top = '0px';
+                particle.style.animationDelay = (i * 0.08) + 's';
+                btn.appendChild(particle);
+                setTimeout(() => particle.remove(), 800);
+            }
         }
     }
 
-    // Wishlist sahifasini yangilash (agar mavjud bo'lsa)
-    if (typeof renderWishlist === 'function') {
-        renderWishlist();
+    // Firebase sync (orqa fonda)
+    const product = typeof products !== 'undefined' && products.find(p => String(p.id) === String(productId));
+    if (added && product && typeof firebaseAddToWishlist === 'function') {
+        firebaseAddToWishlist(product).catch(() => {});
+    } else if (!added && typeof firebaseRemoveFromWishlist === 'function') {
+        firebaseRemoveFromWishlist(productId).catch(() => {});
     }
+
+    // Wishlist sahifasini yangilash
+    if (typeof renderWishlist === 'function') renderWishlist();
 }
 
 function updateWishlistUI() {
-    // Barcha wishlist tugmalarini yangilash
-    const wishlistBtns = document.querySelectorAll('.favorite-btn');
-    wishlistBtns.forEach(btn => {
-        const productId = btn.id.replace('wishlist-btn-', '');
-        const isActive = wishlist.includes(productId.toString());
-        
-        if (isActive) {
-            btn.classList.add('active');
-            const svg = btn.querySelector('svg');
-            if (svg) svg.setAttribute('fill', 'currentColor');
-        } else {
-            btn.classList.remove('active');
-            const svg = btn.querySelector('svg');
-            if (svg) svg.setAttribute('fill', 'none');
-        }
-    });
-
-    // Headerdagi wishlist count (agar bo'lsa)
-    const wishlistCountEl = document.getElementById('wishlistCount');
-    if (wishlistCountEl) {
-        wishlistCountEl.textContent = wishlist.length;
-        wishlistCountEl.style.display = wishlist.length > 0 ? 'flex' : 'none';
-    }
+    wishlist = Wishlist.getIds();
+    Wishlist._sync();
 }
 
-// Wishlist funksiyalarini global miqyosda e'lon qilish
 window.toggleWishlist = toggleWishlist;
 window.updateWishlistUI = updateWishlistUI;
 
