@@ -3246,3 +3246,532 @@ body {
         padding-top: 100px;
     }
 }
+
+/* ========================================
+   CONVERSION MACHINE - MAXIMUM SALES BOOST
+   ======================================== */
+
+/* --- STICKY MOBILE CTA BAR --- */
+.sticky-cta-bar {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    padding: 12px 16px;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+    z-index: 1600;
+    border-top: 1px solid var(--border-light);
+}
+
+.sticky-cta-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.sticky-cta-price {
+    display: flex;
+    flex-direction: column;
+}
+
+.sticky-cta-current {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--accent-color);
+}
+
+.sticky-cta-old {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    text-decoration: line-through;
+}
+
+.sticky-cta-btn {
+    background: var(--cta-gradient);
+    color: white;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 100px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 15px rgba(108, 59, 255, 0.4);
+    animation: stickyPulse 2s ease-in-out infinite;
+    flex: 1;
+    max-width: 200px;
+}
+
+@keyframes stickyPulse {
+    0%, 100% { 
+        box-shadow: 0 4px 15px rgba(108, 59, 255, 0.4);
+        transform: scale(1);
+    }
+    50% { 
+        box-shadow: 0 6px 25px rgba(108, 59, 255, 0.6);
+        transform: scale(1.02);
+    }
+}
+
+/* --- URGENCY ELEMENTS --- */
+.urgency-banner {
+    background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    animation: urgencyFlash 3s ease-in-out infinite;
+}
+
+@keyframes urgencyFlash {
+    0%, 100% { background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%); }
+    50% { background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%); }
+}
+
+.urgency-icon {
+    font-size: 1.2rem;
+    animation: shake 1s ease-in-out infinite;
+}
+
+@keyframes shake {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-10deg); }
+    75% { transform: rotate(10deg); }
+}
+
+/* Countdown Timer */
+.countdown-timer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+}
+
+.countdown-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    opacity: 0.9;
+}
+
+.countdown-value {
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+}
+
+/* Stock Counter */
+.stock-counter {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
+    color: #DC2626;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    animation: stockPulse 2s ease-in-out infinite;
+}
+
+@keyframes stockPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.3); }
+    50% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+}
+
+.stock-dot {
+    width: 8px;
+    height: 8px;
+    background: #EF4444;
+    border-radius: 50%;
+    animation: blink 1s ease-in-out infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+/* Flash Sale Badge */
+.flash-sale-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+    z-index: 10;
+    animation: flashSalePulse 1.5s ease-in-out infinite;
+}
+
+@keyframes flashSalePulse {
+    0%, 100% { 
+        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        transform: translateX(-50%) scale(1);
+    }
+    50% { 
+        box-shadow: 0 6px 25px rgba(239, 68, 68, 0.6);
+        transform: translateX(-50%) scale(1.05);
+    }
+}
+
+/* --- TRUST BOOST BADGES --- */
+.trust-badges-row {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    padding: 20px 0;
+    margin: 20px 0;
+}
+
+.trust-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: white;
+    padding: 12px 20px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-light);
+    transition: all 0.3s ease;
+}
+
+.trust-badge:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--accent-light);
+}
+
+.trust-badge-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, rgba(108, 59, 255, 0.1) 0%, rgba(201, 169, 110, 0.1) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.trust-badge-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.trust-badge-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.trust-badge-subtitle {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+/* Trust badge variants */
+.trust-badge-premium .trust-badge-icon {
+    background: var(--gold-gradient);
+}
+
+.trust-badge-urgent {
+    border-color: rgba(239, 68, 68, 0.3);
+    animation: trustUrgent 2s ease-in-out infinite;
+}
+
+@keyframes trustUrgent {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.2); }
+    50% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+}
+
+.trust-badge-urgent .trust-badge-icon {
+    background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+    color: white;
+}
+
+/* --- SUPER PRODUCT CARD --- */
+.product-card-super {
+    position: relative;
+    overflow: visible;
+}
+
+.product-card-super::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(135deg, var(--accent-color) 0%, var(--gold-color) 50%, var(--accent-color) 100%);
+    border-radius: calc(var(--radius-lg) + 2px);
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.product-card-super:hover::before {
+    opacity: 1;
+}
+
+/* Product Image Zoom */
+.product-image-zoom {
+    position: relative;
+    overflow: hidden;
+}
+
+.product-image-zoom img {
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.product-card:hover .product-image-zoom img {
+    transform: scale(1.15);
+}
+
+/* Quick View Overlay */
+.quick-view-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(108, 59, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 4;
+}
+
+.product-card:hover .quick-view-overlay {
+    opacity: 1;
+}
+
+.quick-view-btn {
+    background: white;
+    color: var(--accent-color);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 100px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.product-card:hover .quick-view-btn {
+    transform: translateY(0);
+}
+
+/* Discount Badge Large */
+.discount-badge-large {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+    color: white;
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 1rem;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+    z-index: 5;
+    animation: discountPulse 2s ease-in-out infinite;
+}
+
+@keyframes discountPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* Add to Cart Super Button */
+.add-cart-super {
+    position: relative;
+    background: var(--cta-gradient);
+    color: white;
+    border: none;
+    padding: 16px;
+    border-radius: 100px;
+    font-weight: 700;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 15px rgba(108, 59, 255, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    overflow: hidden;
+}
+
+.add-cart-super::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.add-cart-super:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(108, 59, 255, 0.5);
+}
+
+.add-cart-super:hover::before {
+    left: 100%;
+}
+
+.add-cart-super:active {
+    transform: translateY(-1px) scale(0.98);
+}
+
+/* Cart icon animation */
+.add-cart-super svg {
+    transition: transform 0.3s ease;
+}
+
+.add-cart-super:hover svg {
+    transform: translateX(3px);
+}
+
+/* Floating CTA Button */
+.floating-cta {
+    position: fixed;
+    bottom: 100px;
+    right: 20px;
+    z-index: 1500;
+    background: var(--cta-gradient);
+    color: white;
+    border: none;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 25px rgba(108, 59, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    animation: floatingCtaPulse 2s ease-in-out infinite;
+}
+
+@keyframes floatingCtaPulse {
+    0%, 100% { 
+        box-shadow: 0 8px 25px rgba(108, 59, 255, 0.5);
+        transform: scale(1);
+    }
+    50% { 
+        box-shadow: 0 12px 35px rgba(108, 59, 255, 0.7);
+        transform: scale(1.05);
+    }
+}
+
+.floating-cta:hover {
+    transform: scale(1.1);
+    box-shadow: 0 12px 35px rgba(108, 59, 255, 0.7);
+}
+
+.floating-cta svg {
+    width: 24px;
+    height: 24px;
+}
+
+.floating-cta-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #EF4444;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: badgeBounce 1s ease-in-out infinite;
+}
+
+@keyframes badgeBounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .sticky-cta-bar {
+        display: block;
+    }
+    
+    .trust-badges-row {
+        gap: 12px;
+        padding: 15px 10px;
+    }
+    
+    .trust-badge {
+        padding: 10px 14px;
+        flex: 1;
+        min-width: 140px;
+    }
+    
+    .trust-badge-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+    }
+    
+    .urgency-banner {
+        font-size: 0.8rem;
+        padding: 8px 12px;
+        flex-wrap: wrap;
+    }
+    
+    .countdown-timer {
+        padding: 4px 10px;
+        font-size: 0.9rem;
+    }
+    
+    .floating-cta {
+        bottom: 80px;
+        width: 50px;
+        height: 50px;
+    }
+    
+    .floating-cta svg {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+/* Hide sticky CTA on larger screens */
+@media (min-width: 769px) {
+    .sticky-cta-bar {
+        display: none !important;
+    }
+}
