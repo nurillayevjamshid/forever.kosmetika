@@ -3808,13 +3808,6 @@ body {
         display: none;
     }
     
-    /* Hide search, cart, and menu toggle on mobile */
-    .search-wrapper,
-    .cart-btn-icon,
-    .menu-toggle {
-        display: none !important;
-    }
-    
     .header-actions {
         gap: 8px;
     }
