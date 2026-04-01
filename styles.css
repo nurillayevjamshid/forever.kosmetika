@@ -3941,20 +3941,29 @@ body {
         max-width: none;
         border-radius: 20px;
         overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        height: auto;
     }
     
     .product-image {
         aspect-ratio: 1;
         min-height: 280px;
+        width: 100%;
+        flex-shrink: 0;
     }
     
     .product-image img {
         min-height: 280px;
+        width: 100%;
         object-fit: cover;
     }
     
     .product-info {
         padding: 20px 16px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
     }
     
     .product-name {
