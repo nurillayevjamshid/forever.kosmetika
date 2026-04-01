@@ -23,7 +23,8 @@ const defaultProducts = [];
 // Cart state
 
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
-let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+// Wishlist modulidan olish (wishlist-module.js loaded bo'lishi kerak)
+let wishlist = (typeof Wishlist !== 'undefined') ? Wishlist.getIds() : (JSON.parse(localStorage.getItem('wishlistItems')) || []).map(w => w.id || w);
 
 // Viloyatlar va Tumanlar ma'lumotlari
 
@@ -87,17 +88,175 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     initContactForm();
 
-    // Initialize search
+    // Initialize search with dropdown
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
+        const isIndexPage = window.location.pathname.endsWith('index.html') || window.location.pathname.endsWith('/') || window.location.pathname === '';
+        const searchWrapper = searchInput.closest('.search-wrapper');
+
+        // Dropdown yaratish
+        let dropdown = searchWrapper?.querySelector('.search-dropdown');
+        if (!dropdown && searchWrapper) {
+            dropdown = document.createElement('div');
+            dropdown.className = 'search-dropdown';
+            searchWrapper.appendChild(dropdown);
+        }
+
+        let searchTimeout = null;
+        let lastSearchTerm = '';
+
+        function renderSearchResults(results, term) {
+            if (!dropdown) return;
+            if (results.length === 0 && term.length > 1) {
+                dropdown.innerHTML = `
+                    <div class="search-no-results">
+                        <span class="search-no-results-icon">🔍</span>
+                        "${term}" bo'yicha mahsulot topilmadi
+                    </div>
+                `;
+                dropdown.classList.add('active');
+                return;
+            }
+            if (results.length === 0) {
+                dropdown.classList.remove('active');
+                return;
+            }
+
+            const fallback = 'assets/logo.png';
+            let html = `<div class="search-dropdown-header">${results.length} ta mahsulot topildi</div>`;
+            results.slice(0, 8).forEach(p => {
+                const img = p.imageUrl || p.image || fallback;
+                const price = formatPrice(p.price);
+                const targetUrl = isIndexPage ? `#product-card-${p.id}` : `index.html#product-card-${p.id}`;
+                html += `
+                    <a href="${targetUrl}" class="search-result-item" data-product-id="${p.id}" onclick="handleSearchResultClick(event, '${p.id}')">
+                        <img src="${img}" alt="${p.name}" class="search-result-img" onerror="this.src='${fallback}'">
+                        <div class="search-result-info">
+                            <div class="search-result-name">${p.name}</div>
+                            <div class="search-result-category">${p.category || ''}</div>
+                        </div>
+                        <div class="search-result-price">${price} so'm</div>
+                        <svg class="search-result-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 18l6-6-6-6"/>
+                        </svg>
+                    </a>
+                `;
+            });
+            dropdown.innerHTML = html;
+            dropdown.classList.add('active');
+        }
+
+        function searchProducts(term) {
+            if (!term || term.length < 2) {
+                if (dropdown) dropdown.classList.remove('active');
+                return;
+            }
+
+            const lowerTerm = term.toLowerCase();
+            let results = [];
+
+            if (typeof products !== 'undefined' && products.length > 0) {
+                results = products.filter(p =>
+                    (p.name || '').toLowerCase().includes(lowerTerm) ||
+                    (p.category || '').toLowerCase().includes(lowerTerm) ||
+                    (p.description || '').toLowerCase().includes(lowerTerm) ||
+                    (p.brand || '').toLowerCase().includes(lowerTerm)
+                );
+            }
+
+            renderSearchResults(results, term);
+        }
+
+        // Search result click handler
+        window.handleSearchResultClick = function(e, productId) {
+            e.preventDefault();
+            if (dropdown) dropdown.classList.remove('active');
+            searchInput.value = '';
+
+            if (isIndexPage) {
+                const card = document.getElementById(`product-card-${productId}`);
+                if (card) {
+                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    card.style.transition = 'box-shadow 0.3s, transform 0.3s';
+                    card.style.boxShadow = '0 0 0 3px rgba(226, 158, 125, 0.5)';
+                    card.style.transform = 'scale(1.02)';
+                    setTimeout(() => {
+                        card.style.boxShadow = '';
+                        card.style.transform = '';
+                    }, 2000);
+                }
+            } else {
+                window.location.href = 'index.html#product-card-' + productId;
+            }
+        };
+
+        // Input event — real-time search
         searchInput.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            if (searchTerm.length > 1) {
-                displayProducts('search:' + searchTerm);
-            } else if (searchTerm.length === 0) {
-                displayProducts('all');
+            const searchTerm = e.target.value.trim();
+
+            if (isIndexPage && typeof displayProducts === 'function') {
+                if (searchTerm.length > 1) {
+                    displayProducts('search:' + searchTerm.toLowerCase());
+                } else if (searchTerm.length === 0) {
+                    displayProducts('all');
+                }
+            }
+
+            // Dropdown search with debounce
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                searchProducts(searchTerm);
+            }, 200);
+        });
+
+        // Focus — agar matn bor bo'lsa dropdown ochish
+        searchInput.addEventListener('focus', () => {
+            const term = searchInput.value.trim();
+            if (term.length >= 2) {
+                searchProducts(term);
             }
         });
+
+        // Tashqariga bosilganda yopish
+        document.addEventListener('click', (e) => {
+            if (searchWrapper && !searchWrapper.contains(e.target)) {
+                if (dropdown) dropdown.classList.remove('active');
+            }
+        });
+
+        // Enter — page ga yo'naltirish
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (dropdown) dropdown.classList.remove('active');
+                const term = searchInput.value.trim();
+                if (term.length > 0) {
+                    if (isIndexPage && typeof displayProducts === 'function') {
+                        displayProducts('search:' + term.toLowerCase());
+                    } else {
+                        window.location.href = 'index.html?search=' + encodeURIComponent(term);
+                    }
+                }
+            }
+            if (e.key === 'Escape') {
+                if (dropdown) dropdown.classList.remove('active');
+                searchInput.blur();
+            }
+        });
+
+        // Search icon click
+        const searchTrigger = searchWrapper?.querySelector('.search-trigger');
+        if (searchTrigger) {
+            searchTrigger.addEventListener('click', () => {
+                const term = searchInput.value.trim();
+                if (term.length > 0) {
+                    if (dropdown) dropdown.classList.remove('active');
+                    if (!isIndexPage) {
+                        window.location.href = 'index.html?search=' + encodeURIComponent(term);
+                    }
+                }
+            });
+        }
     }
 
     // Initialize custom selects (viloyat/tuman)
@@ -133,23 +292,16 @@ document.addEventListener('DOMContentLoaded', async function () {
     initHeroShowcase();
 
     // Firebase real-time listener (agar Firebase ulangan bo'lsa)
-
     if (isFirebaseReady && typeof firebaseListenProducts === 'function') {
-
         firebaseListenProducts((updatedProducts) => {
-
             products = updatedProducts;
-
+            // LocalStorage ga zaxira saqlash
+            try { localStorage.setItem('products', JSON.stringify(products)); } catch(e) {}
             // Hozirgi filterni saqlash
-
             const activeFilter = document.querySelector('.filter-btn.active');
-
             const currentFilter = activeFilter ? activeFilter.getAttribute('data-filter') : 'all';
-
             displayProducts(currentFilter);
-
         });
-
     }
 
     // Product image slider navigation on cards
@@ -187,11 +339,36 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     });
 
+    // URL hash orqali mahsulotga scroll qilish
+    function scrollToHashProduct() {
+        const hash = window.location.hash;
+        if (hash && hash.startsWith('#product-card-')) {
+            setTimeout(() => {
+                const card = document.querySelector(hash);
+                if (card) {
+                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    card.style.transition = 'box-shadow 0.3s, transform 0.3s';
+                    card.style.boxShadow = '0 0 0 3px rgba(226, 158, 125, 0.5)';
+                    card.style.transform = 'scale(1.02)';
+                    setTimeout(() => {
+                        card.style.boxShadow = '';
+                        card.style.transform = '';
+                    }, 2500);
+                }
+            }, 800);
+        }
+    }
+    scrollToHashProduct();
+    window.addEventListener('hashchange', scrollToHashProduct);
+
 });
 
 // ================================
 // CUSTOM SELECTS (VILOYAT/TUMAN)
 // ================================
+// Custom select document-level handlers — faqat bir marta o'rnatiladi
+let _customSelectDocHandlersAttached = false;
+
 function initCustomSelects() {
     const wrappers = document.querySelectorAll('.custom-select');
     if (!wrappers.length) return;
@@ -199,28 +376,58 @@ function initCustomSelects() {
     wrappers.forEach(wrapper => {
         const select = wrapper.querySelector('select');
         const trigger = wrapper.querySelector('.custom-select-trigger');
-        const panel = wrapper.querySelector('.custom-select-panel');
-        if (!select || !trigger || !panel) return;
+        if (!select || !trigger) return;
 
         buildCustomSelectOptions(select);
         syncCustomSelectState(select);
+    });
 
-        trigger.addEventListener('click', () => {
-            if (select.disabled) return;
-            const isOpen = wrapper.classList.contains('is-open');
-            closeAllCustomSelects();
-            if (!isOpen) {
-                wrapper.classList.add('is-open');
-                trigger.setAttribute('aria-expanded', 'true');
+    // Document-level click handler — faqat bir marta o'rnatiladi
+    if (!_customSelectDocHandlersAttached) {
+        _customSelectDocHandlersAttached = true;
+
+        // Trigger clicklar uchun event delegation
+        document.addEventListener('click', (event) => {
+            const trigger = event.target.closest('.custom-select-trigger');
+            if (trigger) {
+                const wrapper = trigger.closest('.custom-select');
+                if (!wrapper) return;
+                const select = wrapper.querySelector('select');
+                if (!select || select.disabled) return;
+                const isOpen = wrapper.classList.contains('is-open');
+                closeAllCustomSelects();
+                if (!isOpen) {
+                    wrapper.classList.add('is-open');
+                    trigger.setAttribute('aria-expanded', 'true');
+                }
+                event.stopPropagation();
+                return;
+            }
+
+            // Option clicklar uchun event delegation
+            const optionBtn = event.target.closest('.custom-select-option');
+            if (optionBtn) {
+                const wrapper = optionBtn.closest('.custom-select');
+                if (!wrapper) return;
+                const select = wrapper.querySelector('select');
+                if (!select) return;
+                const value = optionBtn.dataset.value;
+                if (value !== undefined) {
+                    select.value = value;
+                    select.dispatchEvent(new Event('change', { bubbles: true }));
+                    syncCustomSelectState(select);
+                }
+                closeAllCustomSelects();
+                event.stopPropagation();
+                return;
+            }
+
+            // Tashqariga bosilganda barcha selectlarni yopish
+            if (!event.target.closest('.custom-select')) {
+                closeAllCustomSelects();
             }
         });
-    });
-
-    document.addEventListener('click', (event) => {
-        if (!event.target.closest('.custom-select')) {
-            closeAllCustomSelects();
-        }
-    });
+    }
 }
 
 function closeAllCustomSelects() {
@@ -259,18 +466,20 @@ function buildCustomSelectOptions(selectEl) {
                     </svg>
                 </span>
             `
-            : `<span class="option-bullet"></span>`;
+            : `
+                <span class="option-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+                    </svg>
+                </span>
+            `;
 
         optionBtn.innerHTML = `
             ${iconHtml}
             <span class="option-text">${opt.textContent}</span>
         `;
-        optionBtn.addEventListener('click', () => {
-            selectEl.value = opt.value;
-            selectEl.dispatchEvent(new Event('change', { bubbles: true }));
-            syncCustomSelectState(selectEl);
-            closeAllCustomSelects();
-        });
+        // Event delegation orqali ishlaydi — alohida listener kerak emas
         panel.appendChild(optionBtn);
     });
 }
@@ -299,7 +508,15 @@ function syncCustomSelectState(selectEl) {
                     <span class="option-text">${selectedOption.textContent}</span>
                 `;
             } else {
-                valueEl.textContent = selectedOption.textContent;
+                valueEl.innerHTML = `
+                    <span class="option-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+                        </svg>
+                    </span>
+                    <span class="option-text">${selectedOption.textContent}</span>
+                `;
             }
         } else {
             valueEl.textContent = placeholder;
@@ -325,43 +542,54 @@ function syncCustomSelectState(selectEl) {
 // ================================
 
 async function loadProducts() {
-
     const activeFilter = document.querySelector('.filter-btn.active');
     const currentFilter = activeFilter ? activeFilter.getAttribute('data-filter') : 'all';
+    const grid = document.getElementById('productsGrid');
+
+    // Loading spinner ko'rsatish
+    if (grid) {
+        grid.innerHTML = '<div class="loading-state"><div class="spinner"></div><p>Mahsulotlar yuklanmoqda...</p></div>';
+    }
 
     if (isFirebaseReady && typeof firebaseGetProducts === 'function') {
-
         try {
-
-            console.log('🔥 Firebase\'dan mahsulotlar yuklanmoqda...');
-
             const loadedProducts = await firebaseGetProducts();
-
-            console.log('📦 Bazadan kelgan mahsulotlar:', loadedProducts);
-
             products = loadedProducts;
-
-            console.log(`✅ ${products.length} ta mahsulot yuklandi`);
-
+            console.log(`✅ ${products.length} ta mahsulot yuklandi (Firebase)`);
+            // LocalStorage ga zaxira saqlash
+            try { localStorage.setItem('products', JSON.stringify(products)); } catch(e) {}
         } catch (error) {
-
             console.error('Firebase xatolik:', error);
-
-            products = [];
-
+            // Offline/timeout bo'lsa localStorage dan yuklash
+            const cached = localStorage.getItem('products');
+            if (cached) {
+                try {
+                    products = JSON.parse(cached);
+                    console.log(`📦 ${products.length} ta mahsulot local keshdan yuklandi`);
+                } catch (e) {
+                    products = [];
+                }
+            } else {
+                products = [];
+            }
         }
-
     } else {
-
-        console.log('⚠️ Firebase ulanmagan');
-
-        products = [];
-
+        console.log('⚠️ Firebase ulanmagan, localStorage dan yuklanmoqda');
+        const cached = localStorage.getItem('products');
+        if (cached) {
+            try {
+                products = JSON.parse(cached);
+                console.log(`📦 ${products.length} ta mahsulot local keshdan yuklandi`);
+            } catch (e) {
+                products = [];
+            }
+        } else {
+            products = [];
+        }
     }
 
     // Mahsulotlarni ko'rsatish
-    const productsGrid = document.getElementById('productsGrid');
-    if (productsGrid) {
+    if (grid) {
         displayProducts(currentFilter);
     }
 }
@@ -436,225 +664,129 @@ function initNavigation() {
 
 // ================================
 
+/**
+ * Mahsulotlarni ko'rsatish — optimallashtirilgan
+ * DocumentFragment + CSS staggered animation + lazy loading
+ */
 function displayProducts(filter = 'all') {
+    // Wishlist ni moduldan sinxronlash
+    wishlist = Wishlist.getIds();
 
-    const productsGrid = document.getElementById('productsGrid');
+    const grid = document.getElementById('productsGrid');
+    if (!grid) return;
 
-    // Filter products
+    // 1) Filter
+    const filtered = _filterProducts(filter);
 
-    let filteredProducts;
-    
-    if (filter && typeof filter === 'string' && filter.startsWith('search:')) {
-        const term = filter.replace('search:', '').toLowerCase();
-        filteredProducts = products.filter(p => 
-            (p.name || '').toLowerCase().includes(term) || 
+    // 2) Tozalash (bir marta)
+    grid.innerHTML = '';
+
+    // 3) Empty state
+    if (!filtered.length) {
+        const msg = filter === 'favorites'
+            ? '💔 Sevimlilar ro\'yxati bo\'sh — yurakcha bosib qo\'shing'
+            : '🔍 Bu kategoriyada mahsulot topilmadi';
+        grid.innerHTML = `<div class="empty-state"><span class="empty-icon">✨</span><p>${msg}</p></div>`;
+        return;
+    }
+
+    // 4) Fragment bilan render — bitta reflow
+    const fragment = document.createDocumentFragment();
+    filtered.forEach((product, i) => {
+        const card = createProductCard(product);
+        // CSS animation-delay (setTimeout yo'q!)
+        card.style.animationDelay = (i * 0.04) + 's';
+        fragment.appendChild(card);
+    });
+    grid.appendChild(fragment); // bitta DOM op
+}
+
+/**
+ * Mahsulotni filterlash — ajratilgan funksiya
+ */
+function _filterProducts(filter) {
+    if (!filter || filter === 'all') return products;
+
+    if (typeof filter === 'string' && filter.startsWith('search:')) {
+        const term = filter.slice(7).toLowerCase();
+        return products.filter(p =>
+            (p.name || '').toLowerCase().includes(term) ||
             (p.description || '').toLowerCase().includes(term) ||
             (p.category || '').toLowerCase().includes(term)
         );
-    } else {
-        filteredProducts = (filter === 'all' || !filter)
-            ? products
-            : filter === 'favorites'
-            ? products.filter(p => wishlist.includes(p.id.toString()))
-            : products.filter(p => {
-
-            const cat = (p.category || '').toLowerCase();
-
-            const f = filter.toLowerCase();
-
-            // CRM dagi "Soch parvarishi" -> websitedagi "soch"
-
-            if (f === 'soch' && cat.includes('soch')) return true;
-
-            // Yuz kremi
-
-            if (f === 'yuz kremi' && cat.includes('yuz kremi')) return true;
-
-            // CRM dagi "Tana parvarishi" -> websitedagi "parvarish"
-
-            if (f === 'parvarish' && (cat.includes('tana') || cat.includes('parvarish'))) return true;
-
-            // CRM dagi "Atir" yoki "Parfyumeriya" -> websitedagi "atir"
-
-            if (f === 'atir' && (cat.includes('atir') || cat.includes('parfyumeriya'))) return true;
-
-            // Kosmetika
-
-            if (f === 'kosmetika' && cat.includes('kosmetika')) return true;
-
-            return cat === f;
-
-        });
     }
 
-    // Clear grid
-    if (productsGrid) {
-        productsGrid.innerHTML = '';
-    } else {
-        return;
+    if (filter === 'favorites') {
+        return products.filter(p => wishlist.includes(p.id.toString()));
     }
 
-    // Display products
-    if (filteredProducts.length === 0) {
-        const emptyMsg = filter === 'favorites' 
-            ? "Sevimlilar ro'yxati bo'sh" 
-            : "Hozircha mahsulotlar yo'q";
-
-        if (productsGrid) {
-            productsGrid.innerHTML = `
-                <div class="loading-state">
-                    <p style="color: var(--text-secondary);">${emptyMsg}</p>
-                </div>
-            `;
-        }
-
-        return;
-    }
-
-    filteredProducts.forEach(product => {
-
-        const productCard = createProductCard(product);
-
-        productsGrid.appendChild(productCard);
-
+    const f = filter.toLowerCase();
+    return products.filter(p => {
+        const cat = (p.category || '').toLowerCase();
+        if (f === 'soch' && cat.includes('soch')) return true;
+        if (f === 'yuz kremi' && cat.includes('yuz kremi')) return true;
+        if (f === 'parvarish' && (cat.includes('tana') || cat.includes('parvarish'))) return true;
+        if (f === 'atir' && (cat.includes('atir') || cat.includes('parfyumeriya'))) return true;
+        if (f === 'kosmetika' && cat.includes('kosmetika')) return true;
+        return cat === f;
     });
-
-    // Add animation
-
-    const cards = productsGrid.querySelectorAll('.product-card');
-
-    cards.forEach((card, index) => {
-
-        setTimeout(() => {
-
-            card.style.opacity = '0';
-
-            card.style.transform = 'translateY(20px)';
-
-            setTimeout(() => {
-
-                card.style.transition = 'all 0.5s ease';
-
-                card.style.opacity = '1';
-
-                card.style.transform = 'translateY(0)';
-
-            }, 50);
-
-        }, index * 50);
-
-    });
-
 }
 
+/**
+ * Product card yaratish — optimallashtirilgan
+ * - loading="lazy" rasmlar uchun
+ * - isFavorite marta hisoblash (har bir card uchun emas)
+ * - single innerHTML
+ */
 function createProductCard(product) {
-
     const card = document.createElement('div');
-
     card.className = 'product-card';
-
     card.id = `product-card-${product.id}`;
-
-    const rating = product.rating || "4.9";
 
     const state = ensureProductImageState(product);
     const fallback = getProductFallbackImage(product);
-    const initialImage = (state.images[state.index] || state.images[0] || product.imageUrl || product.image || fallback);
+    const initialImage = state.images[state.index] || state.images[0] || product.imageUrl || product.image || fallback;
     const showNav = state.images.length > 1;
-
-    const isFavorite = wishlist.includes(product.id.toString());
-
-    // Chegirmani tekshirish
+    const isFav = wishlist.includes(product.id.toString());
     const discount = getActiveDiscountForProduct(product);
-    let priceHTML = '';
-    let badgeHTML = '';
 
+    // Narx HTML
+    let priceHTML;
+    let badgeHTML = '';
     if (discount) {
-        priceHTML = `
-            <div style="display: flex; flex-direction: column; gap: 0px; margin-bottom: 0px;">
-                <div class="current-price" style="display: flex; align-items: center; gap: 4px; color: var(--text-light); font-size: 0.8rem; opacity: 0.8;">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M9 5H2v7l6.29 6.29c.94.94 2.48.94 3.42 0l3.58-3.58c.94-.94.94-2.48 0-3.42L9 5Z"></path>
-                        <path d="M6 9h.01"></path>
-                        <path d="M15 5h7v7l-6.29 6.29c-.94.94-2.48.94-3.42 0"></path>
-                    </svg>
-                    <span style="text-decoration: line-through;">${formatPrice(product.price)} so'm</span>
-                    <span style="font-size: 0.7em; background: #eee; padding: 1px 5px; border-radius: 4px; color: #777; font-weight: 500;">asl narxi</span>
-                </div>
-                <div class="current-price" style="display: flex; align-items: center; gap: 4px; color: var(--accent-color); font-weight: 800; font-size: 1.15rem;">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
-                        <path d="m14 11-3 3"></path>
-                        <path d="M11 11h.01"></path>
-                        <path d="M14 14h.01"></path>
-                    </svg>
-                    ${formatPrice(discount.price)} so'm
-                    <span style="font-size: 0.6em; background: rgba(255, 61, 87, 0.1); color: #ff3d57; padding: 2px 6px; border-radius: 4px; margin-left: 2px; font-weight: 700; text-transform: uppercase;">chegirmada</span>
-                </div>
-            </div>
-        `;
-        badgeHTML = `
-            <div style="position: absolute; top: 10px; left: 10px; background: linear-gradient(135deg, #ff3d57 0%, #ff8a80 100%); color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; z-index: 2; display: flex; align-items: center; gap: 4px; box-shadow: 0 4px 10px rgba(255, 61, 87, 0.3);">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
-                    <line x1="7" y1="7" x2="7.01" y2="7"></line>
-                </svg>
-                -${discount.percent}%
-            </div>
-        `;
+        priceHTML = `<div style="display:flex;flex-direction:column;gap:0;margin-bottom:0">
+            <div class="current-price" style="display:flex;align-items:center;gap:4px;color:var(--text-light);font-size:0.8rem;opacity:0.8;text-decoration:line-through">${formatPrice(product.price)} so'm <span style="font-size:0.7em;background:#eee;padding:1px 5px;border-radius:4px;color:#777;font-weight:500">asl narxi</span></div>
+            <div class="current-price" style="color:var(--accent-color);font-weight:800;font-size:1.15rem">${formatPrice(discount.price)} so'm <span style="font-size:0.6em;background:rgba(255,61,87,0.1);color:#ff3d57;padding:2px 6px;border-radius:4px;margin-left:2px;font-weight:700;text-transform:uppercase">chegirmada</span></div>
+        </div>`;
+        badgeHTML = `<div style="position:absolute;top:10px;left:10px;background:linear-gradient(135deg,#ff3d57,#ff8a80);color:white;padding:4px 10px;border-radius:20px;font-size:0.75rem;font-weight:800;z-index:2;display:flex;align-items:center;gap:4px;box-shadow:0 4px 10px rgba(255,61,87,0.3)">-${discount.percent}%</div>`;
     } else {
         priceHTML = `<div class="current-price">${formatPrice(product.price)} so'm</div>`;
     }
 
-    card.innerHTML = `
-        <div class="product-click-area" onclick="openProductDetailModal('${product.id}')" style="position: relative;">
-            ${badgeHTML}
-            <div class="product-image">
-                <img src="${initialImage}" alt="${product.name}" data-fallback="${fallback}" onerror="this.src='${fallback}'">
-                <button class="image-nav prev" data-pid="${product.id}" data-dir="-1" aria-label="Oldingi rasm" style="display:${showNav ? 'flex' : 'none'};">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="15 18 9 12 15 6"></polyline>
-                    </svg>
-                </button>
-                <button class="image-nav next" data-pid="${product.id}" data-dir="1" aria-label="Keyingi rasm" style="display:${showNav ? 'flex' : 'none'};">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="9 18 15 12 9 6"></polyline>
-                    </svg>
-                </button>
-            </div>
+    const brandHTML = product.brand
+        ? product.brand
+        : '<span style="width:40px;height:1.5px;background:#eef2f6;display:inline-block;border-radius:10px;opacity:0.8"></span>';
 
-            <button class="favorite-btn ${wishlist.includes(product.id.toString()) ? 'active' : ''}" 
-                    onclick="toggleWishlist(event, '${product.id}')" 
-                    id="wishlist-btn-${product.id}">
-                <svg width="20" height="20" viewBox="0 0 24 24" 
-                     fill="${wishlist.includes(product.id.toString()) ? 'currentColor' : 'none'}" 
-                     stroke="currentColor" stroke-width="2">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                </svg>
-            </button>
-
-            <div class="product-info">
-                <h3 class="product-name">${product.name}</h3>
-                ${priceHTML}
-                <div class="product-brand" style="font-size: 0.8rem; color: var(--text-light); font-weight: 500; display: flex; align-items: center; gap: 4px; margin-top: 6px; min-height: 1.2rem;">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
-                        <line x1="7" y1="7" x2="7.01" y2="7"></line>
-                    </svg>
-                    ${product.brand ? product.brand : '<span style="width: 40px; height: 1.5px; background: #eef2f6; display: inline-block; border-radius: 10px; opacity: 0.8;"></span>'}
-                </div>
-            </div>
-        </div>
-
-        <div class="product-footer-container">
-            <div class="product-footer" id="footer-${product.id}">
-                ${getProductFooterHTML(product)}
-            </div>
-        </div>
-    `;
+    card.innerHTML =
+        `<div class="product-click-area" onclick="openProductDetailModal('${product.id}')" style="position:relative">` +
+            badgeHTML +
+            `<div class="product-image">` +
+                `<img loading="lazy" src="${initialImage}" alt="${product.name}" data-fallback="${fallback}" onerror="this.src='${fallback}'">` +
+                `<button class="image-nav prev" data-pid="${product.id}" data-dir="-1" aria-label="Oldingi rasm" style="display:${showNav ? 'flex' : 'none'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>` +
+                `<button class="image-nav next" data-pid="${product.id}" data-dir="1" aria-label="Keyingi rasm" style="display:${showNav ? 'flex' : 'none'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>` +
+            `</div>` +
+            `<button class="favorite-btn${isFav ? ' active' : ''}" onclick="toggleWishlist(event,'${product.id}')" id="wishlist-btn-${product.id}">` +
+                `<svg width="20" height="20" viewBox="0 0 24 24" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>` +
+            `</button>` +
+            `<div class="product-info">` +
+                `<h3 class="product-name">${product.name}</h3>` +
+                priceHTML +
+                `<div class="product-brand" style="font-size:0.8rem;color:var(--text-light);font-weight:500;display:flex;align-items:center;gap:4px;margin-top:6px;min-height:1.2rem"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>${brandHTML}</div>` +
+            `</div>` +
+        `</div>` +
+        `<div class="product-footer-container"><div class="product-footer" id="footer-${product.id}">${getProductFooterHTML(product)}</div></div>`;
 
     return card;
-
 }
 
 function getProductFooterHTML(product) {
@@ -1642,50 +1774,71 @@ function openOrderModal() {
 }
 
 function handleViloyatChange(isPage = false) {
-
     const suffix = isPage ? 'Page' : '';
-
-    const viloyat = document.getElementById('orderViloyat' + suffix).value;
-
+    const viloyatSelect = document.getElementById('orderViloyat' + suffix);
     const tumanSelect = document.getElementById('orderTuman' + suffix);
+    if (!viloyatSelect || !tumanSelect) return;
+
+    const viloyat = viloyatSelect.value;
 
     // Clear current tumanlar
-
     tumanSelect.innerHTML = '<option value="" disabled selected>Tumanni tanlang</option>';
 
     if (viloyat && tumanlarData[viloyat]) {
-
         tumanSelect.disabled = false;
-
         tumanlarData[viloyat].forEach(tuman => {
-
             const option = document.createElement('option');
-
             option.value = tuman;
-
             option.textContent = tuman;
-
             tumanSelect.appendChild(option);
-
         });
-
     } else {
-
         tumanSelect.disabled = true;
-
     }
 
-    // Sync custom select UI
+    // Sync custom select UI — tuman
     buildCustomSelectOptions(tumanSelect);
     syncCustomSelectState(tumanSelect);
-    const viloyatSelect = document.getElementById('orderViloyat' + suffix);
-    if (viloyatSelect) {
-        syncCustomSelectState(viloyatSelect);
-    }
 
-    // Cart/order page: viloyat o'zgarganda dostavka matnini yangilash
+    // Sync custom select UI — viloyat
+    syncCustomSelectState(viloyatSelect);
+
+    // Dostavka matnini yangilash
     if (isPage && typeof updateOrderDeliveryTextFromInputs === 'function') {
         updateOrderDeliveryTextFromInputs();
+    }
+}
+
+// Viloyat/Tuman selectlar uchun event listenerlarni o'rnatish (inline onchange o'rniga)
+function initRegionSelectListeners() {
+    const viloyatPage = document.getElementById('orderViloyatPage');
+    const tumanPage = document.getElementById('orderTumanPage');
+    const viloyatModal = document.getElementById('orderViloyat');
+    const tumanModal = document.getElementById('orderTuman');
+
+    if (viloyatPage) {
+        viloyatPage.removeEventListener('change', viloyatPage._regionHandler);
+        viloyatPage._regionHandler = () => handleViloyatChange(true);
+        viloyatPage.addEventListener('change', viloyatPage._regionHandler);
+    }
+    if (tumanPage) {
+        tumanPage.removeEventListener('change', tumanPage._regionHandler);
+        tumanPage._regionHandler = () => {
+            if (typeof updateOrderDeliveryTextFromInputs === 'function') {
+                updateOrderDeliveryTextFromInputs();
+            }
+        };
+        tumanPage.addEventListener('change', tumanPage._regionHandler);
+    }
+    if (viloyatModal) {
+        viloyatModal.removeEventListener('change', viloyatModal._regionHandler);
+        viloyatModal._regionHandler = () => handleViloyatChange(false);
+        viloyatModal.addEventListener('change', viloyatModal._regionHandler);
+    }
+    if (tumanModal) {
+        tumanModal.removeEventListener('change', tumanModal._regionHandler);
+        tumanModal._regionHandler = () => {};
+        tumanModal.addEventListener('change', tumanModal._regionHandler);
     }
 }
 
@@ -2421,7 +2574,7 @@ function renderCartPage() {
                                         Viloyat
                                     </label>
                                     <div class="custom-select" data-placeholder="Viloyatni tanlang">
-                                        <select id="orderViloyatPage" class="native-select" required onchange="handleViloyatChange(true)">
+                                        <select id="orderViloyatPage" class="native-select" required>
                                             ${viloyatOptions}
                                         </select>
                                         <button type="button" class="custom-select-trigger" aria-expanded="false">
@@ -2437,7 +2590,7 @@ function renderCartPage() {
                                         Tuman
                                     </label>
                                     <div class="custom-select" data-placeholder="Tumanni tanlang">
-                                        <select id="orderTumanPage" class="native-select" required disabled onchange="updateOrderDeliveryTextFromInputs()">
+                                        <select id="orderTumanPage" class="native-select" required disabled>
                                             <option value="" disabled selected>Tumanni tanlang</option>
                                         </select>
                                         <button type="button" class="custom-select-trigger" aria-expanded="false" disabled>
@@ -2539,6 +2692,7 @@ function renderCartPage() {
 
     // Custom selectlarni qayta ishga tushirish
     initCustomSelects();
+    initRegionSelectListeners();
 }
 
 function renderCartItems() {
@@ -2708,75 +2862,56 @@ window.updateOrderDeliveryTextFromInputs = updateOrderDeliveryTextFromInputs;
 
 // ================================
 // WISHLIST FUNCTIONS
+// Wishlist module (wishlist-module.js) orqali ishlaydi
 // ================================
 
 async function toggleWishlist(event, productId) {
-    event.stopPropagation();
-    event.preventDefault();
-    
-    const index = wishlist.indexOf(productId.toString());
-    const product = products.find(p => p.id.toString() === productId.toString());
-    
-    if (index === -1) {
-        // Qo'shish
-        wishlist.push(productId.toString());
-        if (typeof showNotification === 'function') {
-            showNotification("Mahsulot sevimlilarga qo'shildi");
-        }
-        
-        // Firebase-ga saqlash
-        if (product && typeof firebaseAddToWishlist === 'function') {
-            await firebaseAddToWishlist(product);
-        }
-    } else {
-        // O'chirish
-        wishlist.splice(index, 1);
-        if (typeof showNotification === 'function') {
-            showNotification("Mahsulot sevimlilardan olib tashlandi");
-        }
-        
-        // Firebase-dan o'chirish
-        if (typeof firebaseRemoveFromWishlist === 'function') {
-            await firebaseRemoveFromWishlist(productId);
+    if (event) { event.stopPropagation(); event.preventDefault(); }
+
+    const added = Wishlist.toggle(productId);
+
+    // wishlist massivini sync qilish (boshqa joylar ishlatishi uchun)
+    wishlist = Wishlist.getIds();
+
+    // Heart pop animatsiya
+    const btn = event && event.currentTarget;
+    if (btn) {
+        btn.classList.remove('pop');
+        void btn.offsetWidth;
+        btn.classList.add('pop');
+        setTimeout(() => btn.classList.remove('pop'), 600);
+
+        if (added) {
+            for (let i = 0; i < 4; i++) {
+                const particle = document.createElement('span');
+                particle.className = 'heart-particle';
+                particle.textContent = ['❤️', '✨', '💕', '💗'][i];
+                particle.style.left = (btn.offsetWidth / 2 - 6 + (Math.random() - 0.5) * 20) + 'px';
+                particle.style.top = '0px';
+                particle.style.animationDelay = (i * 0.08) + 's';
+                btn.appendChild(particle);
+                setTimeout(() => particle.remove(), 800);
+            }
         }
     }
-    
-    localStorage.setItem('wishlist', JSON.stringify(wishlist));
-    updateWishlistUI();
-    
-    // Wishlist sahifasini yangilash (agar mavjud bo'lsa)
-    if (typeof renderWishlist === 'function') {
-        renderWishlist();
+
+    // Firebase sync (orqa fonda)
+    const product = typeof products !== 'undefined' && products.find(p => String(p.id) === String(productId));
+    if (added && product && typeof firebaseAddToWishlist === 'function') {
+        firebaseAddToWishlist(product).catch(() => {});
+    } else if (!added && typeof firebaseRemoveFromWishlist === 'function') {
+        firebaseRemoveFromWishlist(productId).catch(() => {});
     }
+
+    // Wishlist sahifasini yangilash
+    if (typeof renderWishlist === 'function') renderWishlist();
 }
 
 function updateWishlistUI() {
-    // Barcha wishlist tugmalarini yangilash
-    const wishlistBtns = document.querySelectorAll('.favorite-btn');
-    wishlistBtns.forEach(btn => {
-        const productId = btn.id.replace('wishlist-btn-', '');
-        const isActive = wishlist.includes(productId.toString());
-        
-        if (isActive) {
-            btn.classList.add('active');
-            const svg = btn.querySelector('svg');
-            if (svg) svg.setAttribute('fill', 'currentColor');
-        } else {
-            btn.classList.remove('active');
-            const svg = btn.querySelector('svg');
-            if (svg) svg.setAttribute('fill', 'none');
-        }
-    });
-
-    // Headerdagi wishlist count (agar bo'lsa)
-    const wishlistCountEl = document.getElementById('wishlistCount');
-    if (wishlistCountEl) {
-        wishlistCountEl.textContent = wishlist.length;
-        wishlistCountEl.style.display = wishlist.length > 0 ? 'flex' : 'none';
-    }
+    wishlist = Wishlist.getIds();
+    Wishlist._sync();
 }
 
-// Wishlist funksiyalarini global miqyosda e'lon qilish
 window.toggleWishlist = toggleWishlist;
 window.updateWishlistUI = updateWishlistUI;
 

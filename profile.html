@@ -19,22 +19,58 @@
 
 <body class="bg-secondary">
     <!-- Header -->
-    <header class="header">
+    <header class="header" id="siteHeader">
         <nav class="nav-container">
             <div class="logo">
-                <a href="index.html" style="text-decoration: none; display: flex; align-items: center;">
-                    <img src="assets/logo.png" alt="Forever Kosmetika" class="logo-img">
+                <a href="index.html" style="text-decoration: none;">
+                    <span class="logo-text">For.Ever</span>
                 </a>
             </div>
-            <ul class="nav-menu">
-                <li><a href="index.html#home" class="nav-link">Bosh sahifa</a></li>
-                <li><a href="index.html#products" class="nav-link">Mahsulotlar</a></li>
-                <li><a href="index.html#about" class="nav-link">Biz haqimizda</a></li>
-                <li><a href="index.html#contact" class="nav-link">Bog'lanish</a></li>
-                <li>
-                    <a href="profile.html" class="nav-link active">Profil</a>
-                </li>
-            </ul>
+            
+            <div class="nav-menu-wrapper">
+                <ul class="nav-menu">
+                    <li><a href="index.html#home" class="nav-link">Bosh sahifa</a></li>
+                    <li><a href="index.html#products" class="nav-link">Mahsulotlar</a></li>
+                    <li><a href="index.html#about" class="nav-link">Biz haqimizda</a></li>
+                    <li><a href="index.html#contact" class="nav-link">Bog'lanish</a></li>
+                </ul>
+            </div>
+
+            <div class="header-actions">
+                <div class="search-wrapper">
+                    <input type="text" class="search-input" placeholder="Qidirish..." id="searchInput">
+                    <button class="action-btn search-trigger" title="Qidiruv">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </button>
+                </div>
+                <a href="wishlist.html" class="action-btn" title="Sevimlilar">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                </a>
+                <a href="cart.html" class="action-btn cart-btn-icon" title="Savat">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4H6z"></path>
+                        <path d="M3 6h18"></path>
+                        <path d="M16 10a4 4 0 0 1-8 0"></path>
+                    </svg>
+                    <span class="cart-count">0</span>
+                </a>
+                <a href="profile.html" class="action-btn active" title="Profil">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                </a>
+                <button class="menu-toggle" id="menuToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
         </nav>
     </header>
 
@@ -162,6 +198,107 @@
                 el.style.display = 'flex';
             }
         });
+
+        // Search qidiruv — dropdown bilan
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            const searchWrapper = searchInput.closest('.search-wrapper');
+            let dropdown = null;
+            if (searchWrapper) {
+                dropdown = document.createElement('div');
+                dropdown.className = 'search-dropdown';
+                searchWrapper.appendChild(dropdown);
+            }
+
+            let searchTimeout = null;
+
+            function doSearch(term) {
+                if (!dropdown) return;
+                if (!term || term.length < 2) { dropdown.classList.remove('active'); return; }
+
+                const lowerTerm = term.toLowerCase();
+                // products global bo'lishi mumkin (firebase-db.js orqali)
+                let results = [];
+                if (typeof products !== 'undefined' && products.length > 0) {
+                    results = products.filter(p =>
+                        (p.name || '').toLowerCase().includes(lowerTerm) ||
+                        (p.category || '').toLowerCase().includes(lowerTerm)
+                    );
+                }
+
+                if (results.length === 0) {
+                    dropdown.innerHTML = `<div class="search-no-results"><span class="search-no-results-icon">🔍</span>"${term}" bo'yicha topilmadi</div>`;
+                    dropdown.classList.add('active');
+                    return;
+                }
+
+                const fallback = 'assets/logo.png';
+                let html = `<div class="search-dropdown-header">${results.length} ta mahsulot</div>`;
+                results.slice(0, 8).forEach(p => {
+                    const img = p.imageUrl || p.image || fallback;
+                    const price = new Intl.NumberFormat('uz-UZ').format(p.price);
+                    html += `
+                        <a href="index.html#product-card-${p.id}" class="search-result-item" onclick="event.preventDefault(); window.location.href='index.html#product-card-${p.id}'">
+                            <img src="${img}" alt="${p.name}" class="search-result-img" onerror="this.src='${fallback}'">
+                            <div class="search-result-info">
+                                <div class="search-result-name">${p.name}</div>
+                                <div class="search-result-category">${p.category || ''}</div>
+                            </div>
+                            <div class="search-result-price">${price} so'm</div>
+                            <svg class="search-result-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                        </a>
+                    `;
+                });
+                dropdown.innerHTML = html;
+                dropdown.classList.add('active');
+            }
+
+            // Mahsulotlarni yuklash (agar yuklanmagan bo'lsa)
+            if (typeof products === 'undefined' || !products.length) {
+                if (typeof firebaseGetProducts === 'function') {
+                    firebaseGetProducts().then(p => { window.products = p || []; }).catch(() => {});
+                }
+            }
+
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => doSearch(e.target.value.trim()), 200);
+            });
+
+            searchInput.addEventListener('focus', () => {
+                if (searchInput.value.trim().length >= 2) doSearch(searchInput.value.trim());
+            });
+
+            document.addEventListener('click', (e) => {
+                if (searchWrapper && !searchWrapper.contains(e.target)) {
+                    if (dropdown) dropdown.classList.remove('active');
+                }
+            });
+
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (dropdown) dropdown.classList.remove('active');
+                    const term = searchInput.value.trim();
+                    if (term.length > 0) window.location.href = 'index.html?search=' + encodeURIComponent(term);
+                }
+                if (e.key === 'Escape') {
+                    if (dropdown) dropdown.classList.remove('active');
+                    searchInput.blur();
+                }
+            });
+
+            const searchBtn = searchWrapper?.querySelector('.search-trigger');
+            if (searchBtn) {
+                searchBtn.addEventListener('click', () => {
+                    const term = searchInput.value.trim();
+                    if (term.length > 0) {
+                        if (dropdown) dropdown.classList.remove('active');
+                        window.location.href = 'index.html?search=' + encodeURIComponent(term);
+                    }
+                });
+            }
+        }
     </script>
 </body>
 

@@ -15,9 +15,21 @@ async function firebaseGetProducts() {
             }
         });
         // So'nggi qo'shilganlar yuqorida bo'lishi uchun sort qilish (ixtiyoriy)
-        return products.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+        const sorted = products.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+        // Keshga saqlash
+        try { localStorage.setItem('products', JSON.stringify(sorted)); } catch(e) {}
+        return sorted;
     } catch (error) {
         console.error('Mahsulotlarni olishda xatolik:', error);
+        // Offline keshdan yuklash
+        try {
+            const cached = localStorage.getItem('products');
+            if (cached) {
+                const parsed = JSON.parse(cached);
+                console.log(`📦 Offline kesh: ${parsed.length} ta mahsulot`);
+                return parsed;
+            }
+        } catch(e) {}
         return [];
     }
 }
@@ -42,6 +54,13 @@ async function firebaseAddProduct(productData) {
         productData.createdAt = new Date().toISOString();
         productData.updatedAt = new Date().toISOString();
         const docRef = await productsCollection.add(productData);
+        productData.id = docRef.id;
+        // Local keshni yangilash
+        try {
+            const cached = JSON.parse(localStorage.getItem('products') || '[]');
+            cached.unshift(productData);
+            localStorage.setItem('products', JSON.stringify(cached));
+        } catch(e) {}
         console.log('✅ Mahsulot qo\'shildi, ID:', docRef.id);
         return docRef.id;
     } catch (error) {
@@ -55,6 +74,15 @@ async function firebaseUpdateProduct(productId, productData) {
     try {
         productData.updatedAt = new Date().toISOString();
         await productsCollection.doc(productId).update(productData);
+        // Local keshni yangilash
+        try {
+            const cached = JSON.parse(localStorage.getItem('products') || '[]');
+            const idx = cached.findIndex(p => p.id === productId);
+            if (idx !== -1) {
+                cached[idx] = { ...cached[idx], ...productData };
+                localStorage.setItem('products', JSON.stringify(cached));
+            }
+        } catch(e) {}
         console.log('✅ Mahsulot yangilandi:', productId);
         return true;
     } catch (error) {
@@ -78,6 +106,12 @@ async function firebaseDeleteProduct(productId) {
         }
 
         await productsCollection.doc(productId).delete();
+        // Local keshni yangilash
+        try {
+            const cached = JSON.parse(localStorage.getItem('products') || '[]');
+            const filtered = cached.filter(p => p.id !== productId);
+            localStorage.setItem('products', JSON.stringify(filtered));
+        } catch(e) {}
         console.log('✅ Mahsulot o\'chirildi:', productId);
         return true;
     } catch (error) {
