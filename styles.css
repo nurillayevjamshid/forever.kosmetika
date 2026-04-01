@@ -79,23 +79,26 @@ body {
    ================================ */
 .header {
     position: fixed;
-    top: 0;
+    top: 20px;
     left: 0;
     right: 0;
     z-index: 1000;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(15px);
+    background: transparent;
     transition: var(--transition);
-    box-shadow: var(--shadow-nav);
 }
 
 .nav-container {
-    max-width: 1280px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 0.75rem var(--spacing-md);
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(15px);
+    border-radius: 100px;
+    padding: 10px 30px;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    box-shadow: var(--shadow-nav);
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .logo-text {
@@ -123,8 +126,8 @@ body {
     color: var(--text-secondary);
     font-weight: 500;
     font-size: 0.9rem;
-    padding: 8px 16px;
-    border-radius: 8px;
+    padding: 8px 18px;
+    border-radius: 100px;
     transition: var(--transition);
 }
 
@@ -134,8 +137,8 @@ body {
 }
 
 .nav-link.active {
-    background: var(--accent-color);
-    color: white;
+    background: #E8E4E1;
+    color: var(--text-primary);
 }
 
 .header-actions {
@@ -189,7 +192,7 @@ body {
 .hero {
     min-height: 100vh;
     background: var(--bg-cream);
-    padding-top: 100px;
+    padding-top: 120px;
     padding-bottom: 80px;
     display: flex;
     align-items: center;
@@ -426,7 +429,7 @@ body {
 
 @media (max-width: 576px) {
     .hero {
-        padding-top: 80px;
+        padding-top: 100px;
         padding-bottom: 40px;
     }
 
@@ -1244,11 +1247,11 @@ body {
    ================================ */
 @media (max-width: 768px) {
     .header {
-        top: 0;
+        top: 10px;
     }
     
     .nav-container {
-        padding: 0.75rem var(--spacing-md);
+        padding: 8px 20px;
         justify-content: center;
         position: relative;
     }
