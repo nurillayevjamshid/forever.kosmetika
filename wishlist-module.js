@@ -327,6 +327,11 @@
             // Heart pop animatsiya
             const btn = event && event.currentTarget;
             if (btn) {
+                // Active klass va fill atributini to'g'ri yangilash
+                btn.classList.toggle('active', added);
+                const svg = btn.querySelector('svg');
+                if (svg) svg.setAttribute('fill', added ? 'currentColor' : 'none');
+                
                 btn.classList.remove('pop');
                 void btn.offsetWidth;
                 btn.classList.add('pop');
