@@ -3853,6 +3853,38 @@ body {
         width: 100%;
     }
     
+    .hero-actions .btn-secondary {
+        display: none;
+    }
+    
+    /* Create mobile Instagram button */
+    .hero-actions::after {
+        content: "Instagram";
+        display: block;
+        background: linear-gradient(135deg, #e1306c, #833ab4, #fd1d1d);
+        color: white;
+        padding: 18px 24px;
+        border-radius: 16px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 1rem;
+        transition: var(--transition);
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 8px 25px rgba(226, 48, 108, 0.3);
+        text-align: center;
+        min-height: 56px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .hero-actions::after:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 35px rgba(226, 48, 108, 0.4);
+    }
+    
     .btn {
         width: 100%;
         padding: 18px 24px;
@@ -4156,6 +4188,16 @@ body {
     }
     
     .sticky-buy-button {
+        display: none;
+    }
+    
+    /* Desktop: Show original buttons */
+    .hero-actions .btn-secondary {
+        display: inline-flex;
+    }
+    
+    /* Desktop: Hide mobile Instagram button */
+    .hero-actions::after {
         display: none;
     }
 }
