@@ -3812,6 +3812,17 @@ body {
         gap: 8px;
     }
     
+    /* Hide cart and menu icons on mobile - only logo remains */
+    .cart-btn-icon,
+    .menu-toggle {
+        display: none !important;
+    }
+    
+    /* Center logo on mobile */
+    .logo {
+        margin: 0 auto;
+    }
+    
     .action-btn {
         width: 44px;
         height: 44px;
