@@ -4251,10 +4251,46 @@ body {
     transition: var(--transition-fast);
 }
 
-.nav-item:hover svg,
-.nav-item.active svg {
-    transform: scale(1.1);
-}
+    /* Mobile Bottom Navigation - Instagram Style */
+    .mobile-bottom-nav .nav-item:nth-child(3) {
+        position: relative;
+    }
+    
+    .mobile-bottom-nav .nav-item:nth-child(3)::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #e1306c, #833ab4, #fd1d1d);
+        border-radius: 50%;
+        z-index: -1;
+        box-shadow: 0 4px 15px rgba(226, 48, 108, 0.4);
+    }
+    
+    .mobile-bottom-nav .nav-item:nth-child(3) svg {
+        color: white;
+        width: 28px;
+        height: 28px;
+    }
+    
+    .mobile-bottom-nav .nav-item:nth-child(3) span {
+        color: #e1306c;
+        font-weight: 600;
+        font-size: 0.7rem;
+        margin-top: 2px;
+    }
+    
+    .mobile-bottom-nav .nav-item:nth-child(3):hover {
+        background: transparent;
+        transform: scale(1.05);
+    }
+    
+    .mobile-bottom-nav .nav-item:nth-child(3):hover::before {
+        box-shadow: 0 6px 20px rgba(226, 48, 108, 0.5);
+    }
 
 .nav-icon-wrapper {
     position: relative;
