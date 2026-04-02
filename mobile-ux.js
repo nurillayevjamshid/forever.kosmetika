@@ -1,6 +1,6 @@
 // ================================
 // MOBILE UX OPTIMIZATION SCRIPT
-// Conversion-focused mobile experience - Premium Edition
+// Conversion-focused mobile experience
 // ================================
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -10,9 +10,6 @@ document.addEventListener('DOMContentLoaded', function() {
 function initializeMobileUX() {
     // Mobile Navigation
     setupMobileNavigation();
-    
-    // Header Scroll Effects
-    setupHeaderScrollEffects();
     
     // Sticky CTA Elements
     setupStickyElements();
@@ -25,124 +22,6 @@ function initializeMobileUX() {
     
     // Performance Optimizations
     setupPerformanceOptimizations();
-    
-    // Premium Touch Interactions
-    setupPremiumTouchInteractions();
-}
-
-// ================================
-// HEADER SCROLL EFFECTS
-// ================================
-function setupHeaderScrollEffects() {
-    const header = document.querySelector('.header');
-    if (!header) return;
-    
-    let lastScrollY = window.scrollY;
-    let ticking = false;
-    
-    function updateHeader() {
-        const currentScrollY = window.scrollY;
-        
-        // Add scrolled class for shadow effect
-        if (currentScrollY > 10) {
-            header.classList.add('scrolled');
-        } else {
-            header.classList.remove('scrolled');
-        }
-        
-        // Hide/show header on scroll (optional - uncomment if desired)
-        // if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        //     header.style.transform = 'translateY(-100%)';
-        // } else {
-        //     header.style.transform = 'translateY(0)';
-        // }
-        
-        lastScrollY = currentScrollY;
-        ticking = false;
-    }
-    
-    window.addEventListener('scroll', function() {
-        if (!ticking) {
-            requestAnimationFrame(updateHeader);
-            ticking = true;
-        }
-    }, { passive: true });
-}
-
-// ================================
-// PREMIUM TOUCH INTERACTIONS
-// ================================
-function setupPremiumTouchInteractions() {
-    // Add touch feedback to all interactive elements
-    const touchElements = document.querySelectorAll('.product-card, .category-card, .filter-btn, .contact-method');
-    
-    touchElements.forEach(el => {
-        el.addEventListener('touchstart', function() {
-            this.style.transform = 'scale(0.98)';
-        }, { passive: true });
-        
-        el.addEventListener('touchend', function() {
-            this.style.transform = '';
-        }, { passive: true });
-        
-        el.addEventListener('touchcancel', function() {
-            this.style.transform = '';
-        }, { passive: true });
-    });
-    
-    // Enhanced button touch feedback
-    const buttons = document.querySelectorAll('.btn, .add-cart-new-btn, .action-btn');
-    buttons.forEach(btn => {
-        btn.addEventListener('touchstart', function(e) {
-            this.style.transform = 'scale(0.95)';
-            
-            // Create ripple effect
-            const ripple = document.createElement('span');
-            ripple.style.cssText = `
-                position: absolute;
-                border-radius: 50%;
-                background: rgba(255, 255, 255, 0.4);
-                transform: scale(0);
-                animation: rippleEffect 0.5s ease-out;
-                pointer-events: none;
-            `;
-            
-            const rect = this.getBoundingClientRect();
-            const size = Math.max(rect.width, rect.height);
-            const touch = e.touches[0];
-            const x = touch.clientX - rect.left - size / 2;
-            const y = touch.clientY - rect.top - size / 2;
-            
-            ripple.style.width = ripple.style.height = size + 'px';
-            ripple.style.left = x + 'px';
-            ripple.style.top = y + 'px';
-            
-            this.style.position = 'relative';
-            this.style.overflow = 'hidden';
-            this.appendChild(ripple);
-            
-            setTimeout(() => ripple.remove(), 500);
-        }, { passive: true });
-        
-        btn.addEventListener('touchend', function() {
-            this.style.transform = '';
-        }, { passive: true });
-    });
-    
-    // Add ripple animation keyframes
-    if (!document.getElementById('ripple-style')) {
-        const style = document.createElement('style');
-        style.id = 'ripple-style';
-        style.textContent = `
-            @keyframes rippleEffect {
-                to {
-                    transform: scale(4);
-                    opacity: 0;
-                }
-            }
-        `;
-        document.head.appendChild(style);
-    }
 }
 
 // ================================
@@ -422,57 +301,33 @@ function setupStickyBuyButton() {
     
     if (!stickyBuyButton || !stickyBuyBtn) return;
     
-    // Show/hide sticky buy button based on scroll with premium animation
+    // Show/hide sticky buy button based on scroll
     let lastScrollY = window.scrollY;
-    let ticking = false;
     
-    function updateStickyButton() {
+    window.addEventListener('scroll', function() {
         const currentScrollY = window.scrollY;
         const productsSection = document.getElementById('products');
-        const heroSection = document.getElementById('home');
-        
-        let shouldShow = false;
         
         if (productsSection) {
             const productsRect = productsSection.getBoundingClientRect();
-            const isInProductsSection = productsRect.top <= window.innerHeight / 2 && productsRect.bottom >= 100;
+            const isInProductsSection = productsRect.top <= 100 && productsRect.bottom >= 100;
             
-            // Show when in products section and scrolled past hero
-            if (isInProductsSection && currentScrollY > 300) {
-                shouldShow = true;
+            if (isInProductsSection && currentScrollY > 200) {
+                stickyBuyButton.style.display = 'block';
+            } else {
+                stickyBuyButton.style.display = 'none';
             }
         }
         
-        // Use class for smooth animation
-        if (shouldShow) {
-            stickyBuyButton.classList.add('visible');
-        } else {
-            stickyBuyButton.classList.remove('visible');
-        }
-        
         lastScrollY = currentScrollY;
-        ticking = false;
-    }
-    
-    window.addEventListener('scroll', function() {
-        if (!ticking) {
-            requestAnimationFrame(updateStickyButton);
-            ticking = true;
-        }
-    }, { passive: true });
+    });
     
     // Sticky buy button click handler
     stickyBuyBtn.addEventListener('click', function() {
         // Scroll to products section
         const productsSection = document.getElementById('products');
         if (productsSection) {
-            const headerHeight = document.querySelector('.header')?.offsetHeight || 0;
-            const targetPosition = productsSection.offsetTop - headerHeight - 20;
-            
-            window.scrollTo({
-                top: targetPosition,
-                behavior: 'smooth'
-            });
+            productsSection.scrollIntoView({ behavior: 'smooth' });
         }
     });
 }
@@ -539,24 +394,14 @@ function setupScrollToTop() {
     const scrollToTopBtn = document.getElementById('scrollToTopBtn');
     if (!scrollToTopBtn) return;
     
-    // Show/hide scroll to top button with debounce
-    let ticking = false;
-    
-    function updateScrollButton() {
-        if (window.scrollY > 500) {
-            scrollToTopBtn.classList.add('visible');
-        } else {
-            scrollToTopBtn.classList.remove('visible');
-        }
-        ticking = false;
-    }
-    
+    // Show/hide scroll to top button
     window.addEventListener('scroll', function() {
-        if (!ticking) {
-            requestAnimationFrame(updateScrollButton);
-            ticking = true;
+        if (window.scrollY > 300) {
+            scrollToTopBtn.style.display = 'flex';
+        } else {
+            scrollToTopBtn.style.display = 'none';
         }
-    }, { passive: true });
+    });
     
     // Scroll to top functionality
     scrollToTopBtn.addEventListener('click', function() {
