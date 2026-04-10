@@ -361,6 +361,77 @@ document.addEventListener('DOMContentLoaded', async function () {
     scrollToHashProduct();
     window.addEventListener('hashchange', scrollToHashProduct);
 
+    // ================================
+    // DYNAMIC UX EXTENSIONS
+    // ================================
+    
+    // 1. Hero Image Slider (Fade animation)
+    function initHeroSlider() {
+        const slides = document.querySelectorAll('.slide-item');
+        if(!slides.length) return;
+        let currentSlide = 0;
+        setInterval(() => {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }, 4000);
+    }
+    initHeroSlider();
+
+    // 2. Parallax Effect for Hero Backgrounds
+    function initParallax() {
+        const parallaxLayers = document.querySelectorAll('.parallax-layer');
+        if(!parallaxLayers.length) return;
+        
+        document.addEventListener('mousemove', (e) => {
+            const x = (window.innerWidth - e.pageX) / 100;
+            const y = (window.innerHeight - e.pageY) / 100;
+
+            parallaxLayers.forEach(layer => {
+                const speed = layer.getAttribute('data-speed') || 1;
+                layer.style.transform = `translateX(${x * speed}px) translateY(${y * speed}px)`;
+            });
+        });
+    }
+    initParallax();
+
+    // 3. Social Proof Notifications (Mock Data)
+    function initSocialProof() {
+        const toast = document.getElementById('socialProofToast');
+        if(!toast) return;
+        
+        const mockNames = ['Asal', 'Zarina', 'Madina', 'Shahzoda', 'Malika', 'Nigina'];
+        const mockProducts = ['Yuz kremi', 'Kiprik Tushi', 'Namlantiruvchi Serum', 'Lab bo\'yog\'i', 'Qosh qalami'];
+        const mockTimes = ['5 daqiqa', '12 daqiqa', 'soat', '20 daqiqa'];
+        
+        function showRandomToast() {
+            if(window.innerWidth <= 768) return; // Optional: disable on mobile if too annoying, but let's keep it for now.
+            if(products.length === 0) return;
+
+            const randomProduct = products[Math.floor(Math.random() * products.length)] || {};
+            const productName = randomProduct.name || mockProducts[Math.floor(Math.random() * mockProducts.length)];
+            const image = randomProduct.imageUrl || randomProduct.image || 'assets/logo.png';
+            const name = mockNames[Math.floor(Math.random() * mockNames.length)];
+            const time = mockTimes[Math.floor(Math.random() * mockTimes.length)];
+
+            document.getElementById('toastImage').src = image;
+            document.getElementById('toastName').textContent = productName;
+            document.getElementById('toastAction').innerHTML = `<b>${name}</b> ${time} avval sotib oldi 🛍️`;
+
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 6000);
+        }
+
+        // Delay starting the mock toasts
+        setTimeout(() => {
+            showRandomToast();
+            setInterval(showRandomToast, 25000); // show a new one every 25 seconds
+        }, 8000);
+    }
+    initSocialProof();
+
 });
 
 // ================================
