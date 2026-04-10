@@ -4225,10 +4225,16 @@ body {
     backdrop-filter: blur(20px);
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
     z-index: 999;
-    display: flex;
+    display: none;
     justify-content: space-around;
     padding: 8px 0 20px;
     border-top: 1px solid rgba(108, 59, 255, 0.1);
+}
+
+@media (max-width: 768px) {
+    .mobile-bottom-nav {
+        display: flex;
+    }
 }
 
 .nav-item {
