@@ -783,7 +783,6 @@ function _filterProducts(filter) {
 /**
  * Product card yaratish вЂ” optimallashtirilgan
  * - loading="lazy" rasmlar uchun
- * - isFavorite marta hisoblash (har bir card uchun emas)
  * - single innerHTML
  */
 function createProductCard(product) {
