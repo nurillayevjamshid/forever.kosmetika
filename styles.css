@@ -1907,8 +1907,8 @@ body {
     .header-actions {
         display: none !important;
     }
-    }
-    
+
+
     .action-btn:not(.cart-btn-icon) {
         display: none;
     }
@@ -1943,7 +1943,7 @@ body {
         grid-template-columns: 1fr;
     }
 }
-}
+
 
 
 /* Search Input Styles */
