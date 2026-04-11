@@ -1,4 +1,4 @@
-// ================================
+﻿// ================================
 // MOBILE UX OPTIMIZATION SCRIPT
 // Conversion-focused mobile experience
 // ================================
@@ -276,8 +276,8 @@ function setupMobileNavigation() {
     });
     
     // Update mobile menu active state based on scroll
-    updateBottomNavActive();
-    window.addEventListener('scroll', updateBottomNavActive);
+    updateMobileNavActive();
+    window.addEventListener('scroll', updateMobileNavActive);
 }
 
 // ================================
@@ -521,6 +521,30 @@ function setupTouchOptimizations() {
     document.head.appendChild(style);
 }
 
+function setupBottomNavActive() {
+    const navItems = document.querySelectorAll('.nav-item');
+    
+    function updateBottomNavActive() {
+        const sections = ['home', 'products', 'about', 'contact'];
+        
+        let currentSection = '';
+        sections.forEach(sectionId => {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                const rect = section.getBoundingClientRect();
+                if (rect.top <= 100 && rect.bottom >= 100) {
+                    currentSection = sectionId;
+                }
+            }
+        });
+        
+        navItems.forEach(item => {
+            item.classList.remove('active');
+            const href = item.getAttribute('href');
+            if (href === `#${currentSection}`) {
+                item.classList.add('active');
+            }
+        });
     }
     
     // Update on scroll
@@ -528,30 +552,6 @@ function setupTouchOptimizations() {
     
     // Update on load
     updateBottomNavActive();
-}
-
-function updateBottomNavActive() {
-    const navItems = document.querySelectorAll('.nav-item');
-    const sections = ['home', 'products', 'about', 'contact'];
-    
-    let currentSection = '';
-    sections.forEach(sectionId => {
-        const section = document.getElementById(sectionId);
-        if (section) {
-            const rect = section.getBoundingClientRect();
-            if (rect.top <= 150 && rect.bottom >= 150) {
-                currentSection = sectionId;
-            }
-        }
-    });
-    
-    navItems.forEach(item => {
-        item.classList.remove('active');
-        const href = item.getAttribute('href');
-        if (href === `#${currentSection}` || (currentSection === 'home' && href === 'index.html#home')) {
-            item.classList.add('active');
-        }
-    });
 }
 
 function setupProductCardOptimizations() {
@@ -642,6 +642,7 @@ function setupDebouncedScroll() {
     
     function updateOnScroll() {
         // Update scroll-based elements
+        updateMobileNavActive();
         updateBottomNavActive();
         
         ticking = false;
