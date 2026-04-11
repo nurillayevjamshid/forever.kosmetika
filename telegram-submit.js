@@ -16,29 +16,41 @@ async function submitOrder(event) {
         return;
     }
 
-    console.log('Bot Token mavjud:', BOT_TOKEN ? 'Ha' : 'Yo\'q');
-    console.log('Chat ID mavjud:', CHAT_ID ? 'Ha' : 'Yo\'q');
-
-    // Create order message
-    let message = `🔔 *YANGI BUYURTMA*\n\n`;
-    message += `👤 *Ism:* ${name}\n`;
-    message += `📞 *Telefon:* ${phone}\n`;
-    if (comment) {
-        message += `💬 *Izoh:* ${comment}\n`;
+    // HTML escape helper
+    function esc(text) {
+        return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
     }
-    message += `\n📦 *Mahsulotlar:*\n`;
-    message += `━━━━━━━━━━━━━━━━\n`;
+
+    // Create order message in HTML format
+    const orderNum = 'FOR-' + Date.now().toString(36).toUpperCase();
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('uz-UZ', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const timeStr = now.toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' });
+
+    let message = `<b>🛒 YANGI BUYURTMA</b>\n`;
+    message += `<code>${esc(orderNum)}</code>\n\n`;
+    message += `<b>👤 Mijoz:</b> ${esc(name)}\n`;
+    message += `<b>📞 Telefon:</b> <code>${esc(phone)}</code>\n`;
+    if (comment) {
+        message += `<b>💬 Izoh:</b> ${esc(comment)}\n`;
+    }
+    message += `\n<b>📦 Mahsulotlar:</b>\n`;
 
     cart.forEach((item, index) => {
-        message += `${index + 1}. *${item.name}*\n`;
-        message += `   Soni: ${item.quantity} ta\n`;
-        message += `   Narxi: ${formatPrice(item.price * item.quantity)} so'm\n\n`;
+        const itemTotal = item.price * item.quantity;
+        message += `\n${index + 1}. ${esc(item.name)}\n`;
+        message += `   ${item.quantity} × ${formatPrice(item.price)} = <b>${formatPrice(itemTotal)} so'm</b>\n`;
     });
 
     const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    message += `━━━━━━━━━━━━━━━━\n`;
-    message += `💰 *JAMI: ${formatPrice(total)} so'm*\n\n`;
-    message += `📅 Sana: ${new Date().toLocaleString('uz-UZ')}`;
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    message += `\n━━━━━━━━━━━━━━━━\n`;
+    message += `<b>💰 JAMI: ${formatPrice(total)} so'm</b>\n`;
+    message += `<b>📦 Mahsulotlar soni: ${totalItems} ta</b>\n`;
+    message += `\n📅 ${dateStr} ${timeStr}`;
 
     // Show loading notification
     showNotification('Buyurtma yuborilmoqda...');
@@ -53,7 +65,7 @@ async function submitOrder(event) {
             body: JSON.stringify({
                 chat_id: CHAT_ID,
                 text: message,
-                parse_mode: 'Markdown'
+                parse_mode: 'HTML'
             })
         });
 
@@ -61,6 +73,30 @@ async function submitOrder(event) {
         console.log('Telegram API javob:', data);
 
         if (data.ok) {
+            // Save to Firebase
+            if (typeof firebaseSaveOrder === 'function') {
+                try {
+                    await firebaseSaveOrder({
+                        customerName: name,
+                        customerPhone: phone,
+                        customerAddress: '',
+                        viloyat: '',
+                        tuman: '',
+                        items: cart.map(item => ({
+                            id: item.id,
+                            name: item.name,
+                            price: item.price,
+                            quantity: item.quantity
+                        })),
+                        totalAmount: total,
+                        comment: comment || ''
+                    });
+                    console.log('✅ Buyurtma Firebase\'ga saqlandi');
+                } catch (fbErr) {
+                    console.error('Firebase saqlash xatosi:', fbErr);
+                }
+            }
+
             // Success - clear cart
             cart = [];
             localStorage.setItem('cart', JSON.stringify(cart));
@@ -70,12 +106,10 @@ async function submitOrder(event) {
             closeOrderModal();
             showNotification('✅ Buyurtma muvaffaqiyatli yuborildi! Tez orada siz bilan bog\'lanamiz.');
         } else {
-            // Error from Telegram
             console.error('Telegram API error:', data);
             alert(`❌ Telegram xatosi: ${data.description || 'Noma\'lum xato'}`);
         }
     } catch (error) {
-        // Network or other error
         console.error('Error sending order:', error);
         showNotification('❌ Tarmoq xatosi. Iltimos, internetingizni tekshiring.');
     }
