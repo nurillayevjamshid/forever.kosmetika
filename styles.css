@@ -440,12 +440,38 @@ body {
 
 /* Main Title */
 .hero-title {
-    font-family: var(--font-serif);
     font-size: clamp(2.8rem, 4.5vw, 4rem);
-    line-height: 1.15;
+    line-height: 1.1;
     color: var(--text-primary);
+    margin-bottom: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.title-part-1 {
+    font-family: 'Montserrat', sans-serif;
     font-weight: 600;
-    letter-spacing: -0.02em;
+    font-size: 0.9em;
+    color: var(--text-primary);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.title-part-main {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.title-part-2 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+    font-size: 0.7em;
+    color: var(--text-secondary);
+    letter-spacing: 0.5px;
+    margin-top: 10px;
 }
 
 .accent-text {
@@ -455,6 +481,7 @@ body {
     font-weight: 700;
     position: relative;
     display: inline-block;
+    white-space: nowrap;
 }
 
 .accent-text::after {
