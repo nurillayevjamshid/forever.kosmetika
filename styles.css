@@ -35,13 +35,13 @@
     
     /* --- BACKGROUND PALETTE --- */
     /* Clean, premium backgrounds */
-    --bg-white: #E3F2FD;
-    --bg-cream: #E3F2FD;
-    --bg-beige: #D9E9FF;
-    --bg-warm: #F0F7FF;
-    --bg-elevated: #F0F7FF;
-    --bg-primary: #E3F2FD;
-    --bg-secondary: #D9E9FF;
+    --bg-white: #FCF3EB;
+    --bg-cream: #FCF3EB;
+    --bg-beige: #F7EADF;
+    --bg-warm: #FBF1E6;
+    --bg-elevated: #FDF9F6;
+    --bg-primary: #FCF3EB;
+    --bg-secondary: #F7EADF;
     
     /* --- TEXT COLORS --- */
     /* High contrast for readability */
@@ -126,7 +126,7 @@
     --divider: linear-gradient(90deg, transparent, #E5E5E5, transparent);
     
     /* Hero Section */
-    --hero-bg: radial-gradient(circle at center, #E3F2FD 0%, #D9E9FF 100%);
+    --hero-bg: linear-gradient(135deg, #FCF3EB 0%, #F7EADF 50%, #FBF1E6 100%);
     --hero-accent: rgba(108, 59, 255, 0.1);
     --hero-glow: radial-gradient(circle at 30% 50%, rgba(108, 59, 255, 0.15) 0%, transparent 50%);
     
@@ -157,7 +157,7 @@
     /* --- GRADIENTS --- */
     --gradient-premium: linear-gradient(135deg, #6C3BFF 0%, #5B21B6 100%);
     --gradient-gold: linear-gradient(135deg, #C9A96E 0%, #E8D4A8 50%, #C9A96E 100%);
-    --gradient-warm: linear-gradient(135deg, #E3F2FD 0%, #D9E9FF 100%);
+    --gradient-warm: linear-gradient(135deg, #FDF9F6 0%, #F5EFEB 100%);
     --gradient-dark: linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%);
     
     /* --- ANIMATIONS --- */
