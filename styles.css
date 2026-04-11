@@ -451,7 +451,7 @@ body {
 .accent-text {
     font-family: 'Bodoni Moda', serif;
     color: var(--accent-color);
-    font-style: italic;
+    font-style: normal;
     font-weight: 700;
     position: relative;
     display: inline-block;
