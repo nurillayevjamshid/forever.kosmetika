@@ -5064,7 +5064,36 @@ body {
         font-weight: 600 !important;
     }
     
+    /* Layout Fixes to prevent horizontal scroll/cut-offs */
     body {
         padding-bottom: 90px !important;
+        overflow-x: hidden !important;
+        width: 100% !important;
+    }
+
+    .about-stats {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
+    }
+
+    .about-stats .stat-card:last-child {
+        grid-column: span 2 !important;
+    }
+
+    .features-list {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+        width: 100% !important;
+    }
+
+    .feature-item {
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+    .container {
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+        overflow: hidden !important;
     }
 }
