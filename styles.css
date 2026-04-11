@@ -4928,9 +4928,9 @@ body {
         background: rgba(255, 255, 255, 0.98) !important;
         backdrop-filter: blur(20px) !important;
         border-radius: 20px !important;
-        padding: 8px 20px !important;
+        padding: 8px 16px !important;
         justify-content: center !important;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08) !important;
         border: 1px solid rgba(255, 255, 255, 0.5) !important;
         min-height: 60px !important;
     }
@@ -4944,13 +4944,12 @@ body {
         height: 34px !important;
     }
     
-    /* Hide desktop elements */
     .nav-menu-wrapper, 
     .header-actions:not(.mobile-search-active .header-actions) {
         display: none !important;
     }
     
-    /* SECRET LOGO SEARCH - MOBILE ONLY */
+    /* SECRET LOGO SEARCH */
     .header.mobile-search-active .logo {
         display: none !important;
     }
@@ -4959,31 +4958,18 @@ body {
         display: flex !important;
         position: static !important;
         width: 100% !important;
-        right: auto !important;
-        top: auto !important;
-        transform: none !important;
-    }
-    
-    .header.mobile-search-active .search-wrapper {
-        display: flex !important;
-        width: 100% !important;
-        opacity: 1 !important;
-        visibility: visible !important;
     }
     
     .header.mobile-search-active .search-input {
-        display: block !important;
-        width: 100% !important;
         background: var(--bg-white) !important;
         border: 1.5px solid var(--accent-color) !important;
         border-radius: 12px !important;
         padding: 10px 15px !important;
-        font-size: 1rem !important;
     }
-    
+
     /* --- HERO SECTION --- */
     .hero {
-        padding-top: 100px !important;
+        padding-top: 110px !important; /* Increased for better logo spacing */
         padding-bottom: 60px !important;
         background: var(--bg-primary) !important;
     }
@@ -4996,9 +4982,43 @@ body {
     }
     
     .title-part-1 { font-size: 0.85em !important; }
-    .title-part-2 { font-size: 0.7em !important; display: block !important; margin-top: 5px !important; }
-    .accent-text { font-size: 1.1em !important; display: block !important; }
+    .title-part-2 { 
+        font-size: 0.7em !important; 
+        display: block !important; 
+        margin-top: 5px !important;
+    }
+    .accent-text { 
+        font-size: 1.1em !important; 
+        display: block !important;
+    }
+
+    /* Instagram Hero Button Fix */
+    .hero-actions {
+        flex-direction: column !important;
+        gap: 12px !important;
+    }
+
+    .hero-actions .btn-secondary {
+        display: flex !important;
+        background: #FFF0EA !important; /* Soft Rose Background */
+        color: #3D2B1F !important;
+        border: 1.5px solid #C97884 !important;
+        border-radius: 16px !important;
+        padding: 18px !important;
+        box-shadow: 0 4px 15px rgba(201, 120, 132, 0.15) !important;
+        justify-content: center !important;
+        font-weight: 700 !important;
+    }
     
+    .hero-actions::after {
+        display: none !important; /* Remove old redundant pseudo-button */
+    }
+
+    /* --- SIDE ELEMENTS --- */
+    .sticky-buy-button {
+        display: none !important; /* Marked with X in user screenshot */
+    }
+
     /* --- GRID SYSTEMS --- */
     .categories-grid {
         display: grid !important;
@@ -5020,7 +5040,6 @@ body {
         left: 12px !important;
         right: 12px !important;
         width: auto !important;
-        margin: 0 !important;
         padding: 10px 0 14px !important;
         justify-content: space-around !important;
         background: rgba(255, 255, 255, 0.98) !important;
@@ -5029,6 +5048,20 @@ body {
         border: 1px solid rgba(255, 255, 255, 0.5) !important;
         border-radius: 24px !important;
         z-index: 2005 !important;
+    }
+
+    /* Bottom Nav Instagram Fix */
+    .mobile-bottom-nav .nav-item:nth-child(3)::before {
+        display: none !important; /* Remove loud purple blob */
+    }
+    .mobile-bottom-nav .nav-item:nth-child(3) svg {
+        color: #C97884 !important; /* Match Rose Theme */
+        width: 30px !important;
+        height: 30px !important;
+    }
+    .mobile-bottom-nav .nav-item:nth-child(3) span {
+        color: #C97884 !important;
+        font-weight: 600 !important;
     }
     
     body {
