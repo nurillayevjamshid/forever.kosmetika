@@ -894,9 +894,9 @@ body {
 
     .hero-container {
         grid-template-columns: 1fr;
-        gap: 50px;
+        gap: 30px;
         text-align: center;
-        padding: 0 24px;
+        padding: 0 20px;
     }
 
     .hero-content {
@@ -919,7 +919,26 @@ body {
     }
 
     .hero-title {
-        font-size: clamp(2.2rem, 6vw, 3rem);
+        font-size: clamp(2.2rem, 8vw, 2.8rem);
+        text-align: center;
+        align-items: center;
+    }
+
+    .title-part-1 {
+        font-size: 0.8em;
+    }
+
+    .title-part-2 {
+        align-self: center;
+        transform: none;
+        padding-right: 0;
+        margin-top: 5px;
+        font-size: 0.6em;
+    }
+
+    .accent-text {
+        font-size: 1.1em;
+        white-space: normal;
     }
 
     .hero-actions {
@@ -930,14 +949,8 @@ body {
         justify-content: center;
     }
 
-    .floating-card-1 {
-        right: -10px;
-        top: 20px;
-    }
-
-    .floating-card-2 {
-        left: -10px;
-        bottom: 40px;
+    .floating-card {
+        display: none !important; /* Hide floating cards on tablet/mobile to avoid overlapping text */
     }
 }
 
@@ -1884,20 +1897,30 @@ body {
     }
     
     .logo {
-        margin: 0 auto;
+        margin: 0;
+        flex-shrink: 0;
     }
-    
-    .nav-menu-wrapper {
-        display: none;
-    }
-    
+
     .header-actions {
         display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .search-wrapper {
+        width: 40px;
+        overflow: hidden;
+        transition: width 0.3s ease;
+    }
+
+    .search-wrapper:focus-within {
+        width: 200px;
         position: absolute;
-        right: 20px;
-        top: 50%;
-        transform: translateY(-50%);
-        gap: 10px;
+        right: 0;
+        background: var(--bg-white);
+        z-index: 100;
+        border-radius: 20px;
+    }
     }
     
     .action-btn:not(.cart-btn-icon) {
