@@ -1,4 +1,4 @@
-﻿// ================================
+// ================================
 
 // PRODUCT DATA & MANAGEMENT
 
@@ -360,7 +360,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             slides[currentSlide].classList.remove('active');
             currentSlide = (currentSlide + 1) % slides.length;
             slides[currentSlide].classList.add('active');
-        }, 4000);
+        }, 3000);
     }
     initHeroSlider();
 
