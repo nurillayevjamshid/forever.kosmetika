@@ -1,4 +1,4 @@
-// ================================
+﻿// ================================
 
 // PRODUCT DATA & MANAGEMENT
 
@@ -23,8 +23,7 @@ const defaultProducts = [];
 // Cart state
 
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
-// Wishlist modulidan olish (wishlist-module.js loaded bo'lishi kerak)
-let wishlist = (typeof Wishlist !== 'undefined') ? Wishlist.getIds() : (JSON.parse(localStorage.getItem('wishlistItems')) || []).map(w => w.id || w);
+
 
 // Viloyatlar va Tumanlar ma'lumotlari
 
@@ -110,7 +109,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             if (results.length === 0 && term.length > 1) {
                 dropdown.innerHTML = `
                     <div class="search-no-results">
-                        <span class="search-no-results-icon">🔍</span>
+                        <span class="search-no-results-icon">рџ”Ќ</span>
                         "${term}" bo'yicha mahsulot topilmadi
                     </div>
                 `;
@@ -190,7 +189,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
         };
 
-        // Input event — real-time search
+        // Input event вЂ” real-time search
         searchInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value.trim();
 
@@ -209,7 +208,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             }, 200);
         });
 
-        // Focus — agar matn bor bo'lsa dropdown ochish
+        // Focus вЂ” agar matn bor bo'lsa dropdown ochish
         searchInput.addEventListener('focus', () => {
             const term = searchInput.value.trim();
             if (term.length >= 2) {
@@ -224,7 +223,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
         });
 
-        // Enter — page ga yo'naltirish
+        // Enter вЂ” page ga yo'naltirish
         searchInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -265,19 +264,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     // Update cart count
 
     updateCartCount();
-
-    // Update wishlist icons
-    updateWishlistUI();
-
-    // Initialize favorite filter buttons
-    const mobileFavoriteBtn = document.getElementById('mobileFavoriteBtn');
-    if (mobileFavoriteBtn) {
-        mobileFavoriteBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            displayProducts('favorites');
-            document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
-        });
-    }
 
     // Smooth scroll for links
 
@@ -416,7 +402,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
             document.getElementById('toastImage').src = image;
             document.getElementById('toastName').textContent = productName;
-            document.getElementById('toastAction').innerHTML = `<b>${name}</b> ${time} avval sotib oldi 🛍️`;
+            document.getElementById('toastAction').innerHTML = `<b>${name}</b> ${time} avval sotib oldi рџ›ЌпёЏ`;
 
             toast.classList.add('show');
             setTimeout(() => {
@@ -437,7 +423,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 // ================================
 // CUSTOM SELECTS (VILOYAT/TUMAN)
 // ================================
-// Custom select document-level handlers — faqat bir marta o'rnatiladi
+// Custom select document-level handlers вЂ” faqat bir marta o'rnatiladi
 let _customSelectDocHandlersAttached = false;
 
 function initCustomSelects() {
@@ -453,7 +439,7 @@ function initCustomSelects() {
         syncCustomSelectState(select);
     });
 
-    // Document-level click handler — faqat bir marta o'rnatiladi
+    // Document-level click handler вЂ” faqat bir marta o'rnatiladi
     if (!_customSelectDocHandlersAttached) {
         _customSelectDocHandlersAttached = true;
 
@@ -550,7 +536,7 @@ function buildCustomSelectOptions(selectEl) {
             ${iconHtml}
             <span class="option-text">${opt.textContent}</span>
         `;
-        // Event delegation orqali ishlaydi — alohida listener kerak emas
+        // Event delegation orqali ishlaydi вЂ” alohida listener kerak emas
         panel.appendChild(optionBtn);
     });
 }
@@ -626,7 +612,7 @@ async function loadProducts() {
         try {
             const loadedProducts = await firebaseGetProducts();
             products = loadedProducts;
-            console.log(`✅ ${products.length} ta mahsulot yuklandi (Firebase)`);
+            console.log(`вњ… ${products.length} ta mahsulot yuklandi (Firebase)`);
             // LocalStorage ga zaxira saqlash
             try { localStorage.setItem('products', JSON.stringify(products)); } catch(e) {}
         } catch (error) {
@@ -636,7 +622,7 @@ async function loadProducts() {
             if (cached) {
                 try {
                     products = JSON.parse(cached);
-                    console.log(`📦 ${products.length} ta mahsulot local keshdan yuklandi`);
+                    console.log(`рџ“¦ ${products.length} ta mahsulot local keshdan yuklandi`);
                 } catch (e) {
                     products = [];
                 }
@@ -645,12 +631,12 @@ async function loadProducts() {
             }
         }
     } else {
-        console.log('⚠️ Firebase ulanmagan, localStorage dan yuklanmoqda');
+        console.log('вљ пёЏ Firebase ulanmagan, localStorage dan yuklanmoqda');
         const cached = localStorage.getItem('products');
         if (cached) {
             try {
                 products = JSON.parse(cached);
-                console.log(`📦 ${products.length} ta mahsulot local keshdan yuklandi`);
+                console.log(`рџ“¦ ${products.length} ta mahsulot local keshdan yuklandi`);
             } catch (e) {
                 products = [];
             }
@@ -736,13 +722,10 @@ function initNavigation() {
 // ================================
 
 /**
- * Mahsulotlarni ko'rsatish — optimallashtirilgan
+ * Mahsulotlarni ko'rsatish вЂ” optimallashtirilgan
  * DocumentFragment + CSS staggered animation + lazy loading
  */
 function displayProducts(filter = 'all') {
-    // Wishlist ni moduldan sinxronlash
-    wishlist = Wishlist.getIds();
-
     const grid = document.getElementById('productsGrid');
     if (!grid) return;
 
@@ -754,14 +737,12 @@ function displayProducts(filter = 'all') {
 
     // 3) Empty state
     if (!filtered.length) {
-        const msg = filter === 'favorites'
-            ? '💔 Sevimlilar ro\'yxati bo\'sh — yurakcha bosib qo\'shing'
-            : '🔍 Bu kategoriyada mahsulot topilmadi';
-        grid.innerHTML = `<div class="empty-state"><span class="empty-icon">✨</span><p>${msg}</p></div>`;
+        const msg = 'рџ”Ќ Bu kategoriyada mahsulot topilmadi';
+        grid.innerHTML = `<div class="empty-state"><span class="empty-icon">вњЁ</span><p>${msg}</p></div>`;
         return;
     }
 
-    // 4) Fragment bilan render — bitta reflow
+    // 4) Fragment bilan render вЂ” bitta reflow
     const fragment = document.createDocumentFragment();
     filtered.forEach((product, i) => {
         const card = createProductCard(product);
@@ -773,7 +754,7 @@ function displayProducts(filter = 'all') {
 }
 
 /**
- * Mahsulotni filterlash — ajratilgan funksiya
+ * Mahsulotni filterlash вЂ” ajratilgan funksiya
  */
 function _filterProducts(filter) {
     if (!filter || filter === 'all') return products;
@@ -785,10 +766,6 @@ function _filterProducts(filter) {
             (p.description || '').toLowerCase().includes(term) ||
             (p.category || '').toLowerCase().includes(term)
         );
-    }
-
-    if (filter === 'favorites') {
-        return products.filter(p => wishlist.includes(p.id.toString()));
     }
 
     const f = filter.toLowerCase();
@@ -804,7 +781,7 @@ function _filterProducts(filter) {
 }
 
 /**
- * Product card yaratish — optimallashtirilgan
+ * Product card yaratish вЂ” optimallashtirilgan
  * - loading="lazy" rasmlar uchun
  * - isFavorite marta hisoblash (har bir card uchun emas)
  * - single innerHTML
@@ -818,7 +795,6 @@ function createProductCard(product) {
     const fallback = getProductFallbackImage(product);
     const initialImage = state.images[state.index] || state.images[0] || product.imageUrl || product.image || fallback;
     const showNav = state.images.length > 1;
-    const isFav = wishlist.includes(product.id.toString());
     const discount = getActiveDiscountForProduct(product);
 
     // Narx HTML
@@ -846,9 +822,6 @@ function createProductCard(product) {
                 `<button class="image-nav prev" data-pid="${product.id}" data-dir="-1" aria-label="Oldingi rasm" style="display:${showNav ? 'flex' : 'none'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>` +
                 `<button class="image-nav next" data-pid="${product.id}" data-dir="1" aria-label="Keyingi rasm" style="display:${showNav ? 'flex' : 'none'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>` +
             `</div>` +
-            `<button class="favorite-btn${isFav ? ' active' : ''}" onclick="toggleWishlist(event,'${product.id}')" id="wishlist-btn-${product.id}">` +
-                `<svg width="20" height="20" viewBox="0 0 24 24" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>` +
-            `</button>` +
             `<div class="product-info">` +
                 `<h3 class="product-name">${product.name}</h3>` +
                 priceHTML +
@@ -1216,8 +1189,8 @@ function addToCart(productId) {
 
     updateCartCount();
 
-    // Update wishlist icons
-    updateWishlistUI();
+
+
 
     // Update UI for this product
 
@@ -1254,52 +1227,6 @@ function updateCartCount() {
 
     // Mobile UX event
     window.dispatchEvent(new Event('cartUpdated'));
-}
-
-function toggleFavorite(productId) {
-    const id = productId.toString();
-    const index = favorites.indexOf(id);
-    const product = products.find(p => p.id.toString() === id);
-    
-    if (index === -1) {
-        favorites.push(id);
-        if (product) showNotification(`${product.name} sevimlilarga qo'shildi!`);
-    } else {
-        favorites.splice(index, 1);
-        if (product) showNotification(`${product.name} sevimlilardan olib tashlandi!`);
-    }
-    
-    localStorage.setItem('favorites', JSON.stringify(favorites));
-    updateFavoriteCount();
-    
-    // Update the card UI
-    const card = document.getElementById(`product-card-${id}`);
-    if (card) {
-        const favBtn = card.querySelector('.favorite-btn');
-        if (favBtn) {
-            favBtn.classList.toggle('active');
-        }
-    }
-
-    // If we are in favorites view, re-render
-    const activeFilter = document.querySelector('.filter-btn.active');
-    if (activeFilter && activeFilter.getAttribute('data-filter') === 'favorites') {
-        displayProducts('favorites');
-    }
-}
-
-function updateFavoriteCount() {
-    const favoriteCounts = document.querySelectorAll('.favorite-count');
-    const totalFavorites = favorites.length;
-
-    favoriteCounts.forEach(count => {
-        count.textContent = totalFavorites;
-        if (totalFavorites === 0) {
-            count.style.display = 'none';
-        } else {
-            count.style.display = 'flex';
-        }
-    });
 }
 
 // ================================
@@ -1867,11 +1794,11 @@ function handleViloyatChange(isPage = false) {
         tumanSelect.disabled = true;
     }
 
-    // Sync custom select UI — tuman
+    // Sync custom select UI вЂ” tuman
     buildCustomSelectOptions(tumanSelect);
     syncCustomSelectState(tumanSelect);
 
-    // Sync custom select UI — viloyat
+    // Sync custom select UI вЂ” viloyat
     syncCustomSelectState(viloyatSelect);
 
     // Dostavka matnini yangilash
@@ -2007,7 +1934,7 @@ async function submitOrder(event, isPage = false) {
 
             });
 
-            console.log('📋 Buyurtma Firebase ga saqlandi:', orderResult);
+            console.log('рџ“‹ Buyurtma Firebase ga saqlandi:', orderResult);
 
         }
 
@@ -2049,7 +1976,7 @@ async function submitOrder(event, isPage = false) {
 
             });
 
-            console.log('👤 Mijoz Firebase ga saqlandi:', customerResult);
+            console.log('рџ‘¤ Mijoz Firebase ga saqlandi:', customerResult);
 
         }
 
@@ -2069,7 +1996,7 @@ async function submitOrder(event, isPage = false) {
                 totalAmount: grandTotal,
                 orderNumber: orderResult?.orderNumber || ''
             });
-            console.log('🛒 Sotuv Firebase ga saqlandi:', saleId);
+            console.log('рџ›’ Sotuv Firebase ga saqlandi:', saleId);
         }
 
         // ============================
@@ -2082,23 +2009,23 @@ async function submitOrder(event, isPage = false) {
 
         if (BOT_TOKEN && CHAT_ID) {
 
-            let message = `🔔 *YANGI BUYURTMA*\n\n`;
+            let message = `рџ”” *YANGI BUYURTMA*\n\n`;
 
             if (orderResult?.orderNumber) {
 
-                message += `🔢 *Buyurtma №:* ${orderResult.orderNumber}\n`;
+                message += `рџ”ў *Buyurtma в„–:* ${orderResult.orderNumber}\n`;
 
             }
 
-            message += `👤 *Mijoz:* ${name}\n`;
+            message += `рџ‘¤ *Mijoz:* ${name}\n`;
 
-            message += `📞 *Telefon:* ${phone}\n`;
+            message += `рџ“ћ *Telefon:* ${phone}\n`;
 
-            message += `📍 *Manzil:* ${viloyat}, ${tuman}\n`;
+            message += `рџ“Ќ *Manzil:* ${viloyat}, ${tuman}\n`;
 
-            message += `\n📦 *Mahsulotlar:*\n`;
+            message += `\nрџ“¦ *Mahsulotlar:*\n`;
 
-            message += `━━━━━━━━━━━━━━━━\n`;
+            message += `в”Ѓв”Ѓв”Ѓв”Ѓв”Ѓв”Ѓв”Ѓв”Ѓв”Ѓв”Ѓв”Ѓв”Ѓв”Ѓв”Ѓв”Ѓв”Ѓ\n`;
 
             cart.forEach((item, index) => {
 
@@ -2110,17 +2037,17 @@ async function submitOrder(event, isPage = false) {
 
             });
 
-            message += `━━━━━━━━━━━━━━━━\n`;
+            message += `в”Ѓв”Ѓв”Ѓв”Ѓв”Ѓв”Ѓв”Ѓв”Ѓв”Ѓв”Ѓв”Ѓв”Ѓв”Ѓв”Ѓв”Ѓв”Ѓ\n`;
 
             if (deliveryPrice > 0) {
-                message += `🚚 *Yetkazib berish:* ${formatPrice(deliveryPrice)} so'm\n`;
+                message += `рџљљ *Yetkazib berish:* ${formatPrice(deliveryPrice)} so'm\n`;
             } else if (viloyat && tuman) {
-                message += `🚚 *Yetkazib berish:* Tekin\n`;
+                message += `рџљљ *Yetkazib berish:* Tekin\n`;
             }
 
-            message += `💰 *JAMI: ${formatPrice(grandTotal)} so'm*\n\n`;
+            message += `рџ’° *JAMI: ${formatPrice(grandTotal)} so'm*\n\n`;
 
-            message += `📅 Sana: ${new Date().toLocaleString('uz-UZ')}`;
+            message += `рџ“… Sana: ${new Date().toLocaleString('uz-UZ')}`;
 
             try {
 
@@ -2236,7 +2163,7 @@ async function submitOrder(event, isPage = false) {
 
         } else {
 
-            alert('❌ Buyurtma yuborilmadi. Iltimos, qayta urinib ko\'ring.');
+            alert('вќЊ Buyurtma yuborilmadi. Iltimos, qayta urinib ko\'ring.');
 
             submitBtn.disabled = false;
 
@@ -2248,7 +2175,7 @@ async function submitOrder(event, isPage = false) {
 
         console.error('Buyurtma yuborishda umumiy xatolik:', error);
 
-        showNotification('❌ Xatolik yuz berdi. Iltimos, qayta urinib ko\'ring.');
+        showNotification('вќЊ Xatolik yuz berdi. Iltimos, qayta urinib ko\'ring.');
 
         submitBtn.disabled = false;
 
@@ -2547,7 +2474,7 @@ function renderCartPage() {
                             </div>
                             <div class="breakdown-row delivery-row" id="deliveryBreakdownRow" style="display: none;">
                                 <span>Yetkazib berish</span>
-                                <span class="delivery-price-tag" id="deliveryPriceTag">—</span>
+                                <span class="delivery-price-tag" id="deliveryPriceTag">вЂ”</span>
                             </div>
                         </div>
 
@@ -2728,7 +2655,7 @@ function renderCartPage() {
                             </div>
                             <div class="breakdown-row delivery-row" id="orderDeliveryBreakdownRow" style="display: none;">
                                 <span>Yetkazib berish</span>
-                                <span class="delivery-price-tag" id="orderDeliveryPriceTag">—</span>
+                                <span class="delivery-price-tag" id="orderDeliveryPriceTag">вЂ”</span>
                             </div>
                         </div>
                         <div class="summary-total summary-total-premium">
@@ -2873,7 +2800,7 @@ function updateOrderDeliveryTextFromInputs() {
                     <circle cx="5.5" cy="18.5" r="2.5"></circle>
                     <circle cx="18.5" cy="18.5" r="2.5"></circle>
                 </svg>
-                <span>${viloyat}, ${tuman} — ${deliveryPrice > 0 ? formatPrice(deliveryPrice) + " so'm" : 'Tekin yetkazib berish'}</span>
+                <span>${viloyat}, ${tuman} вЂ” ${deliveryPrice > 0 ? formatPrice(deliveryPrice) + " so'm" : 'Tekin yetkazib berish'}</span>
             </div>
         `;
 
@@ -2930,62 +2857,6 @@ window.showStep = showStep;
 window.changeQuantityPage = changeQuantityPage;
 window.removeFromCartPage = removeFromCartPage;
 window.updateOrderDeliveryTextFromInputs = updateOrderDeliveryTextFromInputs;
-
-// ================================
-// WISHLIST FUNCTIONS
-// Wishlist module (wishlist-module.js) orqali ishlaydi
-// ================================
-
-async function toggleWishlist(event, productId) {
-    if (event) { event.stopPropagation(); event.preventDefault(); }
-
-    const added = Wishlist.toggle(productId);
-
-    // wishlist massivini sync qilish (boshqa joylar ishlatishi uchun)
-    wishlist = Wishlist.getIds();
-
-    // Heart pop animatsiya
-    const btn = event && event.currentTarget;
-    if (btn) {
-        btn.classList.remove('pop');
-        void btn.offsetWidth;
-        btn.classList.add('pop');
-        setTimeout(() => btn.classList.remove('pop'), 600);
-
-        if (added) {
-            for (let i = 0; i < 4; i++) {
-                const particle = document.createElement('span');
-                particle.className = 'heart-particle';
-                particle.textContent = ['❤️', '✨', '💕', '💗'][i];
-                particle.style.left = (btn.offsetWidth / 2 - 6 + (Math.random() - 0.5) * 20) + 'px';
-                particle.style.top = '0px';
-                particle.style.animationDelay = (i * 0.08) + 's';
-                btn.appendChild(particle);
-                setTimeout(() => particle.remove(), 800);
-            }
-        }
-    }
-
-    // Firebase sync (orqa fonda)
-    const product = typeof products !== 'undefined' && products.find(p => String(p.id) === String(productId));
-    if (added && product && typeof firebaseAddToWishlist === 'function') {
-        firebaseAddToWishlist(product).catch(() => {});
-    } else if (!added && typeof firebaseRemoveFromWishlist === 'function') {
-        firebaseRemoveFromWishlist(productId).catch(() => {});
-    }
-
-    // Wishlist sahifasini yangilash
-    if (typeof renderWishlist === 'function') renderWishlist();
-}
-
-function updateWishlistUI() {
-    wishlist = Wishlist.getIds();
-    Wishlist._sync();
-}
-
-window.toggleWishlist = toggleWishlist;
-window.updateWishlistUI = updateWishlistUI;
-
 
 // Chegirma vaqtini har minutda tekshirib turish (avtomatik yangilanish uchun)
 // Bu mahsulotlar kartasini yangilaydi agar chegirma vaqti o'tgan bo'lsa
