@@ -36,12 +36,12 @@
     /* --- BACKGROUND PALETTE --- */
     /* Clean, premium backgrounds */
     --bg-white: #FFFFFF;
-    --bg-cream: #FDF9F6;
-    --bg-beige: #F5EFEB;
-    --bg-warm: #FAF6F3;
+    --bg-cream: #FCF3EB;
+    --bg-beige: #F7EADF;
+    --bg-warm: #FBF1E6;
     --bg-elevated: #FFFFFF;
-    --bg-primary: #FDF9F6;
-    --bg-secondary: #F5EFEB;
+    --bg-primary: #FCF3EB;
+    --bg-secondary: #F7EADF;
     
     /* --- TEXT COLORS --- */
     /* High contrast for readability */
@@ -126,7 +126,7 @@
     --divider: linear-gradient(90deg, transparent, #E5E5E5, transparent);
     
     /* Hero Section */
-    --hero-bg: linear-gradient(135deg, #FDF9F6 0%, #F5EFEB 50%, #FAF6F3 100%);
+    --hero-bg: linear-gradient(135deg, #FCF3EB 0%, #F7EADF 50%, #FBF1E6 100%);
     --hero-accent: rgba(108, 59, 255, 0.1);
     --hero-glow: radial-gradient(circle at 30% 50%, rgba(108, 59, 255, 0.15) 0%, transparent 50%);
     
