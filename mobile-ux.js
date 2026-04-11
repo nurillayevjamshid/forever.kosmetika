@@ -1,4 +1,4 @@
-﻿// ================================
+// ================================
 // MOBILE UX OPTIMIZATION SCRIPT
 // Conversion-focused mobile experience
 // ================================
@@ -19,6 +19,9 @@ function initializeMobileUX() {
     
     // Mobile Optimizations
     setupMobileOptimizations();
+    
+    // Secret Logo Search
+    setupMobileSecretSearch();
     
     // Performance Optimizations
     setupPerformanceOptimizations();
@@ -728,3 +731,54 @@ window.MobileUX = {
     isMobile,
     isTouchDevice
 };
+
+function setupMobileSecretSearch() {
+    const logoArea = document.querySelector('.logo');
+    const header = document.querySelector('.header');
+    const searchInput = document.getElementById('searchInput');
+    let pressTimer;
+
+    if (!logoArea || !header || !searchInput) return;
+
+    // Secret long-press search: 1.5s hold on logo
+    logoArea.addEventListener('touchstart', function(e) {
+        if (window.innerWidth > 768) return;
+        
+        pressTimer = window.setTimeout(function() {
+            header.classList.add('mobile-search-active');
+            searchInput.focus();
+            
+            if ('vibrate' in navigator) {
+                navigator.vibrate(50);
+            }
+            
+            if (window.showToast) {
+                window.showToast("Qidiruv rejimi faollashdi", "success", 2000);
+            }
+        }, 1500);
+    }, {passive: true});
+
+    logoArea.addEventListener('touchend', function() {
+        clearTimeout(pressTimer);
+    });
+
+    logoArea.addEventListener('touchmove', function() {
+        clearTimeout(pressTimer);
+    });
+
+    // Close on blur if empty
+    searchInput.addEventListener('blur', function() {
+        if (this.value === '') {
+            setTimeout(() => {
+                header.classList.remove('mobile-search-active');
+            }, 100);
+        }
+    });
+
+    // Prevent default context menu on long press only for logo on mobile
+    logoArea.addEventListener('contextmenu', function(e) {
+        if (window.innerWidth <= 768) {
+            e.preventDefault();
+        }
+    });
+}

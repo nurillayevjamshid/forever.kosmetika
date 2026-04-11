@@ -1913,6 +1913,39 @@ body {
         display: none;
     }
     
+    /* Secret Mobile Search */
+    .header.mobile-search-active .logo {
+        display: none !important;
+    }
+    
+    .header.mobile-search-active .header-actions {
+        display: flex !important;
+        position: static !important;
+        width: 100%;
+        padding: 0 5px;
+        transform: none !important;
+    }
+    
+    .header.mobile-search-active .search-wrapper {
+        display: flex !important;
+        width: 100%;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+    
+    .header.mobile-search-active .search-input {
+        display: block !important;
+        width: 100%;
+        background: var(--bg-white);
+        border: 1.5px solid var(--accent-color);
+        border-radius: 12px;
+        padding: 8px 15px;
+    }
+    
+    .header.mobile-search-active .action-btn:not(.search-trigger) {
+        display: none !important;
+    }
+
     .menu-toggle {
         display: block;
     }
