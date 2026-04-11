@@ -446,7 +446,7 @@ body {
     margin-bottom: 25px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
 }
 
 .title-part-1 {
@@ -458,20 +458,15 @@ body {
     text-transform: uppercase;
 }
 
-.title-part-main {
-    display: flex;
-    align-items: center;
-    gap: 25px;
-    flex-wrap: nowrap;
-}
-
 .title-part-2 {
     font-family: 'Montserrat', sans-serif;
     font-weight: 500;
     font-size: 0.7em;
     color: var(--text-secondary);
     letter-spacing: 0.5px;
-    margin-bottom: -10px; /* Adjust to sit well next to large text */
+    align-self: flex-end;
+    margin-top: -5px;
+    padding-right: 15%;
 }
 
 .accent-text {
