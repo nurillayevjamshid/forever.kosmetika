@@ -74,6 +74,9 @@ document.addEventListener('DOMContentLoaded', async function () {
     // Firebase'dan mahsulotlarni yuklash
 
     await loadProducts();
+    
+    // Eng ko'p sotilgan mahsulotni yangilash
+    updateHeroBestSeller();
 
     // Initialize filters
 
@@ -648,6 +651,55 @@ async function loadProducts() {
     // Mahsulotlarni ko'rsatish
     if (grid) {
         displayProducts(currentFilter);
+    }
+}
+
+// Eng ko'p sotilgan mahsulotni aniqlash va ko'rsatish
+async function updateHeroBestSeller() {
+    if (typeof firebaseGetOrders !== 'function' || typeof firebaseGetProducts !== 'function') return;
+
+    try {
+        const orders = await firebaseGetOrders();
+        if (!orders || orders.length === 0) return;
+
+        // Mahsulotlar bo'yicha sotuvlarni hisoblash
+        const prodStats = {};
+        orders.forEach(order => {
+            if (order.items && Array.isArray(order.items)) {
+                order.items.forEach(item => {
+                    const pid = item.productId || item.id;
+                    if (pid) {
+                        prodStats[pid] = (prodStats[pid] || 0) + (item.quantity || 1);
+                    }
+                });
+            }
+        });
+
+        // Eng ko'p sotilgan ID ni topish
+        const sortedPids = Object.keys(prodStats).sort((a, b) => prodStats[b] - prodStats[a]);
+        if (sortedPids.length === 0) return;
+
+        const bestSellerId = sortedPids[0];
+        
+        // Mahsulot ma'lumotlarini olish
+        const products = await firebaseGetProducts();
+        const bestProduct = products.find(p => p.id === bestSellerId);
+
+        if (bestProduct) {
+            const nameEl = document.getElementById('heroBestSellerName');
+            const imgEl = document.getElementById('heroBestSellerImg');
+            
+            if (nameEl) nameEl.textContent = bestProduct.name;
+            if (imgEl) {
+                const mainImg = (bestProduct.imageUrls && bestProduct.imageUrls[0]) || bestProduct.image || bestProduct.imageUrl;
+                if (mainImg) {
+                    imgEl.src = mainImg;
+                    imgEl.alt = bestProduct.name;
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Best seller card update error:', error);
     }
 }
 
