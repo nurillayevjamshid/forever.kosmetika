@@ -279,8 +279,8 @@ function setupMobileNavigation() {
     });
     
     // Update mobile menu active state based on scroll
-    updateMobileNavActive();
-    window.addEventListener('scroll', updateMobileNavActive);
+    updateBottomNavActive();
+    window.addEventListener('scroll', updateBottomNavActive);
 }
 
 // ================================
@@ -524,30 +524,6 @@ function setupTouchOptimizations() {
     document.head.appendChild(style);
 }
 
-function setupBottomNavActive() {
-    const navItems = document.querySelectorAll('.nav-item');
-    
-    function updateBottomNavActive() {
-        const sections = ['home', 'products', 'about', 'contact'];
-        
-        let currentSection = '';
-        sections.forEach(sectionId => {
-            const section = document.getElementById(sectionId);
-            if (section) {
-                const rect = section.getBoundingClientRect();
-                if (rect.top <= 100 && rect.bottom >= 100) {
-                    currentSection = sectionId;
-                }
-            }
-        });
-        
-        navItems.forEach(item => {
-            item.classList.remove('active');
-            const href = item.getAttribute('href');
-            if (href === `#${currentSection}`) {
-                item.classList.add('active');
-            }
-        });
     }
     
     // Update on scroll
@@ -555,6 +531,30 @@ function setupBottomNavActive() {
     
     // Update on load
     updateBottomNavActive();
+}
+
+function updateBottomNavActive() {
+    const navItems = document.querySelectorAll('.nav-item');
+    const sections = ['home', 'products', 'about', 'contact'];
+    
+    let currentSection = '';
+    sections.forEach(sectionId => {
+        const section = document.getElementById(sectionId);
+        if (section) {
+            const rect = section.getBoundingClientRect();
+            if (rect.top <= 150 && rect.bottom >= 150) {
+                currentSection = sectionId;
+            }
+        }
+    });
+    
+    navItems.forEach(item => {
+        item.classList.remove('active');
+        const href = item.getAttribute('href');
+        if (href === `#${currentSection}` || (currentSection === 'home' && href === 'index.html#home')) {
+            item.classList.add('active');
+        }
+    });
 }
 
 function setupProductCardOptimizations() {
@@ -645,7 +645,6 @@ function setupDebouncedScroll() {
     
     function updateOnScroll() {
         // Update scroll-based elements
-        updateMobileNavActive();
         updateBottomNavActive();
         
         ticking = false;
@@ -733,22 +732,22 @@ window.MobileUX = {
 };
 
 function setupMobileSecretSearch() {
-    const logoArea = document.querySelector('.logo');
-    const header = document.querySelector('.header');
-    const searchInput = document.getElementById('searchInput');
+    const logoArea = document.querySelector(".logo");
+    const header = document.querySelector(".header");
+    const searchInput = document.getElementById("searchInput");
     let pressTimer;
 
     if (!logoArea || !header || !searchInput) return;
 
     // Secret long-press search: 1.5s hold on logo
-    logoArea.addEventListener('touchstart', function(e) {
-        if (window.innerWidth > 768) return;
+    logoArea.addEventListener("touchstart", function(e) {
+        if (window.innerWidth > 991) return;
         
         pressTimer = window.setTimeout(function() {
-            header.classList.add('mobile-search-active');
+            header.classList.add("mobile-search-active");
             searchInput.focus();
             
-            if ('vibrate' in navigator) {
+            if ("vibrate" in navigator) {
                 navigator.vibrate(50);
             }
             
@@ -758,26 +757,26 @@ function setupMobileSecretSearch() {
         }, 1500);
     }, {passive: true});
 
-    logoArea.addEventListener('touchend', function() {
+    logoArea.addEventListener("touchend", function() {
         clearTimeout(pressTimer);
     });
 
-    logoArea.addEventListener('touchmove', function() {
+    logoArea.addEventListener("touchmove", function() {
         clearTimeout(pressTimer);
     });
 
     // Close on blur if empty
-    searchInput.addEventListener('blur', function() {
-        if (this.value === '') {
+    searchInput.addEventListener("blur", function() {
+        if (this.value === "") {
             setTimeout(() => {
-                header.classList.remove('mobile-search-active');
+                header.classList.remove("mobile-search-active");
             }, 100);
         }
     });
 
     // Prevent default context menu on long press only for logo on mobile
-    logoArea.addEventListener('contextmenu', function(e) {
-        if (window.innerWidth <= 768) {
+    logoArea.addEventListener("contextmenu", function(e) {
+        if (window.innerWidth <= 991) {
             e.preventDefault();
         }
     });
