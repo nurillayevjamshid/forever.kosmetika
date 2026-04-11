@@ -35,11 +35,11 @@
     
     /* --- BACKGROUND PALETTE --- */
     /* Clean, premium backgrounds */
-    --bg-white: #FFFFFF;
+    --bg-white: #FCF3EB;
     --bg-cream: #FCF3EB;
     --bg-beige: #F7EADF;
     --bg-warm: #FBF1E6;
-    --bg-elevated: #FFFFFF;
+    --bg-elevated: #FDF9F6;
     --bg-primary: #FCF3EB;
     --bg-secondary: #F7EADF;
     
@@ -607,7 +607,7 @@ body {
 
 /* SECONDARY CTA - Premium Gold */
 .btn-secondary {
-    background: white;
+    background: var(--bg-white);
     color: var(--primary-color);
     border: 2px solid var(--border-medium);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
@@ -806,7 +806,7 @@ body {
 /* Floating Cards */
 .floating-card {
     position: absolute;
-    background: white;
+    background: var(--bg-white);
     padding: 16px 20px;
     border-radius: 16px;
     box-shadow: 0 10px 30px rgba(108, 59, 255, 0.12);
@@ -1076,7 +1076,7 @@ body {
 .filter-btn {
     padding: 12px 28px;
     border: 1px solid var(--border-medium);
-    background: white;
+    background: var(--bg-white);
     border-radius: 100px;
     font-family: var(--font-primary);
     font-size: 0.9rem;
@@ -1336,7 +1336,7 @@ body {
     height: 36px;
     border-radius: 50%;
     border: none;
-    background: white;
+    background: var(--bg-white);
     color: var(--accent-color);
     font-size: 1.2rem;
     font-weight: 600;
@@ -1379,7 +1379,7 @@ body {
 .feature-item {
     display: flex;
     gap: 15px;
-    background: white;
+    background: var(--bg-white);
     padding: 20px;
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-sm);
@@ -1404,7 +1404,7 @@ body {
 }
 
 .stat-card {
-    background: white;
+    background: var(--bg-white);
     padding: 30px;
     border-radius: var(--radius-lg);
     text-align: center;
@@ -1450,7 +1450,7 @@ body {
     display: flex;
     gap: 20px;
     padding: 25px;
-    background: white;
+    background: var(--bg-white);
     border-radius: var(--radius-lg);
     text-decoration: none;
     color: inherit;
@@ -1483,7 +1483,7 @@ body {
 }
 
 .contact-form-wrapper {
-    background: white;
+    background: var(--bg-white);
     padding: 40px;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-lg);
@@ -1514,7 +1514,7 @@ body {
 .form-group textarea:focus {
     outline: none;
     border-color: var(--input-focus);
-    background: white;
+    background: var(--bg-white);
     box-shadow: 0 0 0 4px var(--input-focus-ring);
 }
 
@@ -1535,7 +1535,7 @@ body {
     top: -10px;
     left: 12px;
     font-size: 0.75rem;
-    background: white;
+    background: var(--bg-white);
     padding: 0 8px;
     color: var(--accent-color);
     font-weight: 600;
@@ -1668,7 +1668,7 @@ body {
 }
 
 .modal-content {
-    background: white;
+    background: var(--bg-white);
     border-radius: var(--radius-xl);
     max-width: 900px;
     width: 100%;
@@ -1763,7 +1763,7 @@ body {
     bottom: 0;
     left: 0;
     width: 100%;
-    background: white;
+    background: var(--bg-white);
     box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.05);
     padding: 10px 0;
     z-index: 1500;
@@ -1896,7 +1896,7 @@ body {
 }
 
 .search-wrapper:focus-within {
-    background: white;
+    background: var(--bg-white);
     border-color: var(--accent-color);
     box-shadow: 0 0 0 4px rgba(226, 158, 125, 0.1);
 }
@@ -1936,7 +1936,7 @@ body {
     left: 0;
     right: 0;
     min-width: 320px;
-    background: white;
+    background: var(--bg-white);
     border-radius: 16px;
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06);
     border: 1px solid rgba(0, 0, 0, 0.06);
@@ -2130,7 +2130,7 @@ body {
 }
 
 .cart-item {
-    background: white;
+    background: var(--bg-white);
     border-radius: var(--radius-lg);
     padding: 20px;
     display: flex;
@@ -2206,7 +2206,7 @@ body {
 
 /* Order Summary Card */
 .order-summary-card {
-    background: white;
+    background: var(--bg-white);
     border-radius: var(--radius-lg);
     padding: 28px;
     border: 1px solid var(--border-color);
@@ -2323,7 +2323,7 @@ body {
 
 /* Checkout inputs & sections */
 .order-section-card {
-    background: white;
+    background: var(--bg-white);
     border-radius: var(--radius-lg);
     padding: 32px;
     border: 1px solid var(--border-color);
@@ -2393,7 +2393,7 @@ body {
 
 .phone-input-wrapper:focus-within {
     border-color: var(--primary-color);
-    background: white;
+    background: var(--bg-white);
     box-shadow: 0 0 0 4px rgba(61, 43, 31, 0.05);
 }
 
@@ -2485,7 +2485,7 @@ body {
     height: 36px;
     border-radius: 50%;
     border: none;
-    background: white;
+    background: var(--bg-white);
     color: var(--primary-color);
     font-size: 1.2rem;
     font-weight: 600;
@@ -2563,7 +2563,7 @@ body {
 }
 
 .clear-cart-btn {
-    background: white;
+    background: var(--bg-white);
     color: var(--accent-color);
     border: 1px solid var(--border-color);
     padding: 10px 24px;
@@ -2585,7 +2585,7 @@ body {
 .empty-cart-page {
     text-align: center;
     padding: 100px 20px;
-    background: white;
+    background: var(--bg-white);
     border-radius: var(--radius-xl);
     border: 1px solid var(--border-color);
 }
@@ -2622,7 +2622,7 @@ body {
 }
 
 .custom-select-trigger:focus, .custom-select.is-open .custom-select-trigger {
-    background: white;
+    background: var(--bg-white);
     border-color: var(--primary-color);
     box-shadow: 0 0 0 4px rgba(61, 43, 31, 0.05);
 }
@@ -2632,7 +2632,7 @@ body {
     top: calc(100% + 8px);
     left: 0;
     width: 100%;
-    background: white;
+    background: var(--bg-white);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-lg);
     border: 1px solid var(--border-color);
@@ -2733,7 +2733,7 @@ body {
     align-items: center;
     gap: 10px;
     padding: 12px 22px;
-    background: white;
+    background: var(--bg-white);
     border: 1.5px solid rgba(61, 43, 31, 0.1);
     border-radius: 100px;
     color: var(--text-secondary);
@@ -2764,7 +2764,7 @@ body {
 
 /* Premium Order Section Card */
 .order-section-card {
-    background: white;
+    background: var(--bg-white);
     border-radius: var(--radius-xl);
     padding: 36px;
     border: 1px solid rgba(61, 43, 31, 0.06);
@@ -2829,7 +2829,7 @@ body {
 .form-group textarea:focus {
     outline: none;
     border-color: var(--primary-color);
-    background: white;
+    background: var(--bg-white);
     box-shadow: 0 0 0 4px rgba(61, 43, 31, 0.06);
 }
 
@@ -2846,7 +2846,7 @@ body {
 
 .phone-input-wrapper:focus-within {
     border-color: var(--primary-color);
-    background: white;
+    background: var(--bg-white);
     box-shadow: 0 0 0 4px rgba(61, 43, 31, 0.06);
 }
 
@@ -2912,7 +2912,7 @@ body {
 }
 
 .custom-select-trigger:focus, .custom-select.is-open .custom-select-trigger {
-    background: white;
+    background: var(--bg-white);
     border-color: var(--primary-color);
     box-shadow: 0 0 0 4px rgba(61, 43, 31, 0.06);
 }
@@ -2961,7 +2961,7 @@ body {
     left: 0;
     right: 0;
     width: 100%;
-    background: white;
+    background: var(--bg-white);
     border-radius: 0 0 var(--radius-md) var(--radius-md);
     box-shadow: 0 12px 40px rgba(0,0,0,0.12);
     border: 1.5px solid var(--primary-color);
@@ -3218,7 +3218,7 @@ body {
     bottom: 0;
     left: 0;
     right: 0;
-    background: white;
+    background: var(--bg-white);
     padding: 12px 16px;
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
     z-index: 1600;
@@ -3409,7 +3409,7 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
-    background: white;
+    background: var(--bg-white);
     padding: 12px 20px;
     border-radius: 12px;
     box-shadow: var(--shadow-sm);
@@ -3526,7 +3526,7 @@ body {
 }
 
 .quick-view-btn {
-    background: white;
+    background: var(--bg-white);
     color: var(--accent-color);
     border: none;
     padding: 12px 24px;
@@ -3866,7 +3866,7 @@ body {
     }
     
     .btn-secondary {
-        background: white;
+        background: var(--bg-white);
         border: 2px solid var(--border-medium);
         color: var(--text-primary);
     }
@@ -4457,7 +4457,7 @@ body {
 }
 
 .toast {
-    background: white;
+    background: var(--bg-white);
     border-radius: 12px;
     padding: 16px 20px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
@@ -4780,7 +4780,7 @@ body {
     position: fixed;
     bottom: -100px;
     left: 20px;
-    background: white;
+    background: var(--bg-white);
     border-radius: var(--radius-md);
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     padding: 12px;
