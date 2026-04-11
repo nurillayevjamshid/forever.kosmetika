@@ -461,8 +461,8 @@ body {
 .title-part-main {
     display: flex;
     align-items: center;
-    gap: 15px;
-    flex-wrap: wrap;
+    gap: 25px;
+    flex-wrap: nowrap;
 }
 
 .title-part-2 {
@@ -471,7 +471,7 @@ body {
     font-size: 0.7em;
     color: var(--text-secondary);
     letter-spacing: 0.5px;
-    margin-top: 10px;
+    margin-bottom: -10px; /* Adjust to sit well next to large text */
 }
 
 .accent-text {
