@@ -241,8 +241,8 @@
                         <div class="stat-label">Mahsulotlar</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number">250+</div>
-                        <div class="stat-label">Xursand mijozlar</div>
+                        <div class="stat-number" id="totalCustomersCount">...</div>
+                        <div class="stat-label">Jami xaridorlarimiz</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-number">99%</div>
@@ -532,6 +532,25 @@
     <script src="telegram-config.js?v=1774685356"></script>
     <script src="telegram-contact.js?v=1774685356"></script>
     <script src="script.js?v=1774685356"></script>
+    <script>
+    // Jami xaridorlar sonini Firebase'dan olish
+    async function loadCustomersCount() {
+        const el = document.getElementById('totalCustomersCount');
+        if (!el) return;
+        try {
+            if (typeof firebaseGetOrders === 'function') {
+                const orders = await firebaseGetOrders();
+                const count = orders.length;
+                el.textContent = count + ' ta';
+            } else {
+                el.textContent = '250+';
+            }
+        } catch (e) {
+            el.textContent = '250+';
+        }
+    }
+    loadCustomersCount();
+    </script>
     <script src="mobile-ux.js?v=1774685356"></script> <!-- Mobile UX Optimization -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
