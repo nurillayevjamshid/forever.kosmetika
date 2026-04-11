@@ -5040,33 +5040,40 @@ body {
         left: 12px !important;
         right: 12px !important;
         width: auto !important;
-        padding: 10px 0 14px !important;
+        padding: 6px 0 !important;
+        min-height: 58px !important; /* Harmonized with top navbar */
         justify-content: space-around !important;
         background: rgba(255, 255, 255, 0.98) !important;
         backdrop-filter: blur(20px) !important;
-        box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.1) !important;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08) !important;
         border: 1px solid rgba(255, 255, 255, 0.5) !important;
-        border-radius: 24px !important;
+        border-radius: 20px !important;
         z-index: 2005 !important;
     }
 
-    /* Bottom Nav Instagram Fix */
-    .mobile-bottom-nav .nav-item:nth-child(3)::before {
-        display: none !important; /* Remove loud purple blob */
+    .nav-item {
+        padding: 4px 8px !important;
+        gap: 2px !important;
+        border-radius: 12px !important;
     }
-    .mobile-bottom-nav .nav-item:nth-child(3) svg {
-        color: #C97884 !important; /* Match Rose Theme */
-        width: 30px !important;
-        height: 30px !important;
+
+    .nav-item.active {
+        background: rgba(201, 120, 132, 0.1) !important;
     }
-    .mobile-bottom-nav .nav-item:nth-child(3) span {
-        color: #C97884 !important;
+
+    .nav-item svg {
+        width: 20px !important;
+        height: 20px !important;
+    }
+
+    .nav-item span {
+        font-size: 0.65rem !important;
         font-weight: 600 !important;
     }
     
-    /* Layout Fixes to prevent horizontal scroll/cut-offs */
+    /* Layout Fixes */
     body {
-        padding-bottom: 90px !important;
+        padding-bottom: 85px !important;
         overflow-x: hidden !important;
         width: 100% !important;
     }
@@ -5083,12 +5090,6 @@ body {
     .features-list {
         grid-template-columns: 1fr !important;
         gap: 12px !important;
-        width: 100% !important;
-    }
-
-    .feature-item {
-        margin: 0 !important;
-        width: 100% !important;
     }
 
     .container {
