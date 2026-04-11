@@ -3685,7 +3685,8 @@ body {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.2); }
 }
-
+
+
     
     .trust-badge-icon {
         width: 32px;
@@ -3739,17 +3740,26 @@ body {
         justify-content: center; /* Logo markazda */
     }
 
-    /* Mobil navbar da faqat logo ko'rinsin */
-    .nav-menu-wrapper,
-    .header-actions,
-    .search-wrapper,
-    .action-btn:not(.cart-btn-icon),
+    /* Mobil navbar da FAQAT logo ko'rinsin */
+    .nav-menu-wrapper {
+        display: none !important;
+    }
+    .header-actions {
+        display: none !important;
+    }
+    .search-wrapper {
+        display: none !important;
+    }
+    .action-btn {
+        display: none !important;
+    }
+    .cart-btn-icon {
+        display: none !important;
+    }
     .menu-toggle {
         display: none !important;
     }
-
-    /* Savat icon ham yashirish — chunki bottom nav da bor */
-    .cart-btn-icon {
+    .search-trigger {
         display: none !important;
     }
 
@@ -3841,15 +3851,22 @@ body {
         box-shadow: 0 6px 20px rgba(201, 120, 132, 0.35);
     }
 
-    /* Trust badges */
+    /* Trust badges: 2 ta bir qatorda */
     .hero-trust {
-        gap: 20px;
-        justify-content: center;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        width: 100%;
     }
 
     .trust-item {
-        font-size: 0.85rem;
+        font-size: 0.82rem;
         gap: 6px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        justify-content: center;
     }
 
     .trust-item svg {
@@ -4022,16 +4039,20 @@ body {
     .about-stats {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 12px;
+        gap: 10px;
     }
 
     .stat-card {
-        padding: 20px 14px;
+        padding: 16px 10px;
         border-radius: 12px;
     }
 
     .stat-number {
-        font-size: 1.6rem;
+        font-size: 1.4rem;
+    }
+
+    .stat-label {
+        font-size: 0.7rem;
     }
 
     /* --- 6. CONTACT SECTION --- */
@@ -4044,9 +4065,73 @@ body {
         gap: 30px;
     }
 
+    /* Contact methods: 2 ta bir qatorda */
+    .contact-methods {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
     .contact-method {
-        padding: 18px 14px;
+        padding: 14px 12px;
         border-radius: 12px;
+        flex-direction: column;
+        text-align: center;
+        gap: 8px;
+    }
+
+    .contact-method .method-icon {
+        margin: 0 auto;
+    }
+
+    .contact-method .method-text h4 {
+        font-size: 0.85rem;
+    }
+
+    .contact-method .method-text p {
+        font-size: 0.75rem;
+    }
+
+    /* Social contact cards */
+    .social-contact-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .social-contact-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 20px 16px;
+        border-radius: 14px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    .social-contact-card.telegram {
+        background: #E8F4FD;
+        color: #0088cc;
+    }
+
+    .social-contact-card.telegram:hover {
+        background: #0088cc;
+        color: white;
+    }
+
+    .social-contact-card.instagram {
+        background: #FDEEF4;
+        color: #e1306c;
+    }
+
+    .social-contact-card.instagram:hover {
+        background: linear-gradient(135deg, #e1306c, #833ab4);
+        color: white;
     }
 
     .contact-form-wrapper {
@@ -4258,189 +4343,6 @@ body {
 
 /* ===== DESKTOP: 769px+ — mobil elementlarni yashirish ===== */
 @media (min-width: 769px) {
-    .mobile-bottom-nav {
-        display: none !important;
-    }
-
-    .sticky-buy-button {
-        display: none !important;
-    }
-
-    /* Desktop: Instagram tugmasi ko'rinsin */
-    .hero-actions .btn-secondary {
-        display: inline-flex !important;
-    }
-
-    /* Desktop: hero-actions::after yo'q */
-    .hero-actions::after {
-        display: none !important;
-    }
-}
-   ================================ */
-@media (min-width: 481px) and (max-width: 768px) {
-    .container {
-        padding: 0 20px;
-    }
-    
-    .products-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
-    }
-    
-    .categories-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-    
-    .hero-container {
-        padding: 0 20px;
-    }
-    
-    .product-detail-layout {
-        grid-template-columns: 1.2fr 0.8fr;
-        gap: 30px;
-        padding: 30px 20px;
-    }
-}
-
-/* ================================
-   DESKTOP STYLES (769px+)
-   ================================ */
-@media (min-width: 769px) {
-    .mobile-bottom-nav {
-        display: none;
-    }
-    
-    .sticky-buy-button {
-        display: none;
-    }
-    
-    /* Desktop: Show original buttons */
-    .hero-actions .btn-secondary {
-        display: inline-flex;
-    }
-    
-    /* Desktop: Hide mobile Instagram button */
-    .hero-actions::after {
-        display: none;
-    }
-}
-
-/* ================================
-   MOBILE BOTTOM NAVIGATION
-   ================================ */
-.mobile-bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(20px);
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
-    z-index: 999;
-    display: none;
-    justify-content: space-around;
-    padding: 8px 0 20px;
-    border-top: 1px solid rgba(201, 120, 132, 0.1);
-}
-
-
-.nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    text-decoration: none;
-    color: var(--text-secondary);
-    font-size: 0.75rem;
-    font-weight: 500;
-    padding: 8px 12px;
-    border-radius: 12px;
-    transition: var(--transition-fast);
-    position: relative;
-}
-
-.nav-item:hover {
-    background: rgba(201, 120, 132, 0.05);
-    color: var(--accent-color);
-}
-
-.nav-item.active {
-    color: var(--accent-color);
-    background: rgba(201, 120, 132, 0.1);
-}
-
-.nav-item svg {
-    width: 24px;
-    height: 24px;
-    transition: var(--transition-fast);
-}
-
-    /* Mobile Bottom Navigation - Instagram Style */
-    .mobile-bottom-nav .nav-item:nth-child(3) {
-        position: relative;
-    }
-    
-    .mobile-bottom-nav .nav-item:nth-child(3)::before {
-        content: '';
-        position: absolute;
-        top: -2px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 60px;
-        height: 60px;
-        background: linear-gradient(135deg, #e1306c, #833ab4, #fd1d1d);
-        border-radius: 50%;
-        z-index: -1;
-        box-shadow: 0 4px 15px rgba(226, 48, 108, 0.4);
-    }
-    
-    .mobile-bottom-nav .nav-item:nth-child(3) svg {
-        color: white;
-        width: 28px;
-        height: 28px;
-    }
-    
-    .mobile-bottom-nav .nav-item:nth-child(3) span {
-        color: #e1306c;
-        font-weight: 600;
-        font-size: 0.7rem;
-        margin-top: 2px;
-    }
-    
-    .mobile-bottom-nav .nav-item:nth-child(3):hover {
-        background: transparent;
-        transform: scale(1.05);
-    }
-    
-    .mobile-bottom-nav .nav-item:nth-child(3):hover::before {
-        box-shadow: 0 6px 20px rgba(226, 48, 108, 0.5);
-    }
-
-.nav-icon-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.cart-count {
-    position: absolute;
-    top: -6px;
-    right: -6px;
-    background: var(--cta-primary);
-    color: white;
-    font-size: 0.6rem;
-    font-weight: 700;
-    min-width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 4px;
-    box-shadow: 0 2px 8px rgba(201, 120, 132, 0.4);
-}
-
 /* ================================
    STICKY BUY BUTTON
    ================================ */
@@ -4591,7 +4493,8 @@ body {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(201, 120, 132, 0.5);
 }
-
+
+
 
 /* ================================
    TOAST NOTIFICATIONS & UX ELEMENTS
@@ -4965,4 +4868,5 @@ body {
     font-size: 0.8rem;
     color: var(--text-secondary);
     margin: 0;
-}
+}
+
