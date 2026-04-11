@@ -4257,13 +4257,19 @@ body {
     /* --- 8. BOTTOM NAVIGATION --- */
     .mobile-bottom-nav {
         display: flex;
-        padding: 6px 0 22px; /* safe area */
-        gap: 0;
+        position: fixed;
+        bottom: 12px;
+        left: 12px;
+        right: 12px;
+        width: auto;
+        padding: 8px 0 12px;
         justify-content: space-around;
         background: rgba(255, 255, 255, 0.98);
         backdrop-filter: blur(20px);
-        box-shadow: 0 -2px 16px rgba(0, 0, 0, 0.06);
-        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 24px; /* Tepa navbardagi kabi yumshoq burchaklar */
+        z-index: 2000;
     }
 
     /* Instagram buttonni bottom nav dan ham olib tashlash */
