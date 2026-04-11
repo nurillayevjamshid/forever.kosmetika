@@ -325,7 +325,7 @@ body {
    ================================ */
 .hero {
     min-height: 100vh;
-    background: linear-gradient(135deg, #FDF9F6 0%, #F8F0EA 50%, #F5EFEB 100%);
+    background: var(--hero-bg);
     padding-top: 140px;
     padding-bottom: 100px;
     display: flex;
@@ -1027,7 +1027,19 @@ body {
    ================================ */
 .products-section {
     padding: var(--spacing-xl) 0;
-    background: var(--bg-primary);
+    background: var(--hero-bg);
+    position: relative;
+    overflow: hidden;
+}
+
+.products-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: 
+        radial-gradient(ellipse 50% 40% at 90% 20%, rgba(108, 59, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse 40% 30% at 10% 80%, rgba(201, 169, 110, 0.05) 0%, transparent 50%);
+    pointer-events: none;
 }
 
 .section-header {
@@ -1359,7 +1371,19 @@ body {
    ================================ */
 .about-section {
     padding: var(--spacing-xl) 0;
-    background: var(--bg-beige);
+    background: var(--hero-bg);
+    position: relative;
+    overflow: hidden;
+}
+
+.about-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: 
+        radial-gradient(ellipse 50% 40% at 10% 30%, rgba(108, 59, 255, 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse 40% 30% at 85% 70%, rgba(201, 169, 110, 0.04) 0%, transparent 50%);
+    pointer-events: none;
 }
 
 .about-content {
@@ -1432,6 +1456,18 @@ body {
    ================================ */
 .contact-section {
     padding: var(--spacing-xl) 0;
+    background: var(--hero-bg);
+    position: relative;
+    overflow: hidden;
+}
+
+.contact-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: 
+        radial-gradient(ellipse 60% 50% at 50% 50%, rgba(108, 59, 255, 0.05) 0%, transparent 70%);
+    pointer-events: none;
 }
 
 .contact-content {
