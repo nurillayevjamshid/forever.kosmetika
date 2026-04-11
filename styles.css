@@ -475,6 +475,28 @@ body {
     max-width: 450px;
 }
 
+/* Hero Actions Wrapper */
+.hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-top: 8px;
+}
+
+.hero-actions .btn {
+    height: 56px;
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Ensure secondary button in hero matches the primary's feel */
+.hero-actions .btn-secondary {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
 /* ========================================
    HIGH-CONVERSION CTA BUTTON SYSTEM
    ======================================== */
