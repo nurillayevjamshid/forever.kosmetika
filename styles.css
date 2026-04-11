@@ -467,7 +467,7 @@ body {
     align-self: flex-end;
     margin-top: -5px;
     padding-right: 5%;
-    transform: translateX(30px);
+    transform: translateX(50px);
 }
 
 .accent-text {
