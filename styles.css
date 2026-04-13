@@ -4928,16 +4928,86 @@ body {
 
     /* --- HERO SECTION --- */
     .hero {
-        padding-top: 110px !important; /* Increased for better logo spacing */
+        padding-top: 110px !important;
         padding-bottom: 60px !important;
         background: var(--bg-primary) !important;
+        position: relative !important;
+        overflow: hidden !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-height: 500px !important;
+    }
+    
+    .hero-decoration, .hero-decoration-2 {
+        display: none !important;
+    }
+    
+    .hero-container {
+        position: relative !important;
+        z-index: 10 !important; /* High enough to be above the slider */
+        width: 100% !important;
+        padding: 0 20px !important;
+    }
+
+    /* BACKGROUND CAROUSEL - MOBILE ONLY */
+    .hero-visual {
+        display: block !important;
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        z-index: 1 !important;
+        opacity: 0.55 !important; /* 50-60% opacity as requested */
+        pointer-events: none !important;
+        margin: 0 !important;
+        max-width: none !important;
+    }
+
+    .hero-image-wrapper {
+        width: 100% !important;
+        height: 100% !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        background: transparent !important;
+    }
+
+    .hero-img {
+        object-fit: cover !important;
+        width: 100% !important;
+        height: 100% !important;
+        filter: brightness(0.95);
+    }
+
+    .hero-visual .floating-card {
+        display: none !important; /* Hide floating cards to keep bg clean */
     }
     
     .hero-title {
-        font-size: 2.2rem !important;
-        line-height: 1.2 !important;
+        font-size: 2.3rem !important;
+        line-height: 1.1 !important;
         text-align: center !important;
         margin-bottom: 20px !important;
+        color: #3D2B1F !important;
+        text-shadow: 0 0 20px rgba(255, 255, 255, 0.9), 0 0 10px rgba(255, 255, 255, 0.5) !important;
+    }
+
+    .hero-subtitle {
+        text-align: center !important;
+        margin: 0 auto 30px !important;
+        max-width: 90% !important;
+        font-weight: 500 !important;
+    }
+
+    .hero-actions {
+        justify-content: center !important;
+        width: 100% !important;
+    }
+
+    .hero-trust {
+        justify-content: center !important;
+        margin-top: 30px !important;
     }
     
     .title-part-1 { font-size: 0.85em !important; }
