@@ -4947,22 +4947,22 @@ body {
         padding: 0 20px !important;
     }
 
-    /* BACKGROUND CAROUSEL - Restricted to top area with fade */
+    /* BACKGROUND CAROUSEL - Restricted to top area with double fade */
     .hero-visual {
         display: block !important;
         position: absolute !important;
         top: 0 !important;
         left: 0 !important;
         width: 100% !important;
-        height: 480px !important; /* Fixed height for the text area */
+        height: 500px !important;
         z-index: 1 !important;
-        opacity: 0.45 !important; /* Slightly lower opacity */
+        opacity: 0.5 !important;
         pointer-events: none !important;
         margin: 0 !important;
         max-width: none !important;
-        /* Graceful fade out at bottom */
-        -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%) !important;
-        mask-image: linear-gradient(to bottom, black 60%, transparent 100%) !important;
+        /* Double fade out: top and bottom */
+        -webkit-mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent 100%) !important;
+        mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent 100%) !important;
     }
 
     .hero-image-wrapper {
@@ -4977,11 +4977,18 @@ body {
         object-fit: cover !important;
         width: 100% !important;
         height: 100% !important;
-        filter: brightness(0.6) contrast(1.1) !important; /* Darkened for readability */
+        filter: brightness(0.5) contrast(1.1) !important;
     }
 
     .hero-visual .floating-card {
         display: none !important;
+    }
+
+    .hero-badge {
+        background: rgba(201, 120, 132, 0.3) !important;
+        backdrop-filter: blur(10px) !important;
+        color: white !important;
+        border: 1px solid rgba(255, 255, 255, 0.4) !important;
     }
     
     .hero-title {
@@ -4989,18 +4996,21 @@ body {
         line-height: 1.1 !important;
         text-align: center !important;
         margin-bottom: 20px !important;
-        color: #3D2B1F !important;
-        /* Improved readability shadows */
-        text-shadow: 0 0 15px rgba(255, 255, 255, 1), 0 0 10px rgba(255, 255, 255, 0.8) !important;
+        color: #FFFFFF !important; /* White text for mobile */
+        text-shadow: 0 4px 15px rgba(0, 0, 0, 0.6) !important; /* Dark shadow for contrast */
     }
 
     .hero-subtitle {
         text-align: center !important;
         margin: 0 auto 30px !important;
         max-width: 90% !important;
-        font-weight: 600 !important;
-        color: #2D1B0F !important;
-        text-shadow: 0 0 10px rgba(255, 255, 255, 0.8) !important;
+        font-weight: 500 !important;
+        color: #FFFFFF !important; /* White text for mobile */
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5) !important;
+    }
+    
+    .accent-text, .title-part-1, .title-part-2 {
+        color: #FFFFFF !important;
     }
 
     .hero-actions {
@@ -5013,6 +5023,12 @@ body {
     .hero-trust {
         justify-content: center !important;
         margin-top: 25px !important;
+        color: #FFFFFF !important;
+    }
+
+    .trust-item {
+        color: #FFFFFF !important;
+        text-shadow: 0 1px 5px rgba(0,0,0,0.5) !important;
     }
     
     .title-part-1 { font-size: 0.85em !important; }
