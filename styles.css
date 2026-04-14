@@ -128,15 +128,15 @@
     --divider: linear-gradient(90deg, transparent, #E5E5E5, transparent);
     
     /* Hero Section */
-    --hero-bg: linear-gradient(180deg, #F5EDE6 0%, #EFE3D8 100%);
+    --hero-bg: #FFFFFF;
     --hero-accent: rgba(201, 169, 110, 0.1);
-    --hero-glow: radial-gradient(circle at 30% 50%, rgba(201, 169, 110, 0.15) 0%, transparent 50%);
+    --hero-glow: transparent;
     
     /* Footer */
-    --footer-bg: #1A1A1A;
-    --footer-text: #FFFFFF;
-    --footer-muted: #A3A3A3;
-    --footer-link: #D4D4D4;
+    --footer-bg: #FFFFFF;
+    --footer-text: #1A1A1A;
+    --footer-muted: #737373;
+    --footer-link: #4A4A4A;
     --footer-link-hover: #9B7BFF;
     
     /* Status Colors */
@@ -1420,9 +1420,7 @@ body {
     content: '';
     position: absolute;
     inset: 0;
-    background: 
-        radial-gradient(ellipse 50% 40% at 10% 30%, rgba(201, 169, 110, 0.06) 0%, transparent 50%),
-        radial-gradient(ellipse 40% 30% at 85% 70%, rgba(201, 169, 110, 0.04) 0%, transparent 50%);
+    background: transparent;
     pointer-events: none;
 }
 
@@ -1505,8 +1503,7 @@ body {
     content: '';
     position: absolute;
     inset: 0;
-    background: 
-        radial-gradient(ellipse 60% 50% at 50% 50%, rgba(201, 169, 110, 0.05) 0%, transparent 70%);
+    background: transparent;
     pointer-events: none;
 }
 
@@ -1696,12 +1693,12 @@ body {
 .social-icon {
     width: 44px;
     height: 44px;
-    background: rgba(255, 255, 255, 0.1);
+    background: #f5f5f5;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: #1A1A1A;
     transition: var(--transition-base);
     border: 1px solid transparent;
 }
@@ -1716,7 +1713,7 @@ body {
 .footer-bottom {
     text-align: center;
     padding-top: 40px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid #eeeeee;
     color: var(--footer-muted);
     font-size: 0.9rem;
 }

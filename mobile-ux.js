@@ -130,7 +130,7 @@ function setupMobileNavigation() {
             justify-content: space-between;
             padding: 16px 20px;
             border-bottom: 1px solid rgba(108, 59, 255, 0.1);
-            background: rgba(248, 244, 240, 0.5);
+            background: #ffffff;
         }
         
         .mobile-menu-logo .logo-text {
@@ -190,7 +190,7 @@ function setupMobileNavigation() {
         .mobile-menu-footer {
             padding: 20px;
             border-top: 1px solid rgba(108, 59, 255, 0.1);
-            background: rgba(248, 244, 240, 0.3);
+            background: #ffffff;
         }
         
         .mobile-menu-actions {
