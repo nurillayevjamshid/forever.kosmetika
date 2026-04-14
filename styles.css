@@ -393,7 +393,7 @@ body {
     padding: 0 60px;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 100px;
+    gap: 60px;
     align-items: center;
     width: 100%;
     position: relative;
@@ -406,6 +406,7 @@ body {
     flex-direction: column;
     gap: 32px;
     animation: fadeInUp 1s ease-out;
+    max-width: 600px;
 }
 
 @keyframes fadeInUp {
@@ -789,6 +790,8 @@ body {
     justify-content: center;
     align-items: center;
     animation: fadeInUp 1s ease-out 0.2s both;
+    max-width: 600px;
+    width: 100%;
 }
 
 /* Main Image Container */
