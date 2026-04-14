@@ -35,14 +35,14 @@
     
     /* --- BACKGROUND PALETTE --- */
     /* Clean, premium backgrounds (Nude Theme) */
-    --bg-white: #FFF9F5;
-    --bg-cream: #FFF5EF;
-    --bg-beige: #FDF0E8;
-    --bg-warm: #FFFAF7;
+    --bg-white: #FFFFFF;
+    --bg-cream: #FFFFFF;
+    --bg-beige: #FFFFFF;
+    --bg-warm: #FFFFFF;
     --bg-elevated: #FFFFFF;
-    --bg-primary: #FFF9F5;
-    --bg-secondary: #FFF0EA;
-    --bg-card: #F9EFEC;
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #FFFFFF;
+    --bg-card: #FFFFFF;
     
     /* --- TEXT COLORS --- */
     /* High contrast for readability */
@@ -4930,7 +4930,7 @@ body {
     .hero {
         padding-top: 100px !important;
         padding-bottom: 40px !important;
-        background: var(--bg-primary) !important; /* Back to Nude/Beige base */
+        background: var(--bg-primary) !important; /* Pure White background */
         position: relative !important;
         overflow: hidden !important;
         min-height: auto !important;
