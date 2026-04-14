@@ -902,7 +902,7 @@ body {
     }
 
     .hero-content {
-        order: 1;
+        order: 0;
         align-items: center;
     }
 
@@ -915,7 +915,7 @@ body {
     }
 
     .hero-visual {
-        order: 0;
+        order: 1;
         max-width: 400px;
         margin: 0 auto;
     }
