@@ -1161,6 +1161,13 @@ body {
     gap: 24px;
 }
 
+/* Desktop layout - 2 columns for larger screens */
+@media (min-width: 1024px) {
+    .products-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 .product-card {
     background: var(--card-bg);
     border-radius: 16px;
@@ -1185,6 +1192,13 @@ body {
     overflow: hidden;
     background: var(--hero-bg);
     flex-shrink: 0;
+}
+
+/* Desktop image sizing - ensure proper display */
+@media (min-width: 1024px) {
+    .product-image {
+        min-height: 300px;
+    }
 }
 
 .product-image img {
