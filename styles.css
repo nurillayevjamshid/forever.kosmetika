@@ -327,7 +327,7 @@ body {
    ================================ */
 .hero {
     min-height: 100vh;
-    background: var(--hero-bg);
+    background: #FFFFFF;
     padding-top: 140px;
     padding-bottom: 100px;
     display: flex;
@@ -336,50 +336,15 @@ body {
     overflow: hidden;
 }
 
-/* Soft gradient overlay */
+/* Soft gradient overlay - disabled for white desktop bg */
 .hero::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: 
-        radial-gradient(ellipse 80% 50% at 20% 40%, rgba(201, 169, 110, 0.12) 0%, transparent 50%),
-        radial-gradient(ellipse 60% 40% at 80% 60%, rgba(61, 43, 31, 0.06) 0%, transparent 50%);
-    pointer-events: none;
+    display: none;
 }
 
-/* Decorative elements */
-.hero-decoration {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    pointer-events: none;
-    overflow: hidden;
-}
-
-.hero-decoration::before {
-    content: '';
-    position: absolute;
-    width: 500px;
-    height: 500px;
-    border: 1px solid rgba(201, 169, 110, 0.15);
-    border-radius: 50%;
-    top: -100px;
-    right: -100px;
-    animation: rotate 30s linear infinite;
-}
-
-.hero-decoration::after {
-    content: '';
-    position: absolute;
-    width: 300px;
-    height: 300px;
-    border: 1px solid rgba(212, 175, 55, 0.2);
-    border-radius: 50%;
-    bottom: -50px;
-    left: -50px;
-    animation: rotate 25s linear infinite reverse;
+/* Decorative elements - disabled for white desktop bg */
+.hero-decoration,
+.hero-decoration-2 {
+    display: none;
 }
 
 @keyframes rotate {
@@ -808,15 +773,9 @@ body {
         0 10px 20px rgba(61, 43, 31, 0.1);
 }
 
-/* Decorative frame behind image */
+/* Decorative frame behind image - disabled for white bg */
 .hero-image-wrapper::before {
-    content: '';
-    position: absolute;
-    inset: -20px;
-    background: linear-gradient(135deg, rgba(201, 169, 110, 0.1) 0%, rgba(212, 175, 55, 0.1) 100%);
-    border-radius: 30px;
-    z-index: -1;
-    transform: rotate(-3deg);
+    display: none;
 }
 
 .hero-img {
@@ -3897,6 +3856,18 @@ body {
         min-height: 100vh;
         padding-top: 80px;
         padding-bottom: 60px;
+        background: var(--hero-bg);
+    }
+
+    .hero::before {
+        display: block;
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: 
+            radial-gradient(ellipse 80% 50% at 20% 40%, rgba(201, 169, 110, 0.12) 0%, transparent 50%),
+            radial-gradient(ellipse 60% 40% at 80% 60%, rgba(61, 43, 31, 0.06) 0%, transparent 50%);
+        pointer-events: none;
     }
     
     .hero-container {
